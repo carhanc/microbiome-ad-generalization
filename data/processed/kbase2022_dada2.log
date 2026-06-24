@@ -1,0 +1,67 @@
+
+============================================================
+Stage A: DADA2 processing
+============================================================
+
+------------------------------------------------------------
+Stage A0: Primer trimming (cutadapt)
+------------------------------------------------------------
+  [CUTADAPT] Trimming primers for kbase2022 (78 samples, mode=paired)...
+    [ERROR] cutadapt failed for ERR8157595:
+Traceback (most recent call last):
+  File "/opt/anaconda3/envs/microbiome-ad/lib/python3.11/site-packages/cutadapt/cli.py", line 1261, in main
+    stats = runner.run(pipeline, progress, outfiles)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/microbiome-ad/lib/pytho
+    [ERROR] cutadapt failed for ERR8157596:
+Traceback (most recent call last):
+  File "/opt/anaconda3/envs/microbiome-ad/lib/python3.11/site-packages/cutadapt/cli.py", line 1261, in main
+    stats = runner.run(pipeline, progress, outfiles)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/microbiome-ad/lib/pytho
+    [ERROR] cutadapt failed for ERR8157597:
+[Errno 28] No space left on device: '/Users/arhan/Desktop/microbiome-ad-generalization/data/raw/kbase2022/fastq_trimmed/ERR8157597_1.fastq.gz'
+
+    [ERROR] cutadapt failed for ERR8157598:
+[Errno 28] No space left on device: '/Users/arhan/Desktop/microbiome-ad-generalization/data/raw/kbase2022/fastq_trimmed/ERR8157598_1.fastq.gz'
+
+    [ERROR] cutadapt failed for ERR8157599:
+Traceback (most recent call last):
+  File "/opt/anaconda3/envs/microbiome-ad/lib/python3.11/site-packages/cutadapt/cli.py", line 1261, in main
+    stats = runner.run(pipeline, progress, outfiles)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/envs/microbiome-ad/lib/pytho
+    [ERROR] cutadapt failed for ERR8157600:
+[Errno 28] No space left on device: '/Users/arhan/Desktop/microbiome-ad-generalization/data/raw/kbase2022/fastq_trimmed/ERR8157600_1.fastq.gz'
+
+    [ERROR] cutadapt failed for ERR8157601:
+[Errno 28] No space left on device: '/Users/arhan/Desktop/microbiome-ad-generalization/data/raw/kbase2022/fastq_trimmed/ERR8157601_1.fastq.gz'
+
+    [ERROR] cutadapt failed for ERR8157602:
+[Errno 28] No space left on device: '/Users/arhan/Desktop/microbiome-ad-generalization/data/raw/kbase2022/fastq_trimmed/ERR8157602_1.fastq.gz'
+
+    [ERROR] cutadapt failed for ERR8157603:
+[Errno 28] No space left on device: '/Users/arhan/Desktop/microbiome-ad-generalization/data/raw/kbase2022/fastq_trimmed/ERR8157603_1.fastq.gz'
+
+    [ERROR] cutadapt failed for ERR8157604:
+[Errno 28] No space left on device: '/Users/arhan/Desktop/microbiome-ad-generalization/data/raw/kbase2022/fastq_trimmed/ERR8157604_1.fastq.gz'
+
+  [CUTADAPT] kbase2022: 68 samples trimmed, 10 failed.
+  [WARN] 10 samples failed primer trimming. Check that primer sequences match those used in library prep.
+
+  [DADA2] Starting kbase2022 (paired, trunc=250/200)
+  [CMD] Rscript /Users/arhan/Desktop/microbiome-ad-generalization/scripts/utils/dada2_pipeline.R --cohort kbase2022 --fastq_dir /Users/arhan/Desktop/microbiome-ad-generalization/data/raw/kbase2022/fastq_trimmed --out_dir /Users/arhan/Desktop/microbiome-ad-generalization/data/processed/dada2/kbase2022 --mode paired --trunc_fwd 250 --trunc_rev 200 --silva_path data/silva/silva_nr99_v138.1_train_set.fa.gz --threads 8 --inspect_only FALSE
+
+  [ERROR] dada2_pipeline.R failed for kbase2022 (exit code 2)
+
+[WARNING] DADA2 failed for: ['kbase2022']
+Fix the errors above and re-run. Already-completed cohorts will be skipped.
+
+[DONE] Stage A complete.
+
+Fatal error: cannot create 'R_TempDir'
+
+NoSpaceLeftError: No space left on devices.
+--- Logging error ---
+Exception ignored in: <_io.TextIOWrapper name='<stdout>' mode='w' encoding='utf-8'>
+Exception ignored in sys.unraisablehook: <built-in function unraisablehook>

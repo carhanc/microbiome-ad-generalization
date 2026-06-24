@@ -1,0 +1,192 @@
+Warning messages:
+1: package ‘dada2’ was built under R version 4.5.2 
+2: package ‘Rcpp’ was built under R version 4.5.2 
+3: package ‘optparse’ was built under R version 4.5.2 
+Warning messages:
+1: In scale_y_log10() : log-10 transformation introduced infinite values.
+2: Removed 82 rows containing missing values or values outside the scale range
+(`geom_line()`). 
+3: Removed 82 rows containing missing values or values outside the scale range
+(`geom_line()`). 
+Error: vector memory limit of 18.0 Gb reached, see mem.maxVSize()
+Execution halted
+Warning messages:
+1: package ‘dada2’ was built under R version 4.5.2 
+2: package ‘Rcpp’ was built under R version 4.5.2 
+3: package ‘optparse’ was built under R version 4.5.2 
+Creating output directory: /Users/arhan/Desktop/microbiome-ad-generalization/data/processed/dada2/kbase2022/filtered
+Error in filterAndTrim(fwd = fwd_files, filt = filt_fwd, rev = rev_files,  : 
+  These are the errors (up to 5) encountered in individual cores...
+Error in (function (fn, fout, maxN = c(0, 0), truncQ = c(2, 2), truncLen = c(0,  : 
+  Mismatched forward and reverse sequence files: 23693, 9787.
+Error in (function (fn, fout, maxN = c(0, 0), truncQ = c(2, 2), truncLen = c(0,  : 
+  Mismatched forward and reverse sequence files: 23693, 9787.
+Error in (function (fn, fout, maxN = c(0, 0), truncQ = c(2, 2), truncLen = c(0,  : 
+  Mismatched forward and reverse sequence files: 23693, 9787.
+Error in (function (fn, fout, maxN = c(0, 0), truncQ = c(2, 2), truncLen = c(0,  : 
+  Mismatched forward and reverse sequence files: 23693, 9787.
+Error in (function (fn, fout, maxN = c(0, 0), truncQ = c(2, 2), truncLen = c(0,  : 
+  Mismatched forward and reverse sequence files: 23693, 9787.
+In addition: Warning message:
+In mclapply(seq_len(n), do_one, mc.preschedule = mc.preschedule,  :
+  scheduled core 5 encountered error in user code, all values of the job will be affected
+Execution halted
+
+====================================================================
+Restarting sequential run: kazakhstan2022 (trunc=250) → kbase2022
+Started: Sun Jun 21 13:55:49 PDT 2026
+====================================================================
+
+[kazakhstan2022] Starting DADA2 — Sun Jun 21 13:55:49 PDT 2026
+
+[DADA2] Cohort: kazakhstan2022 | Mode: single | Threads: 8
+[DADA2] Found 84 forward read files
+[DADA2] Generating quality profiles...
+null device 
+          1 
+[DADA2] Quality profile written: /Users/arhan/Desktop/microbiome-ad-generalization/data/processed/dada2/kazakhstan2022/quality_fwd.pdf
+[DADA2] Filtering & trimming: truncFwd=250, truncRev=0, maxEE=c(2,2)...
+[DADA2] Filtering: 7769923/9467007 reads passed (82.1%)
+[DADA2] Learning error rates (forward)...
+116168250 total bases in 464673 reads from 5 samples will be used for learning the error rates.
+null device 
+          1 
+[DADA2] Running sample inference (pool='pseudo')...
+Sample 1 - 120208 reads in 44451 unique sequences.
+Sample 2 - 91501 reads in 36774 unique sequences.
+Sample 3 - 64028 reads in 11401 unique sequences.
+Sample 4 - 85913 reads in 24154 unique sequences.
+Sample 5 - 98757 reads in 24547 unique sequences.
+Sample 6 - 106549 reads in 45258 unique sequences.
+Sample 7 - 99709 reads in 35409 unique sequences.
+Sample 8 - 80300 reads in 28150 unique sequences.
+Sample 9 - 89457 reads in 23692 unique sequences.
+Sample 10 - 96998 reads in 28875 unique sequences.
+Sample 11 - 97924 reads in 29871 unique sequences.
+Sample 12 - 103945 reads in 30619 unique sequences.
+Sample 13 - 64527 reads in 18231 unique sequences.
+Sample 14 - 113539 reads in 31795 unique sequences.
+Sample 15 - 78838 reads in 21230 unique sequences.
+Sample 16 - 68511 reads in 20542 unique sequences.
+Sample 17 - 101304 reads in 38060 unique sequences.
+Sample 18 - 96484 reads in 23178 unique sequences.
+Sample 19 - 82275 reads in 16265 unique sequences.
+Sample 20 - 81408 reads in 23339 unique sequences.
+Sample 21 - 91576 reads in 20221 unique sequences.
+Sample 22 - 109250 reads in 22063 unique sequences.
+Sample 23 - 59986 reads in 10164 unique sequences.
+Sample 24 - 57492 reads in 10548 unique sequences.
+Sample 25 - 97869 reads in 26958 unique sequences.
+Sample 26 - 92025 reads in 23578 unique sequences.
+Sample 27 - 104403 reads in 28593 unique sequences.
+Sample 28 - 117888 reads in 36735 unique sequences.
+Sample 29 - 100676 reads in 30290 unique sequences.
+Sample 30 - 97708 reads in 23554 unique sequences.
+Sample 31 - 91554 reads in 30835 unique sequences.
+Sample 32 - 99959 reads in 28850 unique sequences.
+Sample 33 - 96690 reads in 30131 unique sequences.
+Sample 34 - 82477 reads in 22275 unique sequences.
+Sample 35 - 98419 reads in 29330 unique sequences.
+Sample 36 - 96847 reads in 27966 unique sequences.
+Sample 37 - 87544 reads in 23271 unique sequences.
+Sample 38 - 108718 reads in 35323 unique sequences.
+Sample 39 - 86727 reads in 31144 unique sequences.
+Sample 40 - 97864 reads in 22683 unique sequences.
+Sample 41 - 100809 reads in 28918 unique sequences.
+Sample 42 - 106107 reads in 35228 unique sequences.
+Sample 43 - 90714 reads in 21051 unique sequences.
+Sample 44 - 115009 reads in 28045 unique sequences.
+Sample 45 - 88142 reads in 22795 unique sequences.
+Sample 46 - 93959 reads in 30371 unique sequences.
+Sample 47 - 97344 reads in 29852 unique sequences.
+Sample 48 - 98528 reads in 33397 unique sequences.
+Sample 49 - 119350 reads in 30929 unique sequences.
+Sample 50 - 91575 reads in 35750 unique sequences.
+Sample 51 - 118120 reads in 33281 unique sequences.
+Sample 52 - 97381 reads in 24359 unique sequences.
+Sample 53 - 115941 reads in 34771 unique sequences.
+Sample 54 - 84842 reads in 27300 unique sequences.
+Sample 55 - 100880 reads in 33502 unique sequences.
+Sample 56 - 103289 reads in 30783 unique sequences.
+Sample 57 - 94592 reads in 31327 unique sequences.
+Sample 58 - 93696 reads in 26718 unique sequences.
+Sample 59 - 79458 reads in 27867 unique sequences.
+Sample 60 - 106662 reads in 31191 unique sequences.
+Sample 61 - 87103 reads in 25882 unique sequences.
+Sample 62 - 98729 reads in 24492 unique sequences.
+Sample 63 - 63985 reads in 18791 unique sequences.
+Sample 64 - 113589 reads in 34462 unique sequences.
+Sample 65 - 69968 reads in 17697 unique sequences.
+Sample 66 - 103990 reads in 34149 unique sequences.
+Sample 67 - 64192 reads in 5887 unique sequences.
+Sample 68 - 83308 reads in 24396 unique sequences.
+Sample 69 - 83506 reads in 24726 unique sequences.
+Sample 70 - 69435 reads in 11206 unique sequences.
+Sample 71 - 61155 reads in 10721 unique sequences.
+Sample 72 - 104889 reads in 31023 unique sequences.
+Sample 73 - 80679 reads in 10997 unique sequences.
+Sample 74 - 73856 reads in 11478 unique sequences.
+Sample 75 - 71919 reads in 13210 unique sequences.
+Sample 76 - 74629 reads in 13965 unique sequences.
+Sample 77 - 118014 reads in 29368 unique sequences.
+Sample 78 - 82357 reads in 23958 unique sequences.
+Sample 79 - 88033 reads in 29323 unique sequences.
+Sample 80 - 96618 reads in 27075 unique sequences.
+Sample 81 - 92483 reads in 34275 unique sequences.
+Sample 82 - 106646 reads in 23382 unique sequences.
+Sample 83 - 84825 reads in 26447 unique sequences.
+Sample 84 - 101770 reads in 37949 unique sequences.
+
+   selfConsist step 2[DADA2] Building sequence table...
+[DADA2] Amplicon length distribution: min=250, median=250, max=250
+[DADA2] Removing chimeras...
+[DADA2] After chimera removal: 88.1% of reads retained.
+[DADA2] Processing stats written: /Users/arhan/Desktop/microbiome-ad-generalization/data/processed/dada2/kazakhstan2022/processing_stats.csv
+[DADA2] Assigning taxonomy with SILVA 138.1 (/Users/arhan/Desktop/microbiome-ad-generalization/data/silva/silva_nr99_v138.1_train_set.fa.gz)...
+
+============================================================
+Stage A: DADA2 processing
+============================================================
+
+  [DADA2] Starting kazakhstan2022 (single, trunc=250)
+  [CMD] Rscript /Users/arhan/Desktop/microbiome-ad-generalization/scripts/utils/dada2_pipeline.R --cohort kazakhstan2022 --fastq_dir /Users/arhan/Desktop/microbiome-ad-generalization/data/raw/kazakhstan2022/fastq --out_dir /Users/arhan/Desktop/microbiome-ad-generalization/data/processed/dada2/kazakhstan2022 --mode single --trunc_fwd 250 --trunc_rev 0 --silva_path /Users/arhan/Desktop/microbiome-ad-generalization/data/silva/silva_nr99_v138.1_train_set.fa.gz --threads 8 --inspect_only FALSE
+
+  [ERROR] dada2_pipeline.R failed for kazakhstan2022 (exit code 1)
+
+[WARNING] DADA2 failed for: ['kazakhstan2022']
+Fix the errors above and re-run. Already-completed cohorts will be skipped.
+
+[DONE] Stage A complete.
+[kazakhstan2022] DONE — Sun Jun 21 16:49:35 PDT 2026
+
+[kbase2022] Starting DADA2 — Sun Jun 21 16:49:35 PDT 2026
+
+[DADA2] Cohort: kbase2022 | Mode: paired | Threads: 8
+[DADA2] Found 78 forward read files
+[DADA2] Found 78 reverse read files
+[DADA2] Generating quality profiles...
+null device 
+          1 
+[DADA2] Quality profile written: /Users/arhan/Desktop/microbiome-ad-generalization/data/processed/dada2/kbase2022/quality_fwd.pdf
+[DADA2] Quality profile written: /Users/arhan/Desktop/microbiome-ad-generalization/data/processed/dada2/kbase2022/quality_rev.pdf
+[DADA2] Filtering & trimming: truncFwd=250, truncRev=200, maxEE=c(2,2)...
+
+============================================================
+Stage A: DADA2 processing
+============================================================
+
+  [DADA2] Starting kbase2022 (paired, trunc=250/200)
+  [CMD] Rscript /Users/arhan/Desktop/microbiome-ad-generalization/scripts/utils/dada2_pipeline.R --cohort kbase2022 --fastq_dir /Users/arhan/Desktop/microbiome-ad-generalization/data/raw/kbase2022/fastq_trimmed --out_dir /Users/arhan/Desktop/microbiome-ad-generalization/data/processed/dada2/kbase2022 --mode paired --trunc_fwd 250 --trunc_rev 200 --silva_path /Users/arhan/Desktop/microbiome-ad-generalization/data/silva/silva_nr99_v138.1_train_set.fa.gz --threads 8 --inspect_only FALSE
+
+  [ERROR] dada2_pipeline.R failed for kbase2022 (exit code 1)
+
+[WARNING] DADA2 failed for: ['kbase2022']
+Fix the errors above and re-run. Already-completed cohorts will be skipped.
+
+[DONE] Stage A complete.
+[kbase2022] DONE — Sun Jun 21 19:16:48 PDT 2026
+
+====================================================================
+Both cohorts complete — Sun Jun 21 19:16:48 PDT 2026
+====================================================================
+

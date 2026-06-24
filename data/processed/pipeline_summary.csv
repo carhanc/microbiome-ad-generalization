@@ -1,0 +1,6 @@
+cohort,country,mode,n_samples,reads_input,reads_nonchim,pct_retained
+zhuang2018,China,paired,86,3260213,2551870,78.3
+ling2020,China,paired,171,8556209,4100210,47.9
+shanghai2022,China,paired,180,7275079,5485811,75.4
+kbase2022,South Korea,paired,78,13514374,6117631,45.3
+kazakhstan2022,Kazakhstan,single,84,9467007,6531362,69.0

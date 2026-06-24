@@ -1,0 +1,13 @@
+data/raw/
+data/processed/*.fastq
+data/processed/*.fastq.gz
+*.fastq
+*.fastq.gz
+__pycache__/
+*.pyc
+.DS_Store
+data/silva/
+data/silva/
+data/processed/*_ORIG.csv
+manuscript/~*.docx
+.claude/

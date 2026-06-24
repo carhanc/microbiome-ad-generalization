@@ -1,0 +1,2 @@
+distance,F_stat,df_num,df_den,p_value,n_perm,interpretation
+aitchison,13.934410814639024,4,504,1e-4,9999,Dispersions differ — PERMANOVA result partially reflects heterogeneity

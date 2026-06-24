@@ -1,0 +1,17 @@
+correction,cohort,model,auc_within_corrected,ci_lo,ci_hi
+combatseq,zhuang2018,logreg,0.6647,0.5466,0.7816
+combatseq,zhuang2018,lgbm,0.6544,0.5406,0.7789
+combatseq,ling2020,logreg,0.8754,0.8251,0.9215
+combatseq,ling2020,lgbm,0.8659,0.8109,0.9183
+combatseq,shanghai2022,logreg,0.9956,0.983,1.0
+combatseq,shanghai2022,lgbm,0.9622,0.9065,1.0
+combatseq,kazakhstan2022,logreg,0.7839,0.6763,0.8741
+combatseq,kazakhstan2022,lgbm,0.7351,0.6144,0.8388
+mmuphin,zhuang2018,logreg,0.6393,0.5165,0.7572
+mmuphin,zhuang2018,lgbm,0.5765,0.4522,0.702
+mmuphin,ling2020,logreg,0.8863,0.8365,0.9308
+mmuphin,ling2020,lgbm,0.8844,0.8315,0.9327
+mmuphin,shanghai2022,logreg,0.9933,0.9774,1.0
+mmuphin,shanghai2022,lgbm,0.965,0.9144,0.9967
+mmuphin,kazakhstan2022,logreg,0.7879,0.6829,0.8847
+mmuphin,kazakhstan2022,lgbm,0.6858,0.5629,0.7952

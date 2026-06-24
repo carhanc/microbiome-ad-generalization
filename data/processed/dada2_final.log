@@ -1,0 +1,364 @@
+====================================================================
+Final sequential run: kazakhstan2022 → kbase2022
+R_MAX_VSIZE=64Gb (fixes 18GB memory ceiling)
+Started: Sun Jun 21 21:28:37 PDT 2026
+====================================================================
+
+[kazakhstan2022] Starting DADA2 — Sun Jun 21 21:28:37 PDT 2026
+
+[DADA2] Cohort: kazakhstan2022 | Mode: single | Threads: 8
+[DADA2] Found 84 forward read files
+[DADA2] Generating quality profiles...
+null device 
+          1 
+[DADA2] Quality profile written: /Users/arhan/Desktop/microbiome-ad-generalization/data/processed/dada2/kazakhstan2022/quality_fwd.pdf
+[DADA2] Filtering & trimming: truncFwd=250, truncRev=0, maxEE=c(2,2)...
+[DADA2] Filtering: 7769923/9467007 reads passed (82.1%)
+[DADA2] Learning error rates (forward)...
+111224750 total bases in 444899 reads from 5 samples will be used for learning the error rates.
+null device 
+          1 
+[DADA2] Running sample inference (pool='pseudo')...
+Sample 1 - 120208 reads in 44451 unique sequences.
+Sample 2 - 91501 reads in 36774 unique sequences.
+Sample 3 - 64028 reads in 11401 unique sequences.
+Sample 4 - 85913 reads in 24154 unique sequences.
+Sample 5 - 98757 reads in 24547 unique sequences.
+Sample 6 - 106549 reads in 45258 unique sequences.
+Sample 7 - 99709 reads in 35409 unique sequences.
+Sample 8 - 80300 reads in 28150 unique sequences.
+Sample 9 - 89457 reads in 23692 unique sequences.
+Sample 10 - 96998 reads in 28875 unique sequences.
+Sample 11 - 97924 reads in 29871 unique sequences.
+Sample 12 - 103945 reads in 30619 unique sequences.
+Sample 13 - 64527 reads in 18231 unique sequences.
+Sample 14 - 113539 reads in 31795 unique sequences.
+Sample 15 - 78838 reads in 21230 unique sequences.
+Sample 16 - 68511 reads in 20542 unique sequences.
+Sample 17 - 101304 reads in 38060 unique sequences.
+Sample 18 - 96484 reads in 23178 unique sequences.
+Sample 19 - 82275 reads in 16265 unique sequences.
+Sample 20 - 81408 reads in 23339 unique sequences.
+Sample 21 - 91576 reads in 20221 unique sequences.
+Sample 22 - 109250 reads in 22063 unique sequences.
+Sample 23 - 59986 reads in 10164 unique sequences.
+Sample 24 - 57492 reads in 10548 unique sequences.
+Sample 25 - 97869 reads in 26958 unique sequences.
+Sample 26 - 92025 reads in 23578 unique sequences.
+Sample 27 - 104403 reads in 28593 unique sequences.
+Sample 28 - 117888 reads in 36735 unique sequences.
+Sample 29 - 100676 reads in 30290 unique sequences.
+Sample 30 - 97708 reads in 23554 unique sequences.
+Sample 31 - 91554 reads in 30835 unique sequences.
+Sample 32 - 99959 reads in 28850 unique sequences.
+Sample 33 - 96690 reads in 30131 unique sequences.
+Sample 34 - 82477 reads in 22275 unique sequences.
+Sample 35 - 98419 reads in 29330 unique sequences.
+Sample 36 - 96847 reads in 27966 unique sequences.
+Sample 37 - 87544 reads in 23271 unique sequences.
+Sample 38 - 108718 reads in 35323 unique sequences.
+Sample 39 - 86727 reads in 31144 unique sequences.
+Sample 40 - 97864 reads in 22683 unique sequences.
+Sample 41 - 100809 reads in 28918 unique sequences.
+Sample 42 - 106107 reads in 35228 unique sequences.
+Sample 43 - 90714 reads in 21051 unique sequences.
+Sample 44 - 115009 reads in 28045 unique sequences.
+Sample 45 - 88142 reads in 22795 unique sequences.
+Sample 46 - 93959 reads in 30371 unique sequences.
+Sample 47 - 97344 reads in 29852 unique sequences.
+Sample 48 - 98528 reads in 33397 unique sequences.
+Sample 49 - 119350 reads in 30929 unique sequences.
+Sample 50 - 91575 reads in 35750 unique sequences.
+Sample 51 - 118120 reads in 33281 unique sequences.
+Sample 52 - 97381 reads in 24359 unique sequences.
+Sample 53 - 115941 reads in 34771 unique sequences.
+Sample 54 - 84842 reads in 27300 unique sequences.
+Sample 55 - 100880 reads in 33502 unique sequences.
+Sample 56 - 103289 reads in 30783 unique sequences.
+Sample 57 - 94592 reads in 31327 unique sequences.
+Sample 58 - 93696 reads in 26718 unique sequences.
+Sample 59 - 79458 reads in 27867 unique sequences.
+Sample 60 - 106662 reads in 31191 unique sequences.
+Sample 61 - 87103 reads in 25882 unique sequences.
+Sample 62 - 98729 reads in 24492 unique sequences.
+Sample 63 - 63985 reads in 18791 unique sequences.
+Sample 64 - 113589 reads in 34462 unique sequences.
+Sample 65 - 69968 reads in 17697 unique sequences.
+Sample 66 - 103990 reads in 34149 unique sequences.
+Sample 67 - 64192 reads in 5887 unique sequences.
+Sample 68 - 83308 reads in 24396 unique sequences.
+Sample 69 - 83506 reads in 24726 unique sequences.
+Sample 70 - 69435 reads in 11206 unique sequences.
+Sample 71 - 61155 reads in 10721 unique sequences.
+Sample 72 - 104889 reads in 31023 unique sequences.
+Sample 73 - 80679 reads in 10997 unique sequences.
+Sample 74 - 73856 reads in 11478 unique sequences.
+Sample 75 - 71919 reads in 13210 unique sequences.
+Sample 76 - 74629 reads in 13965 unique sequences.
+Sample 77 - 118014 reads in 29368 unique sequences.
+Sample 78 - 82357 reads in 23958 unique sequences.
+Sample 79 - 88033 reads in 29323 unique sequences.
+Sample 80 - 96618 reads in 27075 unique sequences.
+Sample 81 - 92483 reads in 34275 unique sequences.
+Sample 82 - 106646 reads in 23382 unique sequences.
+Sample 83 - 84825 reads in 26447 unique sequences.
+Sample 84 - 101770 reads in 37949 unique sequences.
+
+   selfConsist step 2[DADA2] Building sequence table...
+[DADA2] Amplicon length distribution: min=250, median=250, max=250
+[DADA2] Removing chimeras...
+[DADA2] After chimera removal: 88.1% of reads retained.
+[DADA2] Processing stats written: /Users/arhan/Desktop/microbiome-ad-generalization/data/processed/dada2/kazakhstan2022/processing_stats.csv
+[DADA2] Assigning taxonomy with SILVA 138.1 (/Users/arhan/Desktop/microbiome-ad-generalization/data/silva/silva_nr99_v138.1_train_set.fa.gz)...
+[DADA2] Species-level assignments added.
+
+[DADA2] Done: 36826 ASVs, 990 genera, 84 samples for cohort 'kazakhstan2022'.
+[DADA2] Outputs in: /Users/arhan/Desktop/microbiome-ad-generalization/data/processed/dada2/kazakhstan2022
+
+
+============================================================
+Stage A: DADA2 processing
+============================================================
+
+  [DADA2] Starting kazakhstan2022 (single, trunc=250)
+  [CMD] Rscript /Users/arhan/Desktop/microbiome-ad-generalization/scripts/utils/dada2_pipeline.R --cohort kazakhstan2022 --fastq_dir /Users/arhan/Desktop/microbiome-ad-generalization/data/raw/kazakhstan2022/fastq --out_dir /Users/arhan/Desktop/microbiome-ad-generalization/data/processed/dada2/kazakhstan2022 --mode single --trunc_fwd 250 --trunc_rev 0 --silva_path /Users/arhan/Desktop/microbiome-ad-generalization/data/silva/silva_nr99_v138.1_train_set.fa.gz --threads 8 --inspect_only FALSE
+
+
+[DONE] Stage A complete.
+[kazakhstan2022] DONE — Sun Jun 21 22:33:45 PDT 2026
+
+[kbase2022] Starting DADA2 — Sun Jun 21 22:33:45 PDT 2026
+
+[DADA2] Cohort: kbase2022 | Mode: paired | Threads: 8
+[DADA2] Found 78 forward read files
+[DADA2] Found 78 reverse read files
+[DADA2] Generating quality profiles...
+null device 
+          1 
+[DADA2] Quality profile written: /Users/arhan/Desktop/microbiome-ad-generalization/data/processed/dada2/kbase2022/quality_fwd.pdf
+[DADA2] Quality profile written: /Users/arhan/Desktop/microbiome-ad-generalization/data/processed/dada2/kbase2022/quality_rev.pdf
+[DADA2] Filtering & trimming: truncFwd=250, truncRev=200, maxEE=c(2,2)...
+[DADA2] Filtering: 10543890/13514374 reads passed (78.0%)
+[DADA2] Learning error rates (forward)...
+129165000 total bases in 516660 reads from 4 samples will be used for learning the error rates.
+[DADA2] Learning error rates (reverse)...
+111466800 total bases in 557334 reads from 4 samples will be used for learning the error rates.
+null device 
+          1 
+null device 
+          1 
+[DADA2] Running sample inference (pool='pseudo')...
+Sample 1 - 130859 reads in 40072 unique sequences.
+Sample 2 - 118693 reads in 41170 unique sequences.
+Sample 3 - 131260 reads in 36909 unique sequences.
+Sample 4 - 124935 reads in 44620 unique sequences.
+Sample 5 - 129981 reads in 35268 unique sequences.
+Sample 6 - 130994 reads in 41597 unique sequences.
+Sample 7 - 103944 reads in 27720 unique sequences.
+Sample 8 - 108263 reads in 32236 unique sequences.
+Sample 9 - 116806 reads in 27296 unique sequences.
+Sample 10 - 135538 reads in 37149 unique sequences.
+Sample 11 - 163455 reads in 45018 unique sequences.
+Sample 12 - 135085 reads in 50583 unique sequences.
+Sample 13 - 105579 reads in 31234 unique sequences.
+Sample 14 - 101825 reads in 41765 unique sequences.
+Sample 15 - 116943 reads in 34109 unique sequences.
+Sample 16 - 136757 reads in 45375 unique sequences.
+Sample 17 - 145991 reads in 47636 unique sequences.
+Sample 18 - 116742 reads in 33725 unique sequences.
+Sample 19 - 108304 reads in 30448 unique sequences.
+Sample 20 - 120232 reads in 35250 unique sequences.
+Sample 21 - 133973 reads in 42507 unique sequences.
+Sample 22 - 124097 reads in 41029 unique sequences.
+Sample 23 - 135042 reads in 40493 unique sequences.
+Sample 24 - 143689 reads in 32807 unique sequences.
+Sample 25 - 141894 reads in 39962 unique sequences.
+Sample 26 - 112593 reads in 28104 unique sequences.
+Sample 27 - 136377 reads in 32767 unique sequences.
+Sample 28 - 128659 reads in 31144 unique sequences.
+Sample 29 - 126699 reads in 35799 unique sequences.
+Sample 30 - 134019 reads in 29808 unique sequences.
+Sample 31 - 132036 reads in 32024 unique sequences.
+Sample 32 - 127958 reads in 26193 unique sequences.
+Sample 33 - 122762 reads in 36344 unique sequences.
+Sample 34 - 131788 reads in 37102 unique sequences.
+Sample 35 - 126179 reads in 37463 unique sequences.
+Sample 36 - 152057 reads in 40147 unique sequences.
+Sample 37 - 135680 reads in 44933 unique sequences.
+Sample 38 - 140456 reads in 44682 unique sequences.
+Sample 39 - 147313 reads in 53198 unique sequences.
+Sample 40 - 146293 reads in 49418 unique sequences.
+Sample 41 - 122064 reads in 39738 unique sequences.
+Sample 42 - 137363 reads in 49436 unique sequences.
+Sample 43 - 148688 reads in 45401 unique sequences.
+Sample 44 - 172733 reads in 62224 unique sequences.
+Sample 45 - 134920 reads in 47755 unique sequences.
+Sample 46 - 168655 reads in 58529 unique sequences.
+Sample 47 - 174513 reads in 52164 unique sequences.
+Sample 48 - 133848 reads in 57702 unique sequences.
+Sample 49 - 116869 reads in 39071 unique sequences.
+Sample 50 - 124054 reads in 48185 unique sequences.
+Sample 51 - 138858 reads in 34130 unique sequences.
+Sample 52 - 136496 reads in 46637 unique sequences.
+Sample 53 - 155256 reads in 55195 unique sequences.
+Sample 54 - 134887 reads in 43763 unique sequences.
+Sample 55 - 131276 reads in 33699 unique sequences.
+Sample 56 - 139189 reads in 37700 unique sequences.
+Sample 57 - 143496 reads in 40213 unique sequences.
+Sample 58 - 140978 reads in 61275 unique sequences.
+Sample 59 - 160512 reads in 52397 unique sequences.
+Sample 60 - 144728 reads in 51847 unique sequences.
+Sample 61 - 140105 reads in 54618 unique sequences.
+Sample 62 - 140914 reads in 51845 unique sequences.
+Sample 63 - 139246 reads in 50939 unique sequences.
+Sample 64 - 142164 reads in 56559 unique sequences.
+Sample 65 - 132791 reads in 44150 unique sequences.
+Sample 66 - 151440 reads in 45965 unique sequences.
+Sample 67 - 139578 reads in 50667 unique sequences.
+Sample 68 - 155923 reads in 52191 unique sequences.
+Sample 69 - 150888 reads in 56745 unique sequences.
+Sample 70 - 120725 reads in 40492 unique sequences.
+Sample 71 - 137506 reads in 32078 unique sequences.
+Sample 72 - 120300 reads in 40846 unique sequences.
+Sample 73 - 128200 reads in 40332 unique sequences.
+Sample 74 - 146472 reads in 38699 unique sequences.
+Sample 75 - 152745 reads in 39461 unique sequences.
+Sample 76 - 135103 reads in 33617 unique sequences.
+Sample 77 - 147700 reads in 39932 unique sequences.
+Sample 78 - 140957 reads in 30920 unique sequences.
+
+   selfConsist step 2Sample 1 - 130859 reads in 31148 unique sequences.
+Sample 2 - 118693 reads in 37191 unique sequences.
+Sample 3 - 131260 reads in 31225 unique sequences.
+Sample 4 - 124935 reads in 34628 unique sequences.
+Sample 5 - 129981 reads in 31891 unique sequences.
+Sample 6 - 130994 reads in 40720 unique sequences.
+Sample 7 - 103944 reads in 26990 unique sequences.
+Sample 8 - 108263 reads in 27648 unique sequences.
+Sample 9 - 116806 reads in 24616 unique sequences.
+Sample 10 - 135538 reads in 31849 unique sequences.
+Sample 11 - 163455 reads in 42906 unique sequences.
+Sample 12 - 135085 reads in 43123 unique sequences.
+Sample 13 - 105579 reads in 28929 unique sequences.
+Sample 14 - 101825 reads in 35467 unique sequences.
+Sample 15 - 116943 reads in 27703 unique sequences.
+Sample 16 - 136757 reads in 39118 unique sequences.
+Sample 17 - 145991 reads in 39951 unique sequences.
+Sample 18 - 116742 reads in 31475 unique sequences.
+Sample 19 - 108304 reads in 29140 unique sequences.
+Sample 20 - 120232 reads in 32149 unique sequences.
+Sample 21 - 133973 reads in 38168 unique sequences.
+Sample 22 - 124097 reads in 35519 unique sequences.
+Sample 23 - 135042 reads in 35696 unique sequences.
+Sample 24 - 143689 reads in 31238 unique sequences.
+Sample 25 - 141894 reads in 33252 unique sequences.
+Sample 26 - 112593 reads in 27431 unique sequences.
+Sample 27 - 136377 reads in 30101 unique sequences.
+Sample 28 - 128659 reads in 27912 unique sequences.
+Sample 29 - 126699 reads in 32630 unique sequences.
+Sample 30 - 134019 reads in 28464 unique sequences.
+Sample 31 - 132036 reads in 29321 unique sequences.
+Sample 32 - 127958 reads in 22454 unique sequences.
+Sample 33 - 122762 reads in 29054 unique sequences.
+Sample 34 - 131788 reads in 31347 unique sequences.
+Sample 35 - 126179 reads in 33312 unique sequences.
+Sample 36 - 152057 reads in 35092 unique sequences.
+Sample 37 - 135680 reads in 41628 unique sequences.
+Sample 38 - 140456 reads in 42795 unique sequences.
+Sample 39 - 147313 reads in 47511 unique sequences.
+Sample 40 - 146293 reads in 41810 unique sequences.
+Sample 41 - 122064 reads in 35680 unique sequences.
+Sample 42 - 137363 reads in 53953 unique sequences.
+Sample 43 - 148688 reads in 38201 unique sequences.
+Sample 44 - 172733 reads in 58209 unique sequences.
+Sample 45 - 134920 reads in 44194 unique sequences.
+Sample 46 - 168655 reads in 52175 unique sequences.
+Sample 47 - 174513 reads in 49857 unique sequences.
+Sample 48 - 133848 reads in 50923 unique sequences.
+Sample 49 - 116869 reads in 32046 unique sequences.
+Sample 50 - 124054 reads in 44501 unique sequences.
+Sample 51 - 138858 reads in 33256 unique sequences.
+Sample 52 - 136496 reads in 45597 unique sequences.
+Sample 53 - 155256 reads in 47889 unique sequences.
+Sample 54 - 134887 reads in 39077 unique sequences.
+Sample 55 - 131276 reads in 35237 unique sequences.
+Sample 56 - 139189 reads in 31417 unique sequences.
+Sample 57 - 143496 reads in 35325 unique sequences.
+Sample 58 - 140978 reads in 53958 unique sequences.
+Sample 59 - 160512 reads in 48136 unique sequences.
+Sample 60 - 144728 reads in 47751 unique sequences.
+Sample 61 - 140105 reads in 56662 unique sequences.
+Sample 62 - 140914 reads in 42048 unique sequences.
+Sample 63 - 139246 reads in 47463 unique sequences.
+Sample 64 - 142164 reads in 44954 unique sequences.
+Sample 65 - 132791 reads in 40587 unique sequences.
+Sample 66 - 151440 reads in 40836 unique sequences.
+Sample 67 - 139578 reads in 47360 unique sequences.
+Sample 68 - 155923 reads in 49835 unique sequences.
+Sample 69 - 150888 reads in 50565 unique sequences.
+Sample 70 - 120725 reads in 30815 unique sequences.
+Sample 71 - 137506 reads in 31735 unique sequences.
+Sample 72 - 120300 reads in 37796 unique sequences.
+Sample 73 - 128200 reads in 36287 unique sequences.
+Sample 74 - 146472 reads in 37796 unique sequences.
+Sample 75 - 152745 reads in 34771 unique sequences.
+Sample 76 - 135103 reads in 31335 unique sequences.
+Sample 77 - 147700 reads in 36604 unique sequences.
+Sample 78 - 140957 reads in 27033 unique sequences.
+
+   selfConsist step 2[DADA2] Merging paired reads...
+[DADA2] Merging complete for 78 samples.
+[DADA2] Building sequence table...
+[DADA2] Amplicon length distribution: min=250, median=424, max=432
+[DADA2] Removing chimeras...
+[DADA2] After chimera removal: 65.3% of reads retained.
+[DADA2] Processing stats written: /Users/arhan/Desktop/microbiome-ad-generalization/data/processed/dada2/kbase2022/processing_stats.csv
+[DADA2] Assigning taxonomy with SILVA 138.1 (/Users/arhan/Desktop/microbiome-ad-generalization/data/silva/silva_nr99_v138.1_train_set.fa.gz)...
+[DADA2] Species-level assignments added.
+
+[DADA2] Done: 7527 ASVs, 254 genera, 78 samples for cohort 'kbase2022'.
+[DADA2] Outputs in: /Users/arhan/Desktop/microbiome-ad-generalization/data/processed/dada2/kbase2022
+
+
+============================================================
+Stage A: DADA2 processing
+============================================================
+
+  [DADA2] Starting kbase2022 (paired, trunc=250/200)
+  [CMD] Rscript /Users/arhan/Desktop/microbiome-ad-generalization/scripts/utils/dada2_pipeline.R --cohort kbase2022 --fastq_dir /Users/arhan/Desktop/microbiome-ad-generalization/data/raw/kbase2022/fastq_trimmed --out_dir /Users/arhan/Desktop/microbiome-ad-generalization/data/processed/dada2/kbase2022 --mode paired --trunc_fwd 250 --trunc_rev 200 --silva_path /Users/arhan/Desktop/microbiome-ad-generalization/data/silva/silva_nr99_v138.1_train_set.fa.gz --threads 8 --inspect_only FALSE
+
+
+[DONE] Stage A complete.
+[kbase2022] DONE — Mon Jun 22 01:43:15 PDT 2026
+
+====================================================================
+Both cohorts complete — Mon Jun 22 01:43:15 PDT 2026
+====================================================================
+Warning messages:
+1: package ‘dada2’ was built under R version 4.5.2 
+2: package ‘Rcpp’ was built under R version 4.5.2 
+3: package ‘optparse’ was built under R version 4.5.2 
+Warning messages:
+1: In scale_y_log10() : log-10 transformation introduced infinite values.
+2: Removed 82 rows containing missing values or values outside the scale range
+(`geom_line()`). 
+3: Removed 82 rows containing missing values or values outside the scale range
+(`geom_line()`). 
+Warning messages:
+1: package ‘dada2’ was built under R version 4.5.2 
+2: package ‘Rcpp’ was built under R version 4.5.2 
+3: package ‘optparse’ was built under R version 4.5.2 
+Warning messages:
+1: Removed 82 rows containing missing values or values outside the scale range
+(`geom_line()`). 
+2: Removed 82 rows containing missing values or values outside the scale range
+(`geom_line()`). 
+Warning messages:
+1: Removed 82 rows containing missing values or values outside the scale range
+(`geom_line()`). 
+2: Removed 82 rows containing missing values or values outside the scale range
+(`geom_line()`). 
+Warning message:
+[DADA2] WARNING: Only 65.3% of reads survived chimera removal for kbase2022. Verify primer trimming was applied and that truncLen leaves sufficient overlap for mergePairs. 
+
+

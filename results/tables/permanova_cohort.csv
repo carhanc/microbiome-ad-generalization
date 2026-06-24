@@ -1,0 +1,5 @@
+model,distance,term,Df,SumOfSqs,R2,F_stat,p_value
+cohort_only,aitchison,cohort,4,67760.81337159796,0.19299139962404116,30.13216507978438,1e-4
+cohort_only,aitchison,Residual,504,283347.1296275813,0.8070085998879438,NA,NA
+cohort_only,bray_curtis,cohort,4,20.80134436675442,0.1358128782581833,19.801756159059725,1e-4
+cohort_only,bray_curtis,Residual,504,132.3604517275054,0.8641871217418159,NA,NA

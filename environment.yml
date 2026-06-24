@@ -1,0 +1,75 @@
+# Conda environment for: Cross-Cohort Generalization Failure in Gut Microbiome-Based AD/MCI Classifiers
+#
+# Create:   conda env create -f environment.yml
+# Activate: conda activate microbiome-ad
+# Update:   conda env update -f environment.yml --prune
+#
+# System dependencies (managed outside conda, must be installed separately):
+#
+#   SRA Toolkit 3.2.1+ (prefetch, fasterq-dump, vdb-config):
+#     brew install sratoolkit             # macOS -- already installed at /usr/local/bin/
+#     conda install -c bioconda sra-tools  # Linux / if Homebrew unavailable
+#
+#   NCBI EDirect (esearch, efetch -- for SRA run-table metadata fetching):
+#     sh -c "$(curl -fsSL https://ftp.ncbi.nlm.nih.gov/entrez/entrezdirect/install-edirect.sh)"
+#     # Installs to ~/edirect/; add to PATH: export PATH=$PATH:$HOME/edirect
+#     # Already installed at ~/edirect/ on this machine.
+#
+#   ENA downloads (KBASE cohort PRJEB50447):
+#     No external tool required. scripts/00_data_acquisition.py uses the ENA
+#     REST API (https://www.ebi.ac.uk/ena/portal/api/filereport) to obtain
+#     per-run FTP URLs and downloads via wget/urllib -- standard library only.
+#     enaBrowserTools is NOT on PyPI (GitHub-only scripts); we do not depend on it.
+#
+#   R 4.4+ (for scripts 05_permanova_variance_decomp.R and 06_batch_correction.R):
+#     brew install r                      # macOS -- already installed at /usr/local/bin/Rscript
+#     # R packages installed via scripts/install_r_packages.R (run once after env creation):
+#     #   vegan       -- PERMANOVA / adonis2
+#     #   sva         -- ComBat-seq batch correction
+#     #   MMUPHin     -- microbiome-specific batch correction
+#     #   phyloseq    -- microbiome data structures
+#     #   zCompositions -- multiplicative zero replacement before CLR
+
+name: microbiome-ad
+
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+
+dependencies:
+  # Python runtime
+  - python=3.11
+
+  # Core scientific stack
+  - numpy>=1.26
+  - pandas>=2.0
+  - scipy>=1.11
+
+  # Machine learning
+  - scikit-learn>=1.3
+  - xgboost>=2.0
+  - lightgbm>=4.0
+
+  # Explainability (SHAP values for per-taxon feature importance, Phase 3)
+  - shap>=0.44
+
+  # Visualization
+  - matplotlib>=3.8
+  - seaborn>=0.13
+
+  # Statistics
+  - statsmodels>=0.14
+  - pingouin>=0.5         # parametric stats and effect sizes, supplements scipy
+
+  # Microbiome / compositional data
+  # scikit-bio: Bray-Curtis and Aitchison distance matrices fed into PERMANOVA (R)
+  - scikit-bio>=0.6
+
+  # Data I/O
+  - openpyxl>=3.1         # read Excel supplementary tables from papers
+  - h5py>=3.9             # HDF5 for large intermediate matrices
+
+  # Reproducibility
+  - jupyter>=1.0          # notebooks/exploratory.ipynb
+  - ipykernel>=6.0

@@ -1,0 +1,7 @@
+metric,value,interpretation
+R2_cohort_aitchison_all5,0.193,Fraction of total Aitchison variance explained by cohort (5 cohorts)
+R2_cohort_bray_curtis_all5,0.1358,Fraction of total Bray-Curtis variance explained by cohort (5 cohorts)
+R2_cohort_aitchison_labeled4_marginal,0.1722,Cohort R2 after adjusting for diagnosis (4 labeled cohorts)
+R2_diagnosis_aitchison_labeled4_marginal,0.014,Diagnosis R2 after adjusting for cohort (4 labeled cohorts)
+betadisper_F,13.9344,Beta-dispersion F-statistic (heterogeneity of within-group spread)
+betadisper_p,1e-4,Beta-dispersion p-value
