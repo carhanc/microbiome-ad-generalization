@@ -1,0 +1,7 @@
+cohort,n_samples,auc_ovr
+kazakhstan2022,84,1.0
+kbase2022,78,0.9965
+ling2020,171,0.9931
+shanghai2022,90,0.9802
+zhuang2018,86,0.9888
+macro_average,509,0.9917

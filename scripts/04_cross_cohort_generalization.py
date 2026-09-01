@@ -457,6 +457,122 @@ def plot_loco_bar(loco_results: list, drop_df: pd.DataFrame,
     print(f"  saved {out_path}")
 
 
+SENSITIVITY_CONFIGS = {
+    "exclude_kazakhstan": ["zhuang2018", "ling2020", "shanghai2022"],
+    "exclude_zhuang2018": ["ling2020", "shanghai2022", "kazakhstan2022"],
+    "exclude_ling2020":   ["zhuang2018", "shanghai2022", "kazakhstan2022"],
+}
+
+
+def run_loco_subset(cohort_data: dict, cohort_subset: list, config_name: str) -> list[dict]:
+    results = []
+    for held_out in cohort_subset:
+        train_cohorts = [c for c in cohort_subset if c != held_out]
+        print(f"\n  [{config_name}] LOCO — hold out {held_out}, train on {train_cohorts}")
+
+        X_train = np.vstack([cohort_data[c]["X"] for c in train_cohorts])
+        y_train = np.concatenate([cohort_data[c]["y"] for c in train_cohorts])
+        X_test  = cohort_data[held_out]["X"]
+        y_test  = cohort_data[held_out]["y"]
+
+        print(f"     train: {len(y_train)} ({int(y_train.sum())} AD / "
+              f"{int((y_train == 0).sum())} CN)")
+        print(f"     test:  {len(y_test)} ({cohort_data[held_out]['n_AD']} AD / "
+              f"{cohort_data[held_out]['n_CN']} CN)")
+
+        for model_name in ["logreg", "lgbm"]:
+            print(f"     {model_name}: ", end="", flush=True)
+            model, best_params = tune_and_fit(X_train, y_train, model_name)
+            metrics = evaluate_on_test(model, X_test, y_test)
+            print(f"AUC={metrics['auc']:.4f}  "
+                  f"CI=[{metrics['ci_lo']:.4f}, {metrics['ci_hi']:.4f}]  "
+                  f"best={best_params}")
+
+            results.append({
+                "config":      config_name,
+                "test_cohort": held_out,
+                "model":       model_name,
+                "loco_auc":    metrics["auc"],
+                "ci_lower":    metrics["ci_lo"],
+                "ci_upper":    metrics["ci_hi"],
+            })
+    return results
+
+
+def run_sensitivity_analysis(cohort_data: dict) -> pd.DataFrame:
+    print("\n\nSensitivity analysis — 3-cohort LOCO excluding one cohort at a time")
+    print("(same preprocessing / 5-fold inner-CV tuning procedure as main LOCO)")
+
+    all_results = []
+    for config_name, cohort_subset in SENSITIVITY_CONFIGS.items():
+        all_results += run_loco_subset(cohort_data, cohort_subset, config_name)
+
+    df = pd.DataFrame(all_results)
+    out_path = TABLES_DIR / "sensitivity_loco.csv"
+    df.to_csv(out_path, index=False)
+    print(f"\n  wrote {out_path}")
+    return df
+
+
+def plot_sensitivity_loco(df: pd.DataFrame, out_path: Path) -> None:
+    config_labels = {
+        "exclude_kazakhstan": "Excl. Kazakhstan\n(Zhuang+Ling+Zhu)",
+        "exclude_zhuang2018": "Excl. Zhuang 2018\n(Ling+Zhu+Kazakh)",
+        "exclude_ling2020":   "Excl. Ling 2020\n(Zhuang+Zhu+Kazakh)",
+    }
+    cohort_labels = {
+        "zhuang2018":     "Zhuang",
+        "ling2020":       "Ling",
+        "shanghai2022":   "Zhu",
+        "kazakhstan2022": "Kazakhstan",
+    }
+    models   = ["logreg", "lgbm"]
+    m_labels = {"logreg": "LogReg", "lgbm": "LightGBM"}
+    colors   = {"logreg": "#4C72B0", "lgbm": "#DD8452"}
+
+    configs = list(SENSITIVITY_CONFIGS.keys())
+    fig, axes = plt.subplots(1, 3, figsize=(15, 5), sharey=True)
+
+    for ax, config_name in zip(axes, configs):
+        sub = df[df["config"] == config_name]
+        test_cohorts = SENSITIVITY_CONFIGS[config_name]
+        x = np.arange(len(test_cohorts))
+        width = 0.35
+
+        for i, model_name in enumerate(models):
+            msub  = sub[sub["model"] == model_name].set_index("test_cohort")
+            aucs  = [msub.loc[c, "loco_auc"] for c in test_cohorts]
+            ci_lo = [msub.loc[c, "loco_auc"] - msub.loc[c, "ci_lower"] for c in test_cohorts]
+            ci_hi = [msub.loc[c, "ci_upper"] - msub.loc[c, "loco_auc"] for c in test_cohorts]
+            offset = (i - 0.5) * width
+            ax.bar(x + offset, aucs, width, label=m_labels[model_name],
+                   color=colors[model_name], alpha=0.85,
+                   yerr=[ci_lo, ci_hi],
+                   error_kw={"capsize": 4, "linewidth": 1.0, "ecolor": "black"})
+
+        ax.axhline(0.5, color="grey", linewidth=0.8, linestyle="--")
+        ax.set_xticks(x)
+        ax.set_xticklabels([cohort_labels[c] for c in test_cohorts], fontsize=9)
+        ax.set_ylim(0.3, 1.05)
+        ax.set_title(config_labels[config_name], fontsize=9)
+        ax.grid(axis="y", alpha=0.3)
+        ax.spines["top"].set_visible(False)
+        ax.spines["right"].set_visible(False)
+        if ax is axes[0]:
+            ax.set_ylabel("LOCO AUC-ROC", fontsize=10)
+            ax.legend(fontsize=8, loc="upper right")
+
+    fig.suptitle(
+        "Sensitivity Analysis: 3-Cohort LOCO Excluding One Cohort at a Time\n"
+        "(error bars = 95% bootstrap CI)",
+        fontsize=11, y=1.03
+    )
+    plt.tight_layout()
+    fig.savefig(out_path, dpi=150, bbox_inches="tight")
+    plt.close(fig)
+    print(f"  saved {out_path}")
+
+
 def main():
     print("04_cross_cohort_generalization.py")
 
@@ -534,12 +650,24 @@ def main():
     else:
         print("\n  no LOCO AUC below 0.55")
 
+    sensitivity_df = run_sensitivity_analysis(cohort_data)
+    plot_sensitivity_loco(sensitivity_df, FIGURES_DIR / "supp_sensitivity_loco.png")
+
+    print("\nSensitivity analysis summary")
+    for config_name in SENSITIVITY_CONFIGS:
+        print(f"\n  {config_name}:")
+        csub = sensitivity_df[sensitivity_df["config"] == config_name]
+        print(csub[["test_cohort", "model", "loco_auc", "ci_lower", "ci_upper"]]
+              .to_string(index=False))
+
     print("\nDone.")
     print(f"  {loco_path}")
     print(f"  {pairwise_path}")
     print(f"  {drop_path}")
+    print(f"  {TABLES_DIR}/sensitivity_loco.csv")
     print(f"  {FIGURES_DIR}/pairwise_heatmap_*.png")
     print(f"  {FIGURES_DIR}/loco_auc_bar.png")
+    print(f"  {FIGURES_DIR}/supp_sensitivity_loco.png")
     print("\nNext: python scripts/05_permanova_variance_decomp.R")
 
 

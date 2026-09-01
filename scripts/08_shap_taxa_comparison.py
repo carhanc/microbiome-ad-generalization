@@ -151,31 +151,57 @@ def compute_importance(shap_vals, genus_cols, cohort, model_name, y):
     return df
 
 
-def run_within_cohort_shap(cohort_data, genus_cols):
+OUTER_FOLDS = 10  # matches 03_within_cohort_baseline.py's nested-CV outer loop
+
+
+def run_within_cohort_shap(cohort_data, genus_cols, outer_folds=OUTER_FOLDS):
+    # Out-of-fold SHAP: for each outer fold, fit on the other folds (with the
+    # same inner-CV hyperparameter search fit_best_* already does) and explain
+    # only the held-out fold. In-sample SHAP (fit and explain on all samples)
+    # can reflect overfitting, especially for small cohorts (n=60-171).
     all_rows = []
 
     for cohort in SUPERVISED_COHORTS:
         cd = cohort_data[cohort]
         X, y, groups = cd["X"], cd["y"], cd["groups"]
-        print(f"\n  {cohort}  (n={cd['n']})")
+        n_samples, n_genera = X.shape
+        print(f"\n  {cohort}  (n={cd['n']})  — {outer_folds}-fold OOF SHAP")
 
-        print(f"    logreg fitting ...", end=" ", flush=True)
-        logreg, lp = fit_best_logreg(X, y, groups)
-        sv_lr = shap_logreg(logreg, X, genus_cols)
-        imp_lr = compute_importance(sv_lr, genus_cols, cohort, "logreg", y)
+        if groups is not None:
+            outer_cv = StratifiedGroupKFold(n_splits=outer_folds)
+            split_iter = list(outer_cv.split(X, y, groups=groups))
+        else:
+            outer_cv = StratifiedKFold(n_splits=outer_folds, shuffle=True,
+                                       random_state=RANDOM_STATE)
+            split_iter = list(outer_cv.split(X, y))
+
+        oof_shap_lr = np.zeros((n_samples, n_genera))
+        oof_shap_gb = np.zeros((n_samples, n_genera))
+
+        for fold_idx, (train_idx, test_idx) in enumerate(split_iter):
+            X_tr, X_te = X[train_idx], X[test_idx]
+            y_tr, y_te = y[train_idx], y[test_idx]
+            g_tr = groups[train_idx] if groups is not None else None
+
+            logreg, lp = fit_best_logreg(X_tr, y_tr, g_tr)
+            oof_shap_lr[test_idx] = shap_logreg(logreg, X_te, genus_cols)
+
+            lgbm_m, lbp = fit_best_lgbm(X_tr, y_tr, g_tr)
+            oof_shap_gb[test_idx] = shap_lgbm(lgbm_m, X_te, genus_cols)
+
+            print(f"    fold {fold_idx+1:2d}/{outer_folds}: "
+                  f"n_test={len(test_idx)}  logreg C={lp['C']}  "
+                  f"lgbm n_est={lbp['n_estimators']}, lr={lbp['learning_rate']}")
+
+        imp_lr = compute_importance(oof_shap_lr, genus_cols, cohort, "logreg", y)
+        imp_gb = compute_importance(oof_shap_gb, genus_cols, cohort, "lgbm", y)
         all_rows.append(imp_lr)
-        print(f"done (best C={lp['C']}). "
-              f"Top taxon: {imp_lr.iloc[0]['taxon']} "
+        all_rows.append(imp_gb)
+
+        print(f"    OOF top taxon (logreg): {imp_lr.iloc[0]['taxon']} "
               f"(|SHAP|={imp_lr.iloc[0]['mean_abs_shap']:.4f}, "
               f"dir={'AD↑' if imp_lr.iloc[0]['mean_shap']>0 else 'CN↑'})")
-
-        print(f"    lgbm fitting ...", end=" ", flush=True)
-        lgbm_m, lbp = fit_best_lgbm(X, y, groups)
-        sv_gb = shap_lgbm(lgbm_m, X, genus_cols)
-        imp_gb = compute_importance(sv_gb, genus_cols, cohort, "lgbm", y)
-        all_rows.append(imp_gb)
-        print(f"done (n_est={lbp['n_estimators']}, lr={lbp['learning_rate']}). "
-              f"Top taxon: {imp_gb.iloc[0]['taxon']} "
+        print(f"    OOF top taxon (lgbm):   {imp_gb.iloc[0]['taxon']} "
               f"(|SHAP|={imp_gb.iloc[0]['mean_abs_shap']:.4f}, "
               f"dir={'AD↑' if imp_gb.iloc[0]['mean_shap']>0 else 'CN↑'})")
 
@@ -237,6 +263,63 @@ def compute_overlap(importance_df, model_name, top_n=TOP_N):
         for c2 in SUPERVISED_COHORTS:
             mat.loc[c1, c2] = jaccard(top_sets[c1], top_sets[c2])
     return mat, top_sets
+
+
+N_JACCARD_PERM = 10_000
+
+
+def jaccard_null_distribution(n_genera, top_n=TOP_N, n_perm=N_JACCARD_PERM,
+                              rng=None):
+    # Null: two independent random top-n draws from the same n_genera pool.
+    # Analytical E[J] for two random size-k sets from n items (no overlap
+    # constraint other than set size): E[|A∩B|] = k^2/n, so
+    # E[J] ≈ E[|A∩B|] / (2k - E[|A∩B|]) = k / (2n - k) for k << n.
+    if rng is None:
+        rng = np.random.default_rng(RANDOM_STATE)
+    null_j = np.empty(n_perm)
+    for i in range(n_perm):
+        set_a = set(rng.choice(n_genera, size=top_n, replace=False))
+        set_b = set(rng.choice(n_genera, size=top_n, replace=False))
+        null_j[i] = jaccard(set_a, set_b)
+    return null_j
+
+
+def compute_jaccard_null_baseline(within_imp, n_genera, top_n=TOP_N,
+                                  n_perm=N_JACCARD_PERM):
+    rng = np.random.default_rng(RANDOM_STATE)
+    rows = []
+    for model_name in ["logreg", "lgbm"]:
+        mat, _ = compute_overlap(within_imp, model_name, top_n=top_n)
+        off_diag = [mat.loc[c1, c2]
+                    for c1 in SUPERVISED_COHORTS
+                    for c2 in SUPERVISED_COHORTS if c1 != c2]
+        observed_mean = float(np.mean(off_diag))
+
+        null_j = jaccard_null_distribution(n_genera, top_n=top_n,
+                                           n_perm=n_perm, rng=rng)
+        mean_null = float(null_j.mean())
+        ci_lo = float(np.percentile(null_j, 2.5))
+        ci_hi = float(np.percentile(null_j, 97.5))
+        p_value = float((null_j >= observed_mean).mean())
+        analytical_e = top_n / (2 * n_genera - top_n)
+
+        rows.append({
+            "model":                model_name,
+            "mean_null_jaccard":    round(mean_null, 4),
+            "ci_lower_null":        round(ci_lo, 4),
+            "ci_upper_null":        round(ci_hi, 4),
+            "analytical_expected":  round(analytical_e, 4),
+            "observed_mean_jaccard": round(observed_mean, 4),
+            "p_value":              round(p_value, 5),
+        })
+        where = ("ABOVE" if observed_mean > ci_hi else
+                 "BELOW" if observed_mean < ci_lo else "WITHIN")
+        print(f"  {model_name}: observed mean Jaccard={observed_mean:.4f} | "
+              f"null mean={mean_null:.4f} [{ci_lo:.4f}, {ci_hi:.4f}] "
+              f"(analytical E[J]={analytical_e:.4f}) | "
+              f"observed is {where} the null 95% CI | p={p_value:.5f}")
+
+    return pd.DataFrame(rows)
 
 
 def directional_analysis(importance_df, model_name, top_n=TOP_N,
@@ -532,6 +615,12 @@ def main():
     overlap_df.to_csv(TABLES_DIR / "shap_taxa_overlap.csv", index=False)
     print(f"\n  Wrote: {TABLES_DIR}/shap_taxa_overlap.csv")
 
+    print(f"\nJaccard null permutation baseline (top-{TOP_N}, {N_JACCARD_PERM:,} draws)")
+    null_df = compute_jaccard_null_baseline(within_imp, len(genus_cols), top_n=TOP_N,
+                                            n_perm=N_JACCARD_PERM)
+    null_df.to_csv(TABLES_DIR / "jaccard_null.csv", index=False)
+    print(f"\n  Wrote: {TABLES_DIR}/jaccard_null.csv")
+
     print(f"\nDirectional SHAP analysis (shared top-{TOP_N} taxa)")
 
     dir_rows = []
@@ -621,7 +710,7 @@ def main():
     print("Outputs:")
     for f in [
         "shap_within_cohort_importance.csv", "shap_loco_importance.csv",
-        "shap_taxa_overlap.csv", "shap_directional_flips.csv"
+        "shap_taxa_overlap.csv", "shap_directional_flips.csv", "jaccard_null.csv"
     ]:
         print(f"  {TABLES_DIR}/{f}")
     for f in [
