@@ -124,7 +124,7 @@ CSS = textwrap.dedent("""\
 """)
 
 def build_figure_block(fig_num: int, caption: str) -> str:
-    img_path = f"{FIGS}/manuscript_fig{fig_num}.png"
+    img_path = f"{FIGS}/manuscript_fig{fig_num}.jpg"
     if not os.path.exists(img_path):
         print(f"  figure {fig_num} not found at {img_path}, skipping")
         return ""

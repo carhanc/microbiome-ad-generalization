@@ -51,28 +51,28 @@ Notes: (1) Reads input = reads passing initial quality cutoff prior to DADA2 fil
 
 ### Table S3. Full PERMANOVA Results
 
-All PERMANOVA models used 9,999 permutations with Type III (marginal) sums of squares (vegan adonis2, `by="margin"`). Aitchison distance = Euclidean distance on CLR-transformed values. Bray-Curtis computed on relative abundances.
+All PERMANOVA models used 9,999 permutations with Type III (marginal) sums of squares (vegan adonis2, `by="margin"`). Aitchison distance = Euclidean distance on CLR-transformed values. Bray-Curtis computed on relative abundances. With 9,999 permutations, the minimum attainable permutation p-value is 1/(9,999+1) = 0.0001; p-values reported below as 0.0001 indicate no permuted statistic met or exceeded the observed value (i.e., the true p-value is at or below this resolution limit, not literally less than it).
 
 **Model 1: Cohort only (all 5 cohorts, Aitchison distance)**
 
 | Term | Df | Sum of Squares | R² | F | p-value |
 |---|---|---|---|---|---|
-| Cohort | 4 | 67,760.8 | 0.193 | 30.13 | <0.0001 |
+| Cohort | 4 | 67,760.8 | 0.193 | 30.13 | 0.0001 |
 | Residual | 504 | 283,347.1 | 0.807 | — | — |
 
 **Model 1B: Cohort only (all 5 cohorts, Bray-Curtis dissimilarity)**
 
 | Term | Df | Sum of Squares | R² | F | p-value |
 |---|---|---|---|---|---|
-| Cohort | 4 | 20.80 | 0.136 | 19.80 | <0.0001 |
+| Cohort | 4 | 20.80 | 0.136 | 19.80 | 0.0001 |
 | Residual | 504 | 132.36 | 0.864 | — | — |
 
 **Model 2: Cohort + Diagnosis (4 labeled cohorts, Aitchison, marginal R²)**
 
 | Term | Df | Sum of Squares | R² (marginal) | F | p-value |
 |---|---|---|---|---|---|
-| Cohort | 3 | 45,476.8 | 0.172 | 28.03 | <0.0001 |
-| Diagnosis | 1 | 3,689.7 | 0.014 | 6.82 | <0.0001 |
+| Cohort | 3 | 45,476.8 | 0.172 | 28.03 | 0.0001 |
+| Diagnosis | 1 | 3,689.7 | 0.014 | 6.82 | 0.0001 |
 
 Note: Marginal R² values for cohort and diagnosis do not sum to total R² because marginal effects are estimated independently (Type III SS), adjusting for the other variable. The sum of marginal R² values underestimates total explained variance.
 
@@ -81,8 +81,8 @@ Note: Marginal R² values for cohort and diagnosis do not sum to total R² becau
 | Cohort | Term | Df | R² | F | p-value |
 |---|---|---|---|---|---|
 | Zhuang 2018 | Diagnosis | 1 | 0.017 | 1.47 | 0.066 |
-| Ling 2020 | Diagnosis | 1 | 0.053 | 9.53 | <0.0001 |
-| Zhu 2022 | Diagnosis | 1 | 0.094 | 6.01 | <0.0001 |
+| Ling 2020 | Diagnosis | 1 | 0.053 | 9.53 | 0.0001 |
+| Zhu 2022 | Diagnosis | 1 | 0.094 | 6.01 | 0.0001 |
 | Kazakhstan | Diagnosis | 1 | 0.022 | 1.83 | 0.069 |
 
 Zhu 2022 analysis restricted to fecal samples only (n=60 binary: 30 AD + 30 CN). Blood microbiome samples excluded prior to all analyses. Zhuang 2018 (p=0.066) and Kazakhstan (p=0.069) did not reach α=0.05 significance for within-cohort diagnosis effect.
@@ -94,7 +94,7 @@ Zhu 2022 analysis restricted to fecal samples only (n=60 binary: 30 AD + 30 CN).
 | F-statistic | 13.93 |
 | Numerator df | 4 |
 | Denominator df | 594 |
-| p-value (permutation, 9,999 perms) | <0.0001 |
+| p-value (permutation, 9,999 perms) | 0.0001 |
 | Interpretation | Within-cohort dispersions differ significantly; PERMANOVA R² reflects both centroid shift and spread heterogeneity |
 
 ---
@@ -111,41 +111,38 @@ Zhu 2022 analysis restricted to fecal samples only (n=60 binary: 30 AD + 30 CN).
 
 ### Figure S2. LightGBM Top-15 SHAP Taxa Per Cohort
 
-**Caption:** SHAP feature importance dot plot for LightGBM classifiers, parallel to Figure 6A (logistic regression). Dot size proportional to mean |SHAP| value (feature importance); red = AD-associated (higher mean SHAP in AD samples); blue = CN-associated. Yellow background marks directional flip taxa appearing in top-20 of ≥2 cohorts with opposite sign (★ prefix). Top taxon per cohort: Oscillibacter (Zhuang 2018, CN-associated, |SHAP|=1.025), Akkermansia (Ling 2020, AD-associated, |SHAP|=0.828), Streptococcus (Zhu 2022, AD-associated, |SHAP|=1.287), Castellaniella (Kazakhstan, CN-associated, |SHAP|=0.830). Mean pairwise Jaccard similarity at top-20: 0.026 — lower than logistic regression (0.101), consistent with tree models finding more cohort-specific features. LightGBM directional flips (top-20): Incertae Sedis, Lactobacillus, Oscillibacter.
+**Caption:** Out-of-fold (OOF) SHAP feature importance dot plot for LightGBM classifiers, parallel to Figure 6A (logistic regression). SHAP values were computed using the same 10-fold outer CV structure used for AUC estimation (Section 2.4): in each fold the classifier was trained on the 9 training folds and SHAP values were computed for the held-out fold only, then aggregated across all 10 folds. This avoids the in-sample overfitting bias that arises when SHAP values are computed on the same data used to fit the model. Dot size proportional to mean |SHAP| value (feature importance); red = AD-associated (positive mean SHAP); blue = CN-associated. Yellow background marks directional flip taxa appearing in top-20 of ≥2 cohorts with opposite sign (★ prefix). Top taxon per cohort: Lachnoclostridium (Zhuang 2018, CN-associated, |SHAP|=0.560), Akkermansia (Ling 2020, CN-associated, |SHAP|=0.947), Bacteroides (Zhu 2022, AD-associated, |SHAP|=1.243), Castellaniella (Kazakhstan, CN-associated, |SHAP|=0.614). Mean pairwise Jaccard similarity at top-20: 0.058 — within the null 95% CI of a random-draw baseline (Section 2.8), consistent with tree models concentrating importance in essentially non-overlapping, cohort-specific feature sets. LightGBM directional flips (top-20, 12 taxa): Agathobacter, Akkermansia, Bacteroides, Colidextribacter, Faecalibacterium, Incertae Sedis, Lachnospira, Lactobacillus, Oscillibacter, Romboutsia, Roseburia, [Eubacterium] siraeum group.
 
-*Source figure:* `results/figures/shap_top15_per_cohort_lgbm.png`
-
----
-
-### Figure S3. LOCO SHAP Analysis — Feature Importance in Held-Out Test Cohorts
-
-**Caption:** SHAP values computed for LOCO-trained classifiers (trained on N-1 cohorts) evaluated on each held-out test cohort. Each panel shows the top-15 genera by mean |SHAP| on the held-out test data, with direction (AD or CN associated) as computed on the test samples. (A) Logistic regression. (B) LightGBM.
-
-Top-1 LOCO SHAP taxon per held-out cohort:
-- Held-out Zhuang 2018: Akkermansia (LogReg, |SHAP|=0.612), Akkermansia (LGBM)
-- Held-out Ling 2020: Eisenbergiella (LogReg), Streptococcus (LGBM)
-- Held-out Zhu 2022: Faecalibacterium (LogReg), Akkermansia (LGBM)
-- Held-out Kazakhstan: Cutibacterium (LogReg), [Eubacterium] xylanophilum group (LGBM)
-
-No single genus ranks first in more than one held-out condition for logistic regression. The four LOCO top taxa are all different, confirming that cross-cohort models activate different features depending on the test population — there is no universal transferable taxon. This provides the mechanistic explanation for LOCO generalization failure: the model relies on genera that are uninformative or directionally inappropriate for the test population.
-
-*Source figure:* `results/figures/shap_loco_direction_logreg.png`, `results/figures/shap_loco_direction_lgbm.png`
+*Source figure:* `results/figures/supp_fig_s2.jpg` (built from `results/figures/working/shap_top15_per_cohort_lgbm.png`)
 
 ---
 
-### Figure S4. PCoA Before and After ComBat-seq Correction
+### Figure S3a. LOCO SHAP Direction — Logistic Regression
 
-**Caption:** Principal coordinates analysis (PCoA) on Aitchison distance (CLR-Euclidean) colored by cohort (left column) and diagnosis (right column), before (top row) and after ComBat-seq correction (bottom row). Samples restricted to four labeled cohorts (n=401). After ComBat-seq correction, cohort-level separation on PC1 and PC2 is visually reduced, consistent with the correction algorithm aligning cohort means. However, diagnosis does not become more separable after correction — diagnoses remain interleaved within and across cohorts — providing a visual complement to the LOCO AUC results showing no improvement in cross-cohort discrimination.
+**Caption:** Out-of-fold SHAP values computed for LOCO-trained logistic regression classifiers (trained on the pooled other three cohorts, with that training pool as the SHAP background distribution) and evaluated on each held-out test cohort. Points show the top genera by mean |SHAP| on the held-out test data; x-position gives the signed mean SHAP value on the held-out cohort (positive = AD-associated, negative = CN-associated).
 
-*Source figure:* `results/figures/pcoa_combatseq_before_after.png`
+Top-1 LOCO SHAP taxon per held-out cohort (logistic regression): held-out Zhuang 2018 — *Akkermansia* (CN-associated, |SHAP|=0.470); held-out Ling 2020 — *Subdoligranulum* (AD-associated, |SHAP|=0.269); held-out Zhu 2022 — *Akkermansia* (CN-associated, |SHAP|=0.372); held-out Kazakhstan — *Christensenellaceae* R-7 group (AD-associated, |SHAP|=0.368). *Akkermansia* is the top LOCO predictor for two of the four held-out cohorts (Zhuang 2018, Zhu 2022), both CN-associated in the LOCO setting; no genus is top-ranked in all four conditions. This recurrence does not indicate a stable transferable signal — *Akkermansia*'s role is directionally inconsistent in the underlying within-cohort SHAP analysis (Figure 6; Section 3.6), where it is a directional-flip taxon with a 2/2 CN/AD split across the same four cohorts. The pattern is consistent with cross-cohort classifiers activating whichever genera most closely resemble their training-cohort signature rather than a disease marker that generalizes across populations.
+
+*Source figure:* `results/figures/supp_fig_s3a.jpg` (built from `results/figures/working/shap_loco_direction_logreg.png`)
 
 ---
 
-### Figure S5. PCoA Before and After MMUPHin Correction
+### Figure S3b. LOCO SHAP Direction — LightGBM
 
-**Caption:** Principal coordinates analysis (PCoA) on Aitchison distance colored by cohort (left) and diagnosis (right), before (top) and after MMUPHin correction (bottom). Four labeled cohorts (n=401). MMUPHin correction produces partial cohort alignment — cohorts are more overlapping in PCoA than before correction — but the diagnosis axis remains unresolved after correction, consistent with MMUPHin LOCO AUC failing to improve upon uncorrected performance. The continued interleaving of AD and CN samples in PCoA after correction visualizes the ~12-fold cohort-to-diagnosis variance ratio: the disease signal occupies a small fraction of compositional space that cannot be selectively preserved when removing the dominant cohort signal.
+**Caption:** Out-of-fold SHAP values computed for LOCO-trained LightGBM classifiers, evaluated on each held-out test cohort, parallel to Figure S3a.
 
-*Source figure:* `results/figures/pcoa_mmuphin_before_after.png`
+Top-1 LOCO SHAP taxon per held-out cohort (LightGBM): held-out Zhuang 2018 — *Akkermansia* (CN-associated, |SHAP|=0.844); held-out Ling 2020 — *[Eubacterium] xylanophilum* group (AD-associated, |SHAP|=0.518); held-out Zhu 2022 — *Akkermansia* (CN-associated, |SHAP|=0.789); held-out Kazakhstan — *[Eubacterium] xylanophilum* group (CN-associated, |SHAP|=0.521). As with logistic regression, *Akkermansia* recurs as the top predictor for two of four held-out cohorts (both CN-associated) while *[Eubacterium] xylanophilum* group tops the other two with opposite directions between them (AD for Ling 2020, CN for Kazakhstan) — no single genus is both top-ranked and directionally consistent across all four held-out conditions for either model.
+
+*Source figure:* `results/figures/supp_fig_s3b.jpg` (built from `results/figures/working/shap_loco_direction_lgbm.png`)
+
+---
+
+### Figure S4. Sensitivity Analysis: LOCO AUC Under Cohort Exclusion
+
+**Caption:** Sensitivity analysis: LOCO AUC under three cohort exclusion configurations. Each panel shows the 3-cohort LOCO experiment with one cohort excluded from the full analysis. Left: excluding Kazakhstan (Zhuang+Ling+Zhu trained, each held out in turn). Center: excluding Zhuang 2018. Right: excluding Ling 2020. Error bars = 95% bootstrap CI. Generalization failure persists across all configurations, confirming robustness to individual cohort exclusion.
+
+*Source data:* `results/tables/sensitivity_loco.csv`
+*Source figure:* `results/figures/supp_sensitivity_loco.png`
 
 ---
 
@@ -174,6 +171,8 @@ The following metadata sources were queried for per-sample diagnosis labels:
 **Additional caveat:** Even if per-sample labels were available, direct comparison with the other four cohorts would require caution. Kim/KBASE 2022 uses amyloid-PET positivity as the case definition (preclinical AD — cognitively normal by neuropsychological testing but amyloid-positive), while the other four cohorts use clinical AD diagnosis (cognitive impairment criterion). These phenotype definitions are not equivalent.
 
 **Recommendation for future analyses:** Researchers wishing to include Kim/KBASE 2022 in supervised analyses should contact the study team (KBASE Consortium / corresponding author of Kim et al., 2022) to request a data use agreement for per-sample amyloid-PET status.
+
+**Cohort search strategy and full inclusion/exclusion record:** The cohort identification search (Section 2.1) queried NCBI SRA and EBI-ENA for studies deposited before January 2025, using the following search string in the SRA search interface: `("Alzheimer's disease" OR "Alzheimer disease" OR "mild cognitive impairment" OR "MCI" OR "dementia") AND ("gut microbiome" OR "gut microbiota" OR "intestinal microbiome" OR "16S rRNA") AND ("Homo sapiens")`. Inclusion required: (1) per-sample diagnosis labels (AD, MCI, or CN) accessible in public metadata; (2) raw FASTQ files or quality-filtered reads deposited in a public archive; (3) a minimum of 40 participants per cohort. Studies were excluded if per-sample labels were IRB-restricted, if data had not been publicly released at the time of analysis, or if samples represented a tissue compartment other than fecal microbiome as the primary analyte; shotgun metagenomic cohorts meeting all other criteria were identified but excluded to avoid mixing amplicon and whole-genome sequencing platforms within the same analysis. Beyond the Kim/KBASE 2022 IRB restriction documented above, one further identified cohort was excluded on public-availability grounds: **ALBION 2025** (Maraki et al., *Journal of Alzheimer's Disease*, 2025; PRJNA1297934), a Greek cohort of 99 participants (50 MCI, 49 CN; V3–V4) — the only European 16S cohort identified in the search — was confirmed as the correct accession from the published paper, but NCBI BioProject reported the deposit as not yet publicly released as of the search date. ALBION was therefore excluded from the active cohort set; it remains the most direct candidate for a future sixth cohort should the data be released.
 
 ---
 
