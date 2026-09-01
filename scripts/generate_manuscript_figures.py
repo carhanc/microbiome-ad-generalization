@@ -28,27 +28,27 @@ COHORT_LABELS = {
     "zhuang2018":    "Zhuang 2018\n(China)",
     "ling2020":      "Ling 2020\n(China)",
     "shanghai2022":  "Zhu 2022\n(China)",
-    "kazakhstan2022":"Auyezbayeva 2022\n(Kazakhstan)",
+    "kazakhstan2022":"Kaiyrlykyzy 2022\n(Kazakhstan)",
     "kbase2022":     "Kim 2022\n(South Korea)",
 }
 COHORT_SHORT = {
     "zhuang2018":    "Zhuang\n(CN)",
     "ling2020":      "Ling\n(CN)",
     "shanghai2022":  "Zhu 2022\n(CN)",
-    "kazakhstan2022":"Auyezbayeva\n(KZ)",
+    "kazakhstan2022":"Kazakhstan\n(KZ)",
 }
 COHORT_SHORT_FLAT = {
     "zhuang2018":    "Zhuang",
     "ling2020":      "Ling",
     "shanghai2022":  "Zhu 2022",
-    "kazakhstan2022":"Auyezbayeva",
+    "kazakhstan2022":"Kazakhstan",
 }
 ALL5_SHORT = {
     "zhuang2018":    "Zhuang",
     "ling2020":      "Ling",
     "shanghai2022":  "Zhu 2022",
     "kbase2022":     "Kim",
-    "kazakhstan2022":"Auyezbayeva",
+    "kazakhstan2022":"Kazakhstan",
 }
 COLORS = {
     "zhuang2018":    "#2166ac",
@@ -102,7 +102,7 @@ def make_fig1():
          "PE MiSeq\n2×300 bp",  "V3–V4", "AD / CN",        "✓ Ph. 2–6"],
         ["Zhu 2022\nPRJNA489760",          "China",      "90†\n(30 each)",
          "PE MiSeq\n2×300 bp",  "V3–V4", "AD/MCI/CN",      "✓ Ph. 2–6"],
-        ["Auyezbayeva 2022\nPRJNA811324", "Kazakhstan", "84\n41AD/43CN",
+        ["Kaiyrlykyzy 2022\nPRJNA811324", "Kazakhstan", "84\n41AD/43CN",
          "SE NovaSeq",           "V3–V4", "AD / CN",        "✓ Ph. 2–6"],
         ["Kim 2022\nPRJEB50447",          "S. Korea",   "78\n18pcAD/60CN",
          "PE MiSeq\n2×300 bp",  "V3–V4", "IRB-restricted", "Ph. 4 only"],
@@ -262,7 +262,7 @@ def make_fig2():
         "zhuang2018":    "Zhuang\n2018",
         "ling2020":      "Ling\n2020",
         "shanghai2022":  "Zhu\n2022",
-        "kazakhstan2022":"Auyezbayeva\n2022",
+        "kazakhstan2022":"Kazakhstan\n2022",
     }
     ax.set_xticklabels([two_line_labels[c] for c in cohorts], fontsize=8)
     ax.set_ylabel("AUC-ROC", fontsize=9)
@@ -694,26 +694,24 @@ def make_fig6():
     ax_a.legend(handles=legend_elements, fontsize=7.5, loc="lower right",
                 framealpha=0.92, ncol=3, columnspacing=0.8)
 
-    flip_taxa = flip_df[(flip_df["model"] == "logreg") &
-                        flip_df["in_top_n"]]["taxon"].unique()
+    # flip_df["in_top_n"] marks whether a (taxon, cohort) row was in that
+    # cohort's own top-N -- taking the union over cohorts (the old logic)
+    # selects every taxon SHARED across >=2 cohorts' top-20, not just the
+    # ones that actually flip sign. Filter to genuine sign-flips explicitly,
+    # matching the definition used in Section 3.6 / directional_analysis().
+    candidate_taxa = flip_df[flip_df["model"] == "logreg"]["taxon"].unique()
+    flip_taxa = [
+        t for t in candidate_taxa
+        if (np.sign(flip_df[(flip_df["model"] == "logreg") &
+                            (flip_df["taxon"] == t)]["mean_shap"]).min() < 0
+            and np.sign(flip_df[(flip_df["model"] == "logreg") &
+                                (flip_df["taxon"] == t)]["mean_shap"]).max() > 0)
+    ]
     flip_sub = shap_df[(shap_df["model"] == "logreg") &
                        (shap_df["taxon"].isin(flip_taxa)) &
                        (shap_df["cohort"].isin(LABELED_COHORTS))]
 
     flip_sub = flip_sub.sort_values("rank").drop_duplicates(["taxon","cohort"])
-
-    # Drop taxa with essentially zero signal everywhere (all cohorts within
-    # +/-0.005 of x=0) -- these add visual noise without conveying anything;
-    # a "flip" between two near-zero values isn't a real directional signal.
-    ZERO_SIGNAL_THRESH = 0.005
-    max_abs_by_taxon = flip_sub.groupby("taxon")["mean_shap"].apply(
-        lambda s: s.abs().max())
-    real_signal_taxa = set(max_abs_by_taxon[max_abs_by_taxon > ZERO_SIGNAL_THRESH].index)
-    dropped_taxa = set(max_abs_by_taxon.index) - real_signal_taxa
-    if dropped_taxa:
-        print(f"    Panel B: dropping {len(dropped_taxa)} near-zero-signal taxa "
-              f"(all cohorts within +/-{ZERO_SIGNAL_THRESH}): {sorted(dropped_taxa)}")
-    flip_sub = flip_sub[flip_sub["taxon"].isin(real_signal_taxa)]
 
     taxa_flip_order = (flip_sub.groupby("taxon")["mean_abs_shap"].max()
                                .sort_values(ascending=False).index.tolist())
@@ -875,7 +873,7 @@ def make_supp_fig_s2():
         "zhuang2018":    "Zhuang 2018\n(China, n=86)",
         "ling2020":      "Ling 2020\n(China, n=171)",
         "shanghai2022":  "Zhu 2022\n(China, n=60)†",
-        "kazakhstan2022":"Auyezbayeva 2022\n(KZ, n=84)",
+        "kazakhstan2022":"Kaiyrlykyzy 2022\n(KZ, n=84)",
     }
 
     cohorts = LABELED_COHORTS

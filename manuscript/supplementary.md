@@ -93,7 +93,7 @@ Zhu 2022 analysis restricted to fecal samples only (n=60 binary: 30 AD + 30 CN).
 |---|---|
 | F-statistic | 13.93 |
 | Numerator df | 4 |
-| Denominator df | 594 |
+| Denominator df | 504 |
 | p-value (permutation, 9,999 perms) | 0.0001 |
 | Interpretation | Within-cohort dispersions differ significantly; PERMANOVA R² reflects both centroid shift and spread heterogeneity |
 
