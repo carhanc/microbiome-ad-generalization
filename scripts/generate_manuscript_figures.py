@@ -591,14 +591,14 @@ def make_fig6():
     flip_df  = pd.read_csv(f"{TABLES}/shap_directional_flips.csv")
     over_df  = pd.read_csv(f"{TABLES}/shap_taxa_overlap.csv")
 
-    fig_h = WIDTH_IN * 0.62
+    fig_h = WIDTH_IN * 0.78
     fig = plt.figure(figsize=(WIDTH_IN, fig_h), dpi=DPI)
     fig.patch.set_facecolor("white")
     gs = gridspec.GridSpec(2, 2, figure=fig,
-                           height_ratios=[1.15, 1.0],
-                           hspace=0.52, wspace=0.40,
+                           height_ratios=[0.92, 1.35],
+                           hspace=0.40, wspace=0.40,
                            left=0.15, right=0.97,
-                           top=0.93, bottom=0.08)
+                           top=0.94, bottom=0.07)
     ax_a = fig.add_subplot(gs[0, :])   # top full-width
     ax_b = fig.add_subplot(gs[1, 0])   # bottom-left
     ax_c = fig.add_subplot(gs[1, 1])   # bottom-right
@@ -702,26 +702,70 @@ def make_fig6():
 
     flip_sub = flip_sub.sort_values("rank").drop_duplicates(["taxon","cohort"])
 
+    # Drop taxa with essentially zero signal everywhere (all cohorts within
+    # +/-0.005 of x=0) -- these add visual noise without conveying anything;
+    # a "flip" between two near-zero values isn't a real directional signal.
+    ZERO_SIGNAL_THRESH = 0.005
+    max_abs_by_taxon = flip_sub.groupby("taxon")["mean_shap"].apply(
+        lambda s: s.abs().max())
+    real_signal_taxa = set(max_abs_by_taxon[max_abs_by_taxon > ZERO_SIGNAL_THRESH].index)
+    dropped_taxa = set(max_abs_by_taxon.index) - real_signal_taxa
+    if dropped_taxa:
+        print(f"    Panel B: dropping {len(dropped_taxa)} near-zero-signal taxa "
+              f"(all cohorts within +/-{ZERO_SIGNAL_THRESH}): {sorted(dropped_taxa)}")
+    flip_sub = flip_sub[flip_sub["taxon"].isin(real_signal_taxa)]
+
     taxa_flip_order = (flip_sub.groupby("taxon")["mean_abs_shap"].max()
                                .sort_values(ascending=False).index.tolist())
 
-    for _, row in flip_sub.iterrows():
-        t = row["taxon"]
-        c = row["cohort"]
-        if t not in taxa_flip_order: continue
-        yy = taxa_flip_order.index(t)
-        shap_v = row["mean_shap_AD"] - row["mean_shap_CN"]
-        size = max(30, abs(row["mean_abs_shap"]) * 180)
-        color = AD_COL if shap_v > 0 else CN_COL
-        ax_b.scatter(shap_v, yy, s=size, color=color, alpha=0.8,
-                     zorder=3, linewidths=0.4, edgecolors="white")
-        ax_b.text(shap_v, yy, COHORT_SHORT_FLAT[c][0],
-                  ha="center", va="center", fontsize=5,
-                  color="white", fontweight="bold", zorder=4)
+    # Vertical stagger for dots that crowd together in x within the same row:
+    # deterministic (sorted-x, symmetric spread), not random -- exactly
+    # reproducible without needing to carry a seed. Horizontal position is
+    # never touched: it's the actual mean_shap value being reported.
+    CLUSTER_X_THRESH = 0.003
+    STAGGER_STEP     = 0.17
+
+    def stagger_offsets(xs: np.ndarray) -> np.ndarray:
+        order = np.argsort(xs)
+        offsets = np.zeros(len(xs))
+        cluster = [order[0]]
+        for idx in order[1:]:
+            if xs[idx] - xs[cluster[-1]] <= CLUSTER_X_THRESH:
+                cluster.append(idx)
+            else:
+                if len(cluster) > 1:
+                    spread = np.linspace(-(len(cluster)-1)/2, (len(cluster)-1)/2,
+                                         len(cluster)) * STAGGER_STEP
+                    for off, i in zip(spread, cluster):
+                        offsets[i] = off
+                cluster = [idx]
+        if len(cluster) > 1:
+            spread = np.linspace(-(len(cluster)-1)/2, (len(cluster)-1)/2,
+                                 len(cluster)) * STAGGER_STEP
+            for off, i in zip(spread, cluster):
+                offsets[i] = off
+        return offsets
+
+    for taxon in taxa_flip_order:
+        t_rows = flip_sub[flip_sub["taxon"] == taxon]
+        xs = t_rows["mean_shap"].to_numpy()
+        y_offsets = stagger_offsets(xs)
+        yy_base = taxa_flip_order.index(taxon)
+        for (_, row), y_off in zip(t_rows.iterrows(), y_offsets):
+            c = row["cohort"]
+            shap_v = row["mean_shap"]
+            size = max(30, abs(row["mean_abs_shap"]) * 180)
+            color = AD_COL if shap_v > 0 else CN_COL
+            ax_b.scatter(shap_v, yy_base + y_off, s=size, color=color, alpha=0.8,
+                         zorder=3, linewidths=0.4, edgecolors="white")
+            ax_b.text(shap_v, yy_base + y_off, COHORT_SHORT_FLAT[c][0],
+                      ha="center", va="center", fontsize=5,
+                      color="white", fontweight="bold", zorder=4)
 
     ax_b.axvline(0, color="black", lw=0.8, zorder=2)
     ax_b.set_yticks(range(len(taxa_flip_order)))
     ax_b.set_yticklabels([f"★ {t}" for t in taxa_flip_order], fontsize=7.5)
+    ax_b.set_ylim(-0.6, len(taxa_flip_order) - 0.4)
     ax_b.set_xlabel("Mean SHAP (AD-direction → positive)", fontsize=8)
     ax_b.set_title("Directional Flip Taxa\n(LogReg; letter = cohort initial)", fontsize=8.5)
     ax_b.set_xlim(ax_b.get_xlim()[0] * 1.15, ax_b.get_xlim()[1] * 1.15)
