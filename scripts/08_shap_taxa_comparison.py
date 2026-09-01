@@ -114,10 +114,18 @@ def fit_best_lgbm(X, y, groups=None):
     return gs.best_estimator_, gs.best_params_
 
 
-def shap_logreg(model, X, genus_cols):
-    explainer  = shap.LinearExplainer(model, X,
+def shap_logreg(model, X_background, X_eval, genus_cols):
+    # X_background must differ from X_eval: for a linear model under
+    # interventional SHAP, shap_ij ~= beta_j*(x_ij - mean_j(background)), so
+    # if background==eval, sum_i shap_ij == beta_j*(sum_i x_ij - n*mean_j(X))
+    # == 0 EXACTLY (any set's deviations from its own mean sum to zero). That
+    # forces mean_shap to ~1e-17 noise regardless of the true feature effect,
+    # silently breaking every AD/CN direction call downstream. Using a
+    # different reference population (training fold / other cohorts) avoids
+    # this degeneracy.
+    explainer  = shap.LinearExplainer(model, X_background,
                                       feature_perturbation="interventional")
-    shap_vals  = explainer.shap_values(X)
+    shap_vals  = explainer.shap_values(X_eval)
     return shap_vals
 
 
@@ -184,7 +192,7 @@ def run_within_cohort_shap(cohort_data, genus_cols, outer_folds=OUTER_FOLDS):
             g_tr = groups[train_idx] if groups is not None else None
 
             logreg, lp = fit_best_logreg(X_tr, y_tr, g_tr)
-            oof_shap_lr[test_idx] = shap_logreg(logreg, X_te, genus_cols)
+            oof_shap_lr[test_idx] = shap_logreg(logreg, X_tr, X_te, genus_cols)
 
             lgbm_m, lbp = fit_best_lgbm(X_tr, y_tr, g_tr)
             oof_shap_gb[test_idx] = shap_lgbm(lgbm_m, X_te, genus_cols)
@@ -222,7 +230,7 @@ def run_loco_shap(cohort_data, genus_cols):
               f"train={'+'.join(train_cohorts)}  (train n={len(y_train)}, test n={len(X_test)})")
 
         logreg, lp = fit_best_logreg(X_train, y_train)
-        sv_lr = shap_logreg(logreg, X_test, genus_cols)
+        sv_lr = shap_logreg(logreg, X_train, X_test, genus_cols)
         imp_lr = compute_importance(sv_lr, genus_cols,
                                     f"loco_test_{held_out}", "logreg", y_test)
         imp_lr["train_cohorts"] = "+".join(train_cohorts)

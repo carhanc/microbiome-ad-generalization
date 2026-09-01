@@ -512,7 +512,7 @@ def make_fig4():
                                           alpha=0.5))
     ax_c.set_xticks(positions)
     ax_c.set_xticklabels([ALL5_SHORT.get(c, c) for c in plot_cohorts],
-                          fontsize=7.5, rotation=20, ha="right")
+                          fontsize=7, rotation=40, ha="right")
     ax_c.set_ylabel("Distance to Cohort Centroid\n(Aitchison)", fontsize=8)
     ax_c.set_title(f"Beta-Dispersion by Cohort\n(F=13.93, p<0.0001)", fontsize=8.5)
     ax_c.spines["top"].set_visible(False)
@@ -644,7 +644,12 @@ def make_fig6():
         yy = y_pos[t]
         xx = x_pos[c]
         size  = max(25, row["mean_abs_shap"] * 220)
-        color = AD_COL if row["mean_shap_AD"] > row["mean_shap_CN"] else CN_COL
+        # mean_shap_AD > mean_shap_CN is ~always true for any feature the
+        # model actually uses (background cancels out of that comparison,
+        # regardless of the taxon's real abundance direction) -- it doesn't
+        # indicate direction. Use signed mean_shap instead, consistent with
+        # Panel B and every other AD/CN call in the paper.
+        color = AD_COL if row["mean_shap"] > 0 else CN_COL
         ax_a.scatter(xx, yy, s=size, color=color, alpha=0.82,
                      zorder=3, linewidths=0.3, edgecolors="white")
         ax_a.text(xx, yy, f"{row['mean_abs_shap']:.2f}",
