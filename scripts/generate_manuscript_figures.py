@@ -293,17 +293,20 @@ def make_fig3():
     loco_df  = pd.read_csv(f"{TABLES}/loco_auc.csv")
     pair_df  = pd.read_csv(f"{TABLES}/pairwise_auc.csv")
 
-    fig = plt.figure(figsize=(WIDTH_IN, WIDTH_IN * 0.68), dpi=DPI)
+    # Wider canvas and larger wspace: panel B/C's "Train Cohort" y-axis
+    # label was landing in the gap right next to panel A's rightmost
+    # (Kazakhstan) bars, and the three panels felt cramped overall.
+    fig = plt.figure(figsize=(WIDTH_IN * 1.25, WIDTH_IN * 0.72), dpi=DPI)
     fig.patch.set_facecolor("white")
-    gs = gridspec.GridSpec(1, 3, figure=fig, width_ratios=[1.1, 1.0, 1.0],
-                           wspace=0.35, left=0.07, right=0.97,
-                           top=0.88, bottom=0.18)
+    gs = gridspec.GridSpec(1, 3, figure=fig, width_ratios=[1.05, 1.0, 1.0],
+                           wspace=0.55, left=0.06, right=0.97,
+                           top=0.86, bottom=0.2)
     ax_a = fig.add_subplot(gs[0])
     ax_b = fig.add_subplot(gs[1])
     ax_c = fig.add_subplot(gs[2])
 
     for ax, lbl in zip([ax_a, ax_b, ax_c], "ABC"):
-        ax.text(-0.15, 1.08, lbl, transform=ax.transAxes, fontsize=11,
+        ax.text(-0.18, 1.1, lbl, transform=ax.transAxes, fontsize=12,
                 fontweight="bold", va="bottom")
 
     cohorts = LABELED_COHORTS
@@ -381,7 +384,12 @@ def make_fig3():
         ax.set_xticklabels(xlabels, fontsize=7, rotation=30, ha="right")
         ax.set_yticklabels(ylabels, fontsize=7)
         ax.set_xlabel("Test Cohort", fontsize=8)
-        ax.set_ylabel("Train Cohort", fontsize=8)
+        if ax is ax_b:
+            # Both heatmaps share identical row/column semantics; labeling
+            # only the left one avoids the label colliding with panel B's
+            # colorbar (fig.colorbar() isn't accounted for by GridSpec
+            # wspace, so it eats into the B-C gap).
+            ax.set_ylabel("Train Cohort", fontsize=8)
         ax.set_title(f"Pairwise AUC\n({panel_lbl})", fontsize=8.5)
         cb = fig.colorbar(im, ax=ax, fraction=0.046, pad=0.04, shrink=0.82)
         cb.ax.tick_params(labelsize=7)
