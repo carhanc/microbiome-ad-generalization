@@ -177,7 +177,7 @@ def make_fig1():
 
     ax = ax_b
     steps = [
-        ("Phase 1", "DADA2 Processing\n& Genus Harmonization\n(509 samples, 396 genera)", "#1a6faf"),
+        ("Phase 1", "DADA2 Processing\n(599 samples) → fecal\nfiltering & harmonization\n(509 samples, 396 genera)", "#1a6faf"),
         ("Phase 2", "Within-Cohort Baseline\nNested 10×5 CV\n(LogReg + LGBM)", "#2ca02c"),
         ("Phase 3", "Cross-Cohort\nGeneralization\n(LOCO + Pairwise)", "#d62728"),
         ("Phase 4", "PERMANOVA Variance\nDecomposition\n(Aitchison + Bray-Curtis)", "#8c564b"),

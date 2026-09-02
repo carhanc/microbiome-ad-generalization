@@ -42,12 +42,13 @@ FIGURES = [
         "### 3.5 Batch Correction Does Not Recover Cross-Cohort Generalization",
         4,
         "**Figure 4.** PERMANOVA variance decomposition and beta-diversity structure. "
-        "(**A**) Stacked bar showing the proportion of total Aitchison variance explained by "
-        "cohort (R²=0.172, marginal) versus residual in the four labeled cohorts. "
+        "(**A**) Marginal R² values from a two-variable PERMANOVA model on the four labeled "
+        "cohorts (n=401): cohort R²=0.172 and diagnosis R²=0.014, shown as independent bars. "
+        "These Type III marginal R² values are estimated independently and do not sum to 1. "
         "(**B**) PCoA of Aitchison distance matrix (all five cohorts; n=509). Cohort R²=0.193 "
-        "(F=30.13, p<0.0001, 9,999 permutations). Ellipses = 95% normal confidence ellipses. "
+        "(F=30.13, p=0.0001, 9,999 permutations). Ellipses = 95% normal confidence ellipses. "
         "(**C**) Beta-dispersion: distance from each sample to its cohort centroid "
-        "(F=13.93, p<0.0001, 9,999 permutations)."
+        "(F=13.93, p=0.0001, 9,999 permutations)."
     ),
     (
         "### 3.6 SHAP Analysis Reveals Cohort-Specific and Contradictory Taxonomic Signatures",
@@ -68,7 +69,7 @@ FIGURES = [
         "(**B**) Directional flip taxa (logistic regression): genera appearing in the top-20 for "
         "≥2 cohorts with opposite AD/CN associations. Letters indicate cohort initials. "
         "(**C**) Pairwise Jaccard similarity of top-20 SHAP taxa between cohort pairs "
-        "(logistic regression); mean off-diagonal Jaccard = 0.101."
+        "(logistic regression); mean off-diagonal Jaccard = 0.135."
     ),
 ]
 
@@ -179,6 +180,7 @@ def main():
         "--to", "html5",
         "--standalone",
         "--embed-resources",
+        "--mathjax",
         "--css", css_path,
         "--metadata", "title=Microbiome AD Generalization",
         "--toc",
@@ -196,6 +198,10 @@ def main():
         "--disable-gpu",
         "--no-sandbox",
         "--run-all-compositor-stages-before-draw",
+        # --mathjax renders equations via async JS after page load; without
+        # giving Chrome time to execute and finish typesetting before the
+        # print snapshot, the PDF can capture raw/unrendered LaTeX.
+        "--virtual-time-budget=8000",
         "--print-to-pdf-no-header",
         f"--print-to-pdf={OUT_PDF}",
         f"--no-pdf-header-footer",
