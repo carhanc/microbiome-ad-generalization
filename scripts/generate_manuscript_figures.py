@@ -429,20 +429,20 @@ def make_fig4():
             bd_data.append({"cohort": c, "distance": d})
     bd_df = pd.DataFrame(bd_data)
 
-    fig = plt.figure(figsize=(WIDTH_IN, WIDTH_IN * 0.55), dpi=DPI)
+    # Wider overall canvas: the previous width (WIDTH_IN) left panel A too
+    # narrow for its own title text to fit without overflowing past the
+    # axis edge into the "A" panel-label position, and made all three
+    # panels feel horizontally cramped.
+    fig = plt.figure(figsize=(WIDTH_IN * 1.3, WIDTH_IN * 0.62), dpi=DPI)
     fig.patch.set_facecolor("white")
-    # Panel A is now a simple 2-bar chart (see redesign below) and needs
-    # much less width than the 5-cohort PCoA scatter+legend (B) or the
-    # boxplot with rotated tick labels (C); rebalance width_ratios toward
-    # B/C instead of the original even-ish split.
-    gs = gridspec.GridSpec(1, 3, figure=fig, width_ratios=[0.62, 1.5, 1.05],
-                           wspace=0.48, left=0.06, right=0.96,
-                           top=0.87, bottom=0.16)
+    gs = gridspec.GridSpec(1, 3, figure=fig, width_ratios=[0.85, 1.5, 1.1],
+                           wspace=0.55, left=0.07, right=0.97,
+                           top=0.85, bottom=0.16)
     ax_a = fig.add_subplot(gs[0])
     ax_b = fig.add_subplot(gs[1])
     ax_c = fig.add_subplot(gs[2])
     for ax, lbl in zip([ax_a, ax_b, ax_c], "ABC"):
-        ax.text(-0.18, 1.08, lbl, transform=ax.transAxes, fontsize=11,
+        ax.text(-0.22, 1.12, lbl, transform=ax.transAxes, fontsize=12,
                 fontweight="bold", va="bottom")
 
     # Type III marginal R^2 values are not additive (each is estimated
