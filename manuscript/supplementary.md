@@ -109,9 +109,9 @@ Zhu 2022 analysis restricted to fecal samples only (n=60 binary: 30 AD + 30 CN).
 
 ---
 
-### Figure S2. LightGBM Top-15 SHAP Taxa Per Cohort
+### Figure S2. Top-15 SHAP Taxa Per Cohort (LightGBM, Out-of-Fold)
 
-**Caption:** Out-of-fold (OOF) SHAP feature importance dot plot for LightGBM classifiers, parallel to Figure 6A (logistic regression). SHAP values were computed using the same 10-fold outer CV structure used for AUC estimation (Section 2.4): in each fold the classifier was trained on the 9 training folds and SHAP values were computed for the held-out fold only, then aggregated across all 10 folds. This avoids the in-sample overfitting bias that arises when SHAP values are computed on the same data used to fit the model. Dot size proportional to mean |SHAP| value (feature importance); red = AD-associated (positive mean SHAP); blue = CN-associated. Yellow background marks directional flip taxa appearing in top-20 of ≥2 cohorts with opposite sign (★ prefix). Top taxon per cohort: Lachnoclostridium (Zhuang 2018, CN-associated, |SHAP|=0.560), Akkermansia (Ling 2020, CN-associated, |SHAP|=0.947), Bacteroides (Zhu 2022, AD-associated, |SHAP|=1.243), Castellaniella (Kazakhstan, CN-associated, |SHAP|=0.614). Mean pairwise Jaccard similarity at top-20: 0.058 — within the null 95% CI of a random-draw baseline (Section 2.8), consistent with tree models concentrating importance in essentially non-overlapping, cohort-specific feature sets. LightGBM directional flips (top-20, 12 taxa): Agathobacter, Akkermansia, Bacteroides, Colidextribacter, Faecalibacterium, Incertae Sedis, Lachnospira, Lactobacillus, Oscillibacter, Romboutsia, Roseburia, [Eubacterium] siraeum group.
+**Caption:** Horizontal bar charts showing mean |SHAP| value (CLR units) for the top-15 genera by importance in each of the four labeled cohorts under out-of-fold LightGBM evaluation. Red bars = AD-associated (positive mean signed SHAP); blue bars = CN-associated (negative mean signed SHAP). Top taxon per cohort: Lachnoclostridium (Zhuang 2018, CN-associated, |SHAP|=0.560), Akkermansia (Ling 2020, CN-associated, |SHAP|=0.947), Bacteroides (Zhu 2022, AD-associated, |SHAP|=1.243), Castellaniella (Kazakhstan, CN-associated, |SHAP|=0.614). Mean pairwise Jaccard similarity at top-20: 0.058, within the null 95% CI of a random-draw baseline (Section 2.8). LightGBM directional flips (top-20, 12 taxa): Agathobacter, Akkermansia, Bacteroides, Colidextribacter, Faecalibacterium, Incertae Sedis, Lachnospira, Lactobacillus, Oscillibacter, Romboutsia, Roseburia, [Eubacterium] siraeum group.
 
 *Source figure:* `results/figures/supp_fig_s2.jpg` (built from `results/figures/working/shap_top15_per_cohort_lgbm.png`)
 
@@ -139,7 +139,7 @@ Top-1 LOCO SHAP taxon per held-out cohort (LightGBM): held-out Zhuang 2018 — *
 
 ### Figure S4. Sensitivity Analysis: LOCO AUC Under Cohort Exclusion
 
-**Caption:** Sensitivity analysis: LOCO AUC under three cohort exclusion configurations. Each panel shows the 3-cohort LOCO experiment with one cohort excluded from the full analysis. Left: excluding Kazakhstan (Zhuang+Ling+Zhu trained, each held out in turn). Center: excluding Zhuang 2018. Right: excluding Ling 2020. Error bars = 95% bootstrap CI. Generalization failure persists across all configurations, confirming robustness to individual cohort exclusion.
+**Caption:** Sensitivity analysis: LOCO AUC under three cohort exclusion configurations. Each panel shows the 3-cohort LOCO experiment with one cohort excluded from the full analysis. Left: excluding Kazakhstan (Zhuang+Ling+Zhu trained, each held out in turn). Center: excluding Zhuang 2018. Right: excluding Ling 2020. Error bars = 95% bootstrap CI. Generalization degradation persisted across all three prespecified cohort-exclusion configurations.
 
 *Source data:* `results/tables/sensitivity_loco.csv`
 *Source figure:* `results/figures/supp_sensitivity_loco.png`
