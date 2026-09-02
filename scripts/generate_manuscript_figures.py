@@ -270,7 +270,12 @@ def make_fig2():
     ax.set_title("Within-Cohort Classification Performance\n(Nested 10-fold outer / 5-fold inner CV)", fontsize=9)
     ax.set_ylim(0.35, 1.15)   # raised from 1.12 so 0.998/0.992 value labels clear the top
     ax.yaxis.set_major_formatter(mticker.FormatStrFormatter("%.2f"))
-    ax.legend(fontsize=8, loc="upper left", framealpha=0.9)
+    # Legend placed outside/below the axes: any position inside the plot
+    # area overlaps some bar or error bar, since every cohort's bar fills
+    # continuously from the x-axis up to its AUC value (no data-free band
+    # exists at a fixed height across all four cohorts).
+    ax.legend(fontsize=7.5, loc="upper center", bbox_to_anchor=(0.5, -0.34),
+              ncol=3, framealpha=0.9, columnspacing=1.2, handletextpad=0.5)
     ax.grid(axis="y", linestyle=":", linewidth=0.5, alpha=0.6, zorder=1)
     ax.spines["top"].set_visible(False)
     ax.spines["right"].set_visible(False)
@@ -424,11 +429,15 @@ def make_fig4():
             bd_data.append({"cohort": c, "distance": d})
     bd_df = pd.DataFrame(bd_data)
 
-    fig = plt.figure(figsize=(WIDTH_IN, WIDTH_IN * 0.52), dpi=DPI)
+    fig = plt.figure(figsize=(WIDTH_IN, WIDTH_IN * 0.55), dpi=DPI)
     fig.patch.set_facecolor("white")
-    gs = gridspec.GridSpec(1, 3, figure=fig, width_ratios=[0.75, 1.3, 1.0],
-                           wspace=0.38, left=0.05, right=0.97,
-                           top=0.87, bottom=0.14)
+    # Panel A is now a simple 2-bar chart (see redesign below) and needs
+    # much less width than the 5-cohort PCoA scatter+legend (B) or the
+    # boxplot with rotated tick labels (C); rebalance width_ratios toward
+    # B/C instead of the original even-ish split.
+    gs = gridspec.GridSpec(1, 3, figure=fig, width_ratios=[0.62, 1.5, 1.05],
+                           wspace=0.48, left=0.06, right=0.96,
+                           top=0.87, bottom=0.16)
     ax_a = fig.add_subplot(gs[0])
     ax_b = fig.add_subplot(gs[1])
     ax_c = fig.add_subplot(gs[2])
@@ -494,8 +503,13 @@ def make_fig4():
     ax_b.set_xlabel(f"PC1 ({pv1:.1f}%)", fontsize=8.5)
     ax_b.set_ylabel(f"PC2 ({pv2:.1f}%)", fontsize=8.5)
     ax_b.set_title(f"PCoA — Aitchison Distance\nCohort R²=0.193 (p=0.0001)", fontsize=8.5)
-    ax_b.legend(fontsize=6.5, loc="upper right", framealpha=0.85,
-                markerscale=1.5)
+    # Kazakhstan's cluster extends into the upper-right of the scatter, so
+    # any in-axes legend position overlaps points. Placing it to the right
+    # (outside the axes) instead collides with panel C's title, so put it
+    # below panel B, in the empty margin under the PC1 axis label.
+    ax_b.legend(fontsize=6.5, loc="upper center", bbox_to_anchor=(0.5, -0.22),
+                ncol=3, framealpha=0.9, markerscale=1.3,
+                columnspacing=0.8, handletextpad=0.3)
     ax_b.axhline(0, color="gray", lw=0.4, ls=":"); ax_b.axvline(0, color="gray", lw=0.4, ls=":")
     ax_b.spines["top"].set_visible(False); ax_b.spines["right"].set_visible(False)
 
@@ -572,7 +586,11 @@ def make_fig5():
         ax.set_ylabel("LOCO AUC-ROC", fontsize=8.5)
         ax.set_title(f"LOCO AUC: Batch Correction Effect\n({model_lbl})", fontsize=8.5)
         ax.set_ylim(0.15, 1.05)
-        ax.legend(fontsize=7.5, loc="upper right", framealpha=0.9)
+        # Bars/error bars span most of the y-range in both panels (e.g. Zhu
+        # 2022 reaches ~0.9 at top, Zhuang/Kazakhstan dip to ~0.2 at bottom),
+        # so no in-axes corner is reliably free; place legend below the axes.
+        ax.legend(fontsize=7, loc="upper center", bbox_to_anchor=(0.5, -0.28),
+                  ncol=2, framealpha=0.9, columnspacing=1.0, handletextpad=0.4)
         ax.grid(axis="y", linestyle=":", lw=0.5, alpha=0.6, zorder=1)
         ax.spines["top"].set_visible(False)
         ax.spines["right"].set_visible(False)
@@ -593,14 +611,17 @@ def make_fig6():
     flip_df  = pd.read_csv(f"{TABLES}/shap_directional_flips.csv")
     over_df  = pd.read_csv(f"{TABLES}/shap_taxa_overlap.csv")
 
-    fig_h = WIDTH_IN * 0.78
+    fig_h = WIDTH_IN * 0.92
     fig = plt.figure(figsize=(WIDTH_IN, fig_h), dpi=DPI)
     fig.patch.set_facecolor("white")
+    # Panel A has 20 taxon rows, Panel B (bottom-left) has 12 -- give A the
+    # larger height share (previously inverted, which squeezed A's 20 genus
+    # labels into less room than B's 12).
     gs = gridspec.GridSpec(2, 2, figure=fig,
-                           height_ratios=[0.92, 1.35],
-                           hspace=0.40, wspace=0.40,
+                           height_ratios=[1.55, 1.0],
+                           hspace=0.38, wspace=0.40,
                            left=0.15, right=0.97,
-                           top=0.94, bottom=0.07)
+                           top=0.95, bottom=0.06)
     ax_a = fig.add_subplot(gs[0, :])   # top full-width
     ax_b = fig.add_subplot(gs[1, 0])   # bottom-left
     ax_c = fig.add_subplot(gs[1, 1])   # bottom-right
