@@ -308,7 +308,7 @@ The directional flip taxa identified under OOF SHAP—twelve for logistic regres
 
 *Lactobacillus* shows a more consistent directional pattern: CN-associated in Chinese cohorts but AD-associated in Kazakhstan across both model types. Fermented dairy consumption (kumis, kefir) is culturally prominent in Central Asian populations and would be expected to substantially elevate *Lactobacillus* abundance in Kazakh controls. This speculative dietary hypothesis, if correct, would imply that the same relative abundance of *Lactobacillus* carries different disease-predictive information in Chinese versus Kazakh populations—a biological generalization problem not correctable by standard batch correction.
 
-The critical implication of directional flips is that they may reflect biological population heterogeneity, technical study effects, or interactions between the two; the present design cannot disentangle these sources. Standard batch correction methods, designed to remove technical batch effects, would not be expected to resolve directional disagreements to the extent that these differences are driven by genuine population-level biology rather than technical artifacts alone.
+The critical implication of directional flips is that they may reflect biological population heterogeneity, technical study effects, or interactions between the two; the present design cannot disentangle these sources. Standard batch correction methods, designed to remove technical batch effects, would not be expected to resolve directional disagreements to the extent that these differences are driven by population-level biological differences rather than technical artifacts alone.
 
 ### 4.5 Implications for Clinical Translation
 
