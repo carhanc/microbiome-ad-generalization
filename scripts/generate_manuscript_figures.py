@@ -436,31 +436,33 @@ def make_fig4():
         ax.text(-0.18, 1.08, lbl, transform=ax.transAxes, fontsize=11,
                 fontweight="bold", va="bottom")
 
+    # Type III marginal R^2 values are not additive (each is estimated
+    # holding the other term in the model, not partitioning a shared total),
+    # so a stacked bar summing them to 1.0 alongside a "residual" wedge
+    # misrepresents what these numbers mean. Show the two marginal R^2
+    # values as independent horizontal bars instead.
     r2_cohort = 0.1722
     r2_diag   = 0.0140
-    r2_resid  = 1 - r2_cohort - r2_diag
-    bar_colors = ["#d73027", "#4575b4", "#d9d9d9"]
-    labels_r2  = [f"Cohort (R²={r2_cohort:.3f})",
-                  f"Diagnosis (R²={r2_diag:.3f})",
-                  f"Residual (R²={r2_resid:.3f})"]
-    vals = [r2_cohort, r2_diag, r2_resid]
-    bot = 0
-    for v, c, lbl in zip(vals, bar_colors, labels_r2):
-        ax_a.bar(0, v, 0.5, bottom=bot, color=c, label=lbl, alpha=0.9)
-        if v > 0.025:
-            ax_a.text(0, bot + v / 2, f"{v:.3f}", ha="center", va="center",
-                      fontsize=8, fontweight="bold", color="white")
-        bot += v
-    ax_a.set_xlim(-0.5, 0.5)
-    ax_a.set_ylim(0, 1.08)
-    ax_a.set_xticks([])
-    ax_a.set_ylabel("Proportion of Aitchison Variance (R²)", fontsize=8)
-    ax_a.set_title("PERMANOVA\nVariance Partitioning\n(4 labeled cohorts)", fontsize=8.5)
-    ax_a.legend(fontsize=7, loc="upper right", framealpha=0.9,
-                bbox_to_anchor=(2.85, 1.02))
+    bar_colors_a = ["#d73027", "#4575b4"]
+    labels_a = ["Cohort", "Diagnosis"]
+    vals_a   = [r2_cohort, r2_diag]
+    y_pos_a  = [1, 0]
+
+    ax_a.barh(y_pos_a, vals_a, height=0.5, color=bar_colors_a, alpha=0.9)
+    for y, v in zip(y_pos_a, vals_a):
+        ax_a.text(v + 0.006, y, f"R²={v:.3f}", ha="left", va="center",
+                  fontsize=8, fontweight="bold", color="#333333")
+    ax_a.set_yticks(y_pos_a)
+    ax_a.set_yticklabels(labels_a, fontsize=9)
+    ax_a.set_xlim(0, 0.22)
+    ax_a.set_ylim(-0.7, 1.7)
+    ax_a.set_xlabel("Marginal R² (Aitchison)", fontsize=8)
+    ax_a.set_title("PERMANOVA Marginal R²\n(4 labeled cohorts, n=401)", fontsize=8.5)
+    ax_a.text(0.97, 0.93, "~12× disparity", transform=ax_a.transAxes,
+              ha="right", va="top", fontsize=8.5, fontweight="bold",
+              color="#333333", style="italic")
     ax_a.spines["top"].set_visible(False)
     ax_a.spines["right"].set_visible(False)
-    ax_a.spines["bottom"].set_visible(False)
 
     pc1 = coords[:, 0]
     pc2 = coords[:, 1]
@@ -491,7 +493,7 @@ def make_fig4():
 
     ax_b.set_xlabel(f"PC1 ({pv1:.1f}%)", fontsize=8.5)
     ax_b.set_ylabel(f"PC2 ({pv2:.1f}%)", fontsize=8.5)
-    ax_b.set_title(f"PCoA — Aitchison Distance\nCohort R²=0.193 (p<0.0001)", fontsize=8.5)
+    ax_b.set_title(f"PCoA — Aitchison Distance\nCohort R²=0.193 (p=0.0001)", fontsize=8.5)
     ax_b.legend(fontsize=6.5, loc="upper right", framealpha=0.85,
                 markerscale=1.5)
     ax_b.axhline(0, color="gray", lw=0.4, ls=":"); ax_b.axvline(0, color="gray", lw=0.4, ls=":")
@@ -514,7 +516,7 @@ def make_fig4():
     ax_c.set_xticklabels([ALL5_SHORT.get(c, c) for c in plot_cohorts],
                           fontsize=7, rotation=40, ha="right")
     ax_c.set_ylabel("Distance to Cohort Centroid\n(Aitchison)", fontsize=8)
-    ax_c.set_title(f"Beta-Dispersion by Cohort\n(F=13.93, p<0.0001)", fontsize=8.5)
+    ax_c.set_title(f"Beta-Dispersion by Cohort\n(F=13.93, p=0.0001)", fontsize=8.5)
     ax_c.spines["top"].set_visible(False)
     ax_c.spines["right"].set_visible(False)
     ax_c.grid(axis="y", linestyle=":", lw=0.5, alpha=0.6)
@@ -634,7 +636,17 @@ def make_fig6():
     y_pos  = {t: (n_taxa - 1 - i) for i, t in enumerate(taxa_order_plot)}
     x_pos  = {c: j for j, c in enumerate(cohort_order)}
 
-    flip_taxa_lr = set(flip_df[flip_df["model"] == "logreg"]["taxon"].unique())
+    # Same fix as Panel B: flip_df contains every taxon shared across >=2
+    # cohorts' top-20, not just the ones that actually flip sign (e.g.
+    # Agathobacter is shared but does not flip). Filter to genuine sign-flips.
+    _lr_candidates = flip_df[flip_df["model"] == "logreg"]["taxon"].unique()
+    flip_taxa_lr = {
+        t for t in _lr_candidates
+        if (np.sign(flip_df[(flip_df["model"] == "logreg") &
+                            (flip_df["taxon"] == t)]["mean_shap"]).min() < 0
+            and np.sign(flip_df[(flip_df["model"] == "logreg") &
+                                (flip_df["taxon"] == t)]["mean_shap"]).max() > 0)
+    }
 
     for _, row in sub.iterrows():
         t = row["taxon"]
