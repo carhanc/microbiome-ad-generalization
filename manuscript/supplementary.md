@@ -99,6 +99,97 @@ Zhu 2022 analysis restricted to fecal samples only (n=60 binary: 30 AD + 30 CN).
 
 ---
 
+### Table S4. Training-Only Feature-Selection Sensitivity (Round 2)
+
+Genus retention (≥20% prevalence) re-derived independently within every split, using only that split's training-side samples (Section 2.5.1), compared against the main analysis's global (all-five-cohort) feature selection.
+
+**LOCO**
+
+| Test Cohort | Model | Original (Global-Feature) LOCO AUC | Training-Only LOCO AUC | Δ | N Retained Genera (Training-Only) |
+|---|---|---|---|---|---|
+| Zhuang 2018 | LogReg | 0.5041 | 0.5057 | +0.0016 | 370 |
+| Zhuang 2018 | LGBM | 0.5646 | 0.5960 | +0.0314 | 370 |
+| Ling 2020 | LogReg | 0.6775 | 0.6794 | +0.0019 | 370 |
+| Ling 2020 | LGBM | 0.6735 | 0.6534 | −0.0201 | 370 |
+| Zhu 2022 | LogReg | 0.8133 | 0.8122 | −0.0011 | 373 |
+| Zhu 2022 | LGBM | 0.7578 | 0.7878 | +0.0300 | 373 |
+| Kazakhstan | LogReg | 0.5644 | 0.6092 | +0.0448 | 150 |
+| Kazakhstan | LGBM | 0.5905 | 0.5247 | −0.0658 | 150 |
+
+**Within-cohort nested CV**
+
+| Cohort | Model | Original (Global-Feature) AUC | Training-Only AUC | Δ |
+|---|---|---|---|---|
+| Zhuang 2018 | LogReg | 0.6333 | 0.6647 | +0.0314 |
+| Zhuang 2018 | LGBM | 0.6349 | 0.6733 | +0.0384 |
+| Ling 2020 | LogReg | 0.8648 | 0.8896 | +0.0248 |
+| Ling 2020 | LGBM | 0.8618 | 0.8415 | −0.0203 |
+| Zhu 2022 | LogReg | 0.9978 | 0.9956 | −0.0022 |
+| Zhu 2022 | LGBM | 0.9789 | 0.9700 | −0.0089 |
+| Kazakhstan | LogReg | 0.7657 | 0.7368 | −0.0289 |
+| Kazakhstan | LGBM | 0.6943 | 0.6109 | −0.0834 |
+
+The retained genus count for LOCO training-only selection is lower when Kazakhstan is excluded from feature selection (150 genera) than when it is included in the training pool (370–373 genera), reflecting that Kazakhstan alone passes the 20%-prevalence threshold for many genera the Chinese/Korean-pipeline cohorts do not. No cohort–model combination changes qualitative classification (near-chance, intermediate, robust) between the global and training-only designs.
+
+*Source data:* `results/tables/within_cohort_auc_training_only.csv`, `results/tables/loco_auc_training_only.csv`, `results/tables/pairwise_auc_training_only.csv`, `results/tables/training_only_feature_sensitivity_summary.csv`, `results/tables/training_only_feature_counts.csv`, `results/tables/training_only_feature_lists.csv` (full per-split retained-genus lists).
+
+---
+
+### Table S5. Within-Cohort AUC on Batch-Corrected Data: Label-Blind vs. Label-Informed (Round 2)
+
+Within-cohort nested-CV AUC (Section 2.4 procedure) computed on batch-corrected features, under both correction designs (Section 2.7). The label-blind comparison is unconfounded by label use during correction; the label-informed comparison is confounded (Section 3.5) and is shown only for completeness/continuity with the original analysis.
+
+| Cohort | Model | Uncorrected | ComBat-seq (label-blind) | MMUPHin (label-blind) | ComBat-seq (label-informed, exploratory) | MMUPHin (label-informed, exploratory) |
+|---|---|---|---|---|---|---|
+| Zhuang 2018 | LogReg | 0.6333 | 0.6604 | 0.6171 | 0.6647 | 0.6393 |
+| Zhuang 2018 | LGBM | 0.6349 | 0.6479 | 0.6247 | 0.6544 | 0.5765 |
+| Ling 2020 | LogReg | 0.8648 | 0.8701 | 0.8690 | 0.8754 | 0.8863 |
+| Ling 2020 | LGBM | 0.8618 | 0.8255 | 0.8689 | 0.8659 | 0.8844 |
+| Zhu 2022 | LogReg | 0.9978 | 0.9878 | 0.9900 | 0.9956 | 0.9933 |
+| Zhu 2022 | LGBM | 0.9789 | 0.9533 | 0.9600 | 0.9622 | 0.9650 |
+| Kazakhstan | LogReg | 0.7657 | 0.6926 | 0.7663 | 0.7839 | 0.7879 |
+| Kazakhstan | LGBM | 0.6943 | 0.6829 | 0.5621 | 0.7351 | 0.6858 |
+
+*Source data:* `results/tables/within_cohort_auc_corrected_labelblind.csv`, `results/tables/within_cohort_auc_corrected.csv`, `results/tables/within_cohort_auc.csv`.
+
+---
+
+### Table S6. Logistic-Regression Coefficient Sign Stability, Directional-Flip Candidates and *Akkermansia* (Round 2)
+
+Per (cohort, genus), counts of positive/negative/zero fitted coefficients across the 10 outer OOF folds (Section 2.8). `sign_stability` uses the pre-specified ≥8/10-fold threshold. Full table (1,584 cohort×genus rows) in `results/tables/logreg_coefficient_stability.csv`; below, the eight confirmed stable-flip taxa (Section 3.6) plus *Akkermansia* as a negative-control illustration (Section 3.6, Section 4.4).
+
+| Cohort | Taxon | n_positive/10 | n_negative/10 | Median Coefficient | Sign Stability |
+|---|---|---|---|---|---|
+| Zhuang 2018 | Akkermansia | 10 | 0 | 0.0124 | stable_positive |
+| Ling 2020 | Akkermansia | 10 | 0 | 0.1181 | stable_positive |
+| Zhu 2022 | Akkermansia | 10 | 0 | 0.0709 | stable_positive |
+| Kazakhstan | Akkermansia | 10 | 0 | 0.0682 | stable_positive |
+
+*Akkermansia*'s coefficient is stable and positive in all four cohorts — it is not a stable directional flip despite its pooled mean SHAP value appearing to reverse sign (Section 3.6); see the full CSV for the corresponding rows for each of the eight confirmed flip taxa (*Agathobacter*, *Bifidobacterium*, *Coprococcus*, *Dorea*, *Lactobacillus*, *NK4A214 group*, *Romboutsia*, *Ruminococcus gnavus group*) and for `logreg_directional_flips_stable.csv`, which lists, per candidate taxon, which cohorts carried a stable positive vs. stable negative coefficient.
+
+*Source data:* `results/tables/logreg_coefficient_stability.csv`, `results/tables/logreg_directional_flips_stable.csv`.
+
+---
+
+### Table S7. Matched-Null Jaccard Overlap Across Top-N Thresholds (Round 2)
+
+Observed statistic = mean of the six unique pairwise Jaccard similarities among the four labeled cohorts' top-N SHAP taxa sets. Null = 100,000 replicates, each drawing four independent random top-N gene sets from the 396-genus pool and averaging the same six pairwise Jaccards among them (Section 2.8). Empirical one-sided p = (1 + #{null ≥ observed}) / (n_perm + 1).
+
+| Model | Top-N | Observed Mean (6 pairs) | Null Mean | Null 95% CI | Empirical p |
+|---|---|---|---|---|---|
+| LogReg | 10 | 0.0850 | 0.0134 | [0.0000, 0.0361] | <0.0001 |
+| LogReg | **20 (primary)** | **0.1350** | 0.0265 | [0.0085, 0.0491] | **<0.0001** |
+| LogReg | 50 | 0.2296 | 0.0680 | [0.0491, 0.0895] | <0.0001 |
+| LightGBM | 10 | 0.0175 | 0.0135 | [0.0000, 0.0361] | 0.4494 (not significant) |
+| LightGBM | **20 (primary)** | **0.0584** | 0.0265 | [0.0085, 0.0491] | **0.0048** |
+| LightGBM | 50 | 0.1430 | 0.0680 | [0.0492, 0.0894] | <0.0001 |
+
+LightGBM's overlap is significant at N=20 and N=50 but not at N=10, indicating a real but small-magnitude and N-sensitive signal — smaller and less consistent than logistic regression's overlap at every threshold tested. This supersedes an earlier, incorrectly-calibrated null (Section 2.8) that had reported LightGBM's N=20 overlap as "within the random baseline" (p=0.068); that earlier null drew only two random sets per replicate rather than the four-set, six-pair statistic actually being tested.
+
+*Source data:* `results/tables/jaccard_null_corrected.csv`. The superseded `results/tables/jaccard_null.csv` is retained on disk for audit-trail provenance only and is not used by this manuscript.
+
+---
+
 ## Supplementary Figures
 
 ### Figure S1. Zhu 2022: Fecal-Only Within-Cohort AUC
@@ -111,29 +202,17 @@ Zhu 2022 analysis restricted to fecal samples only (n=60 binary: 30 AD + 30 CN).
 
 ### Figure S2. Top-15 SHAP Taxa Per Cohort (LightGBM, Out-of-Fold)
 
-**Caption:** Horizontal bar charts showing mean |SHAP| value (CLR units) for the top-15 genera by importance in each of the four labeled cohorts under out-of-fold LightGBM evaluation. Red bars = AD-associated (positive mean signed SHAP); blue bars = CN-associated (negative mean signed SHAP). Top taxon per cohort: Lachnoclostridium (Zhuang 2018, CN-associated, |SHAP|=0.560), Akkermansia (Ling 2020, CN-associated, |SHAP|=0.947), Bacteroides (Zhu 2022, AD-associated, |SHAP|=1.243), Castellaniella (Kazakhstan, CN-associated, |SHAP|=0.614). Mean pairwise Jaccard similarity at top-20: 0.058, within the null 95% CI of a random-draw baseline (Section 2.8). LightGBM directional flips (top-20, 12 taxa): Agathobacter, Akkermansia, Bacteroides, Colidextribacter, Faecalibacterium, Incertae Sedis, Lachnospira, Lactobacillus, Oscillibacter, Romboutsia, Roseburia, [Eubacterium] siraeum group.
+**Caption (revised, Round 2):** Horizontal bar charts showing mean |SHAP| value (CLR units) for the top-15 genera by importance in each of the four labeled cohorts under out-of-fold LightGBM evaluation. Bars are a single neutral color and show feature-importance magnitude only — **no AD/CN direction is assigned**, because a tree ensemble has no single coefficient-like global direction and LightGBM's SHAP-feature relationships may be nonlinear or non-monotonic (Section 2.8). Top taxon per cohort (by |SHAP| magnitude only): Lachnoclostridium (Zhuang 2018, |SHAP|=0.560), Akkermansia (Ling 2020, |SHAP|=0.947), Bacteroides (Zhu 2022, |SHAP|=1.243), Castellaniella (Kazakhstan, |SHAP|=0.614). Mean pairwise Jaccard similarity at top-20: 0.058, significantly above a null distribution matched to this statistic's construction (p=0.0048 at N=20; not significant at N=10, p=0.45; Supplementary Table S7). **No LightGBM directional-flip claim is made in this paper**; an earlier draft's report of "12 LightGBM directional flips" (based on an invalid mean-signed-SHAP statistic) is superseded and should not be cited.
 
-*Source figure:* `results/figures/supp_fig_s2.jpg` (built from `results/figures/working/shap_top15_per_cohort_lgbm.png`)
-
----
-
-### Figure S3a. LOCO SHAP Direction — Logistic Regression
-
-**Caption:** Out-of-fold SHAP values computed for LOCO-trained logistic regression classifiers (trained on the pooled other three cohorts, with that training pool as the SHAP background distribution) and evaluated on each held-out test cohort. Points show the top genera by mean |SHAP| on the held-out test data; x-position gives the signed mean SHAP value on the held-out cohort (positive = AD-associated, negative = CN-associated).
-
-Top-1 LOCO SHAP taxon per held-out cohort (logistic regression): held-out Zhuang 2018 — *Akkermansia* (CN-associated, |SHAP|=0.470); held-out Ling 2020 — *Subdoligranulum* (AD-associated, |SHAP|=0.269); held-out Zhu 2022 — *Akkermansia* (CN-associated, |SHAP|=0.372); held-out Kazakhstan — *Christensenellaceae* R-7 group (AD-associated, |SHAP|=0.368). *Akkermansia* is the top LOCO predictor for two of the four held-out cohorts (Zhuang 2018, Zhu 2022), both CN-associated in the LOCO setting; no genus is top-ranked in all four conditions. This recurrence does not indicate a stable transferable signal — *Akkermansia*'s role is directionally inconsistent in the underlying within-cohort SHAP analysis (Figure 6; Section 3.6), where it is a directional-flip taxon with a 2/2 CN/AD split across the same four cohorts. The pattern is consistent with cross-cohort classifiers activating whichever genera most closely resemble their training-cohort signature rather than a disease marker that generalizes across populations.
-
-*Source figure:* `results/figures/supp_fig_s3a.jpg` (built from `results/figures/working/shap_loco_direction_logreg.png`)
+*Source figure:* `results/figures/supp_fig_s2.jpg` (built from `results/figures/working/shap_top15_per_cohort_lgbm.png`, regenerated Round 2 with neutral-color bars)
 
 ---
 
-### Figure S3b. LOCO SHAP Direction — LightGBM
+### Figure S3a/S3b. LOCO SHAP Direction — Removed in Round 2
 
-**Caption:** Out-of-fold SHAP values computed for LOCO-trained LightGBM classifiers, evaluated on each held-out test cohort, parallel to Figure S3a.
+**These two figures (originally: out-of-fold SHAP values for LOCO-trained classifiers, plotted with a signed x-position labeled "AD-associated"/"CN-associated") have been removed.** Reviewer 3, Round 2, concern #3 established that mean signed SHAP is not a valid direction statistic in general, and this is especially severe for LOCO SHAP specifically: the SHAP background (the three pooled training cohorts) and the evaluation set (the held-out cohort) are drawn from systematically different populations by construction, so the sign of a LOCO mean SHAP value is confounded with the raw cross-cohort compositional difference quantified by PERMANOVA (Section 3.4), independent of anything the model learned. No coefficient-based replacement direction is offered for LOCO SHAP either, because LOCO models are refit on pooled multi-cohort training data each time and a single stable-fold coefficient analysis analogous to Section 2.8's within-cohort procedure was not part of this design.
 
-Top-1 LOCO SHAP taxon per held-out cohort (LightGBM): held-out Zhuang 2018 — *Akkermansia* (CN-associated, |SHAP|=0.844); held-out Ling 2020 — *[Eubacterium] xylanophilum* group (AD-associated, |SHAP|=0.518); held-out Zhu 2022 — *Akkermansia* (CN-associated, |SHAP|=0.789); held-out Kazakhstan — *[Eubacterium] xylanophilum* group (CN-associated, |SHAP|=0.521). As with logistic regression, *Akkermansia* recurs as the top predictor for two of four held-out cohorts (both CN-associated) while *[Eubacterium] xylanophilum* group tops the other two with opposite directions between them (AD for Ling 2020, CN for Kazakhstan) — no single genus is both top-ranked and directionally consistent across all four held-out conditions for either model.
-
-*Source figure:* `results/figures/supp_fig_s3b.jpg` (built from `results/figures/working/shap_loco_direction_lgbm.png`)
+LOCO SHAP **feature importance** (mean |SHAP|, magnitude only, no direction) remains available and is unaffected by this issue: see `results/tables/shap_loco_importance.csv`. For reference, the previously reported top-importance genus per held-out cohort was: Zhuang 2018 — *Akkermansia* (logistic regression |SHAP|=0.470); Ling 2020 — *Subdoligranulum* (|SHAP|=0.269); Zhu 2022 — *Akkermansia* (|SHAP|=0.372); Kazakhstan — *Christensenellaceae R-7 group* (|SHAP|=0.368); no genus ranked first across all four held-out conditions for either model (Section 3.6).
 
 ---
 
@@ -143,6 +222,15 @@ Top-1 LOCO SHAP taxon per held-out cohort (LightGBM): held-out Zhuang 2018 — *
 
 *Source data:* `results/tables/sensitivity_loco.csv`
 *Source figure:* `results/figures/supp_sensitivity_loco.png`
+
+---
+
+### Figure S5. Batch Correction, Label-Informed Design (Exploratory Sensitivity, Round 2)
+
+**Caption:** LOCO AUC-ROC under the label-informed transductive batch-correction design (ComBat-seq/MMUPHin fit using every sample's own true diagnosis label; Section 2.7), shown for (**A**) logistic regression and (**B**) LightGBM. This is the same comparison previously presented as the paper's primary batch-correction result; it is retained here as an **explicitly-labeled exploratory/oracle-style sensitivity only**, because a correction step that has already seen each sample's true label cannot estimate prospective external-validation performance, and because the resulting within-cohort AUC on corrected data cannot be used as evidence that genuine, correction-independent biological signal survived (Section 3.5). The main-text Figure 5 shows the label-blind design (no diagnosis information used during correction), which we now treat as the primary batch-correction result. Note the severe, cohort-specific degradation visible here (e.g., Kazakhstan logistic regression LOCO AUC=0.308) that is **not** reproduced under the label-blind design (Kazakhstan label-blind LOCO AUC=0.560, closely matching the uncorrected value of 0.564) — indicating this degradation was driven substantially by the label-informed design itself.
+
+*Source data:* `results/tables/auc_comparison_table.csv`, `results/tables/loco_auc_corrected.csv`
+*Source figure:* `results/figures/supp_fig_s5.jpg`
 
 ---
 

@@ -270,3 +270,83 @@ Panel C's observed values are unchanged and their mean ((0.290+0.212+0.026+0.176
 0.053+0.053)/6 = 0.135) still matches the manuscript's stated Jaccard figure exactly.
 
 ---
+
+## 4. Manuscript rewrite (Section G) and remaining figure/caption fixes
+
+**Files modified:** `manuscript/draft.md`, `manuscript/supplementary.md`, `scripts/build_pdf.py`
+(figure caption list + one heading-text marker fix), `scripts/generate_manuscript_figures.py`
+(Figure 5 now reads label-blind data as primary; new `make_supp_fig_s5()` for the
+label-informed exploratory comparison; `make_supp_fig_s2()` LightGBM bars fixed to a
+neutral color, removing the same invalid AD/CN-from-mean-SHAP coloring the main
+Figure 6 fix addressed, which had also been present in this supplementary figure).
+
+**Every affected section was rewritten**, per the Round 2 instructions: Abstract,
+§2.2 (genus filtering — now states the actual 20%-prevalence global rule and
+acknowledges held-out-cohort information use), new §2.5.1 (training-only sensitivity
+methodology), §2.7 (batch correction — label-blind primary / label-informed
+exploratory), §2.8 (SHAP — coefficient-based direction, matched Jaccard null), §2.10
+(mixed-environment disclosure), §3.3 (LOCO — added training-only sensitivity
+paragraph), §3.4 (PERMANOVA — empirical/hypothesis separation), §3.5 (batch
+correction results — full rewrite around the label-blind finding), §3.6 (SHAP results
+— full rewrite: 8 stable flips, no LightGBM flip, matched-null Jaccard), §4.2
+(batch-correction discussion — explicit empirical-result-vs-hypothesis structure,
+retraction of the "ComBat-seq substantially worsens" mechanistic claim), §4.4
+(directional-flip discussion — 8 taxa, LightGBM claim removed), §4.6 (Limitations —
+new bullets: global feature selection [now sensitivity-tested], two-design batch
+correction, SHAP/coefficient limitations, L2-vs-elastic-net disclosure), Conclusion.
+New Supplementary Tables S4 (training-only sensitivity), S5 (within-cohort AUC,
+label-blind vs. label-informed), S6 (coefficient stability detail), S7 (Jaccard N
+sensitivity); Supplementary Figures S3a/S3b (LOCO SHAP direction) replaced with an
+explicit removal notice; Figure S2's caption corrected to match its neutral-color
+regeneration; new Supplementary Figure S5 (label-informed exploratory batch
+correction) added.
+
+**Correctness catch made during the rewrite, documented rather than silently fixed:**
+while writing the *Akkermansia* discussion (planned to parallel the old manuscript's
+"CN-associated in Zhuang/Ling, AD-associated in Zhu 2022/Kazakhstan" framing but
+translated into coefficient language), a direct check of
+`results/tables/logreg_coefficient_stability.csv` showed *Akkermansia*'s fitted
+coefficient is **stable and positive in all four cohorts** (10/10 outer folds each),
+not mixed as the old mean-SHAP-based framing implied. This was corrected before
+finalizing the prose (Section 3.6, Section 4.4, and new Supplementary Table S6) and
+is now presented as a deliberate, concrete illustration of exactly why mean signed
+SHAP was an inadequate direction statistic: the pooled mean SHAP value for this
+genus does appear to flip sign across cohorts, but the model's actual fitted
+coefficient never does. This is flagged explicitly per the standing instruction not
+to propagate assumed-but-unverified numbers into the manuscript.
+
+**Gate-check greps performed against the final `draft.md`** for every stale term
+listed in the Round 2 instructions (0.135, 0.058, 0.068, 0.0019, "twelve
+directional", "12 directional", "within the random baseline", "ruling out",
+"mechanistically", "upper bound", "n=521", "elastic-net", "AD-associated",
+"CN-associated"): every remaining hit was manually inspected and confirmed to be
+either (a) a still-correct, unchanged value used in its original correct context,
+or (b) intentionally retained inside a corrective/retraction sentence that
+explicitly labels the old value as superseded. No live, uncaveated occurrence of a
+prohibited phrase or a stale number was found. `AD-associated`/`CN-associated` do
+not appear anywhere in the final `draft.md` at all (fully replaced by
+coefficient/model-direction language). One additional stale "elastic-net" reference
+was found and fixed in `scripts/build_pdf.py`'s Figure 2 caption (not caught by the
+draft.md-only grep pass, since it lives in the caption-generation script).
+
+**DOCX/PDF rebuild:**
+```
+pandoc manuscript/draft.md -o manuscript/draft.docx --standalone
+pandoc manuscript/supplementary.md -o manuscript/supplementary.docx --standalone
+<python-docx table-border script, applied to both>
+/opt/anaconda3/bin/python scripts/build_pdf.py
+```
+Table-border pass: 4 tables in `draft.docx` (unchanged count), 13 tables in
+`supplementary.docx` (up from 9, the 4 new Round 2 tables S4–S7). `build_pdf.py`
+completed with zero "marker not found" warnings (verified by re-running and
+grepping for "marker"/"not found"/"skip" — no matches), confirming every figure
+insertion point, including the renamed §3.6 heading used as Figure 5's marker,
+matched correctly. `manuscript/manuscript_draft.pdf` rebuilt (31 pages, ~3.08 MB).
+Visually verified via PyMuPDF rendering: Section 2.2/2.3 (genus-filter correction +
+CLR equation still typeset as real math), Table 4 (all 5 rows, borders correct),
+Figure 5 (flat label-blind bars) and Figure 6 (coefficient-colored dots, Akkermansia
+red/positive in all four cohorts, matching the corrected text) all render as
+intended. One grammar slip ("an label-informed" → "a label-informed") was caught
+during this visual pass and fixed, then the docx/pdf were rebuilt again.
+
+---

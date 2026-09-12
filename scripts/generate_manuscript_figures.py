@@ -62,6 +62,8 @@ CORRECTION_COLORS = {
     "uncorrected": "#4dac26",
     "combatseq":   "#d01c8b",
     "mmuphin":     "#f4a582",
+    "combatseq_labelblind": "#d01c8b",
+    "mmuphin_labelblind":   "#f4a582",
 }
 
 LABELED_COHORTS = ["zhuang2018", "ling2020", "shanghai2022", "kazakhstan2022"]
@@ -551,15 +553,20 @@ def make_fig4():
 
 
 def make_fig5():
-    print("  Generating Figure 5 (Batch Correction Comparison)…")
-    df = pd.read_csv(f"{TABLES}/auc_comparison_table.csv")
+    print("  Generating Figure 5 (Batch Correction Comparison — label-blind, primary)…")
+    # Round 2 (Reviewer 3, concern #2): the main-text figure now shows the
+    # label-blind correction (no diagnosis information used during ComBat-seq/
+    # MMUPHin fitting) as the primary batch-correction result. The original
+    # label-informed/oracle-style comparison (auc_comparison_table.csv) is
+    # retained as Supplementary Figure S5, explicitly labeled exploratory.
+    df = pd.read_csv(f"{TABLES}/auc_comparison_labelblind.csv")
 
     fig, axes = plt.subplots(1, 2, figsize=(WIDTH_IN, WIDTH_IN * 0.46), dpi=DPI)
     fig.patch.set_facecolor("white")
 
-    corrections = ["uncorrected", "combatseq", "mmuphin"]
-    corr_labels = {"uncorrected": "Uncorrected", "combatseq": "ComBat-seq",
-                   "mmuphin": "MMUPHin"}
+    corrections = ["uncorrected", "combatseq_labelblind", "mmuphin_labelblind"]
+    corr_labels = {"uncorrected": "Uncorrected", "combatseq_labelblind": "ComBat-seq (label-blind)",
+                   "mmuphin_labelblind": "MMUPHin (label-blind)"}
     cohorts = LABELED_COHORTS
     n = len(cohorts)
     x = np.arange(n)
@@ -592,7 +599,7 @@ def make_fig5():
         ax.set_xticklabels([COHORT_SHORT_FLAT[c] for c in cohorts],
                             fontsize=8, rotation=15, ha="right")
         ax.set_ylabel("LOCO AUC-ROC", fontsize=8.5)
-        ax.set_title(f"LOCO AUC: Batch Correction Effect\n({model_lbl})", fontsize=8.5)
+        ax.set_title(f"LOCO AUC: Label-Blind Batch Correction\n({model_lbl})", fontsize=8.5)
         ax.set_ylim(0.15, 1.05)
         # Bars/error bars span most of the y-range in both panels (e.g. Zhu
         # 2022 reaches ~0.9 at top, Zhuang/Kazakhstan dip to ~0.2 at bottom),
@@ -926,8 +933,11 @@ def make_supp_fig_s2():
                .head(15)
                .sort_values("mean_abs_shap", ascending=True))
 
-        colours = ["#d73027" if v >= 0 else "#4575b4" for v in sub["mean_shap"]]
-        ax.barh(sub["taxon"], sub["mean_abs_shap"], color=colours, alpha=0.85)
+        # Round 2 (Reviewer 3, concern #3): LightGBM has no single
+        # coefficient-like global direction, and its SHAP relationships may
+        # be nonlinear/nonmonotonic, so bars are a single neutral color --
+        # magnitude (feature importance) only, no AD/CN direction implied.
+        ax.barh(sub["taxon"], sub["mean_abs_shap"], color="#4C72B0", alpha=0.85)
         ax.set_xlabel("Mean |SHAP value| (CLR units)", fontsize=8)
         label = COHORT_LABELS_S2.get(cohort, cohort)
         ax.set_title(label, fontsize=8.5, fontweight="bold",
@@ -938,10 +948,80 @@ def make_supp_fig_s2():
         ax.spines["right"].set_visible(False)
 
     fig.suptitle("Top-15 SHAP taxa per cohort (LightGBM)\n"
-                 "Red = AD-associated; Blue = CN-associated",
+                 "Bars show OOF mean |SHAP| feature importance only; no AD/CN "
+                 "direction is assigned (see Methods)",
                  fontsize=9, y=1.01)
     plt.tight_layout()
     out = f"{FIGS}/supp_fig_s2.png"
+    fig.savefig(out, dpi=DPI, bbox_inches="tight", facecolor="white")
+    plt.close(fig)
+    print(f"  Saved: {out}")
+
+
+def make_supp_fig_s5():
+    print("  Generating Figure S5 (Batch Correction, label-informed exploratory sensitivity)…")
+    # Round 2 (Reviewer 3, concern #2): this is the ORIGINAL label-informed
+    # (oracle-style) batch-correction comparison -- each sample's own true
+    # diagnosis label was used during ComBat-seq/MMUPHin fitting. Retained
+    # here only as an explicitly-labeled exploratory sensitivity; the
+    # label-blind comparison in the main-text Figure 5 is the primary result.
+    df = pd.read_csv(f"{TABLES}/auc_comparison_table.csv")
+
+    fig, axes = plt.subplots(1, 2, figsize=(WIDTH_IN, WIDTH_IN * 0.46), dpi=DPI)
+    fig.patch.set_facecolor("white")
+
+    corrections = ["uncorrected", "combatseq", "mmuphin"]
+    corr_labels = {"uncorrected": "Uncorrected", "combatseq": "ComBat-seq (label-informed)",
+                   "mmuphin": "MMUPHin (label-informed)"}
+    cohorts = LABELED_COHORTS
+    n = len(cohorts)
+    x = np.arange(n)
+    bar_w = 0.24
+
+    for ax, model, model_lbl in zip(axes, ["logreg", "lgbm"],
+                                     ["Logistic Regression", "LightGBM"]):
+        offsets = np.array([-0.25, 0.0, 0.25])
+        for corr, offset in zip(corrections, offsets):
+            aucs, ci_lo, ci_hi = [], [], []
+            for c in cohorts:
+                row = df[(df["test_cohort"] == c) & (df["model"] == model) &
+                         (df["correction"] == corr)]
+                if len(row) == 0:
+                    aucs.append(np.nan); ci_lo.append(0); ci_hi.append(0)
+                else:
+                    row = row.iloc[0]
+                    aucs.append(row["loco_auc"])
+                    ci_lo.append(row["loco_auc"] - row["loco_ci_lo"])
+                    ci_hi.append(row["loco_ci_hi"] - row["loco_auc"])
+            ax.bar(x + offset, aucs, bar_w, color=CORRECTION_COLORS[corr],
+                   alpha=0.85, label=corr_labels[corr], zorder=3)
+            ax.errorbar(x + offset, aucs, yerr=[ci_lo, ci_hi],
+                        fmt="none", color="#222222", capsize=2.5,
+                        capthick=0.7, elinewidth=0.7, zorder=4)
+
+        ax.axhline(0.5, color="gray", linestyle="--", lw=0.8, zorder=2,
+                   label="Chance (0.5)")
+        ax.set_xticks(x)
+        ax.set_xticklabels([COHORT_SHORT_FLAT[c] for c in cohorts],
+                            fontsize=8, rotation=15, ha="right")
+        ax.set_ylabel("LOCO AUC-ROC", fontsize=8.5)
+        ax.set_title(f"LOCO AUC: Label-Informed Correction\n(exploratory; {model_lbl})", fontsize=8.5)
+        ax.set_ylim(0.15, 1.05)
+        ax.legend(fontsize=7, loc="upper center", bbox_to_anchor=(0.5, -0.28),
+                  ncol=2, framealpha=0.9, columnspacing=1.0, handletextpad=0.4)
+        ax.grid(axis="y", linestyle=":", lw=0.5, alpha=0.6, zorder=1)
+        ax.spines["top"].set_visible(False)
+        ax.spines["right"].set_visible(False)
+        ax.text(-0.12, 1.08, "AB"[list(axes).index(ax)],
+                transform=ax.transAxes, fontsize=11, fontweight="bold",
+                va="bottom")
+
+    fig.suptitle("Exploratory sensitivity: label-informed transductive correction\n"
+                 "(each sample's own true diagnosis label was used during correction; "
+                 "not a prospective or deployable design -- see Methods)",
+                 fontsize=8.5, y=1.06, color="#993300")
+    plt.tight_layout()
+    out = f"{FIGS}/supp_fig_s5.png"
     fig.savefig(out, dpi=DPI, bbox_inches="tight", facecolor="white")
     plt.close(fig)
     print(f"  Saved: {out}")
@@ -962,5 +1042,6 @@ if __name__ == "__main__":
     make_fig6()
     make_supp_fig_s1()
     make_supp_fig_s2()
+    make_supp_fig_s5()
 
     print("\nAll figures saved to results/figures/")

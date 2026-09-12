@@ -26,7 +26,7 @@ FIGURES = [
         "**Figure 2.** Within-cohort classification performance under nested cross-validation "
         "(10-fold outer / 5-fold inner CV). Bars show out-of-fold AUC-ROC; error bars represent "
         "95% bootstrap confidence intervals (1,000 resamples). Dashed line = chance (AUC = 0.50). "
-        "LogReg = logistic regression with elastic-net regularization; LGBM = LightGBM."
+        "LogReg = L2-regularized logistic regression; LGBM = LightGBM."
     ),
     (
         "### 3.4 PERMANOVA Variance Decomposition",
@@ -51,25 +51,37 @@ FIGURES = [
         "(F=13.93, p=0.0001, 9,999 permutations)."
     ),
     (
-        "### 3.6 SHAP Analysis Reveals Cohort-Specific and Contradictory Taxonomic Signatures",
+        "### 3.6 SHAP Analysis Reveals Cohort-Specific Taxonomic Signatures and a Conservative Set of Stable Directional Flips",
         5,
-        "**Figure 5.** Effect of batch correction on LOCO cross-cohort AUC-ROC. "
+        "**Figure 5.** Effect of label-blind batch correction on LOCO cross-cohort AUC-ROC "
+        "(primary analysis; no diagnosis information used during correction). "
         "(**A**) Logistic regression and (**B**) LightGBM LOCO AUC for each held-out cohort "
-        "under three conditions: uncorrected (green), ComBat-seq corrected (magenta), and "
-        "MMUPHin corrected (salmon). Error bars = 95% bootstrap CI. Dashed line = chance (0.50). "
-        "Both methods failed to improve cross-cohort generalization; ComBat-seq substantially worsened it."
+        "under three conditions: uncorrected (green), ComBat-seq label-blind corrected (magenta), and "
+        "MMUPHin label-blind corrected (salmon). Error bars = 95% bootstrap CI. Dashed line = chance (0.50). "
+        "Under this label-blind design, both methods left mean LOCO AUC essentially unchanged "
+        "relative to uncorrected (within 0.007 AUC for both methods and models), neither "
+        "recovering nor substantially worsening cross-cohort generalization. An exploratory "
+        "label-informed (oracle-style) comparison, in which correction used each sample's own "
+        "true diagnosis label and which produced substantially different, more severe "
+        "degradation for some cohorts, is reported separately in Supplementary Figure S5 "
+        "and is not treated as evidence about prospective performance (Section 2.7, Section 3.5)."
     ),
     (
         "---\n\n## 4. Discussion",
         6,
-        "**Figure 6.** SHAP feature importance analysis. "
-        "(**A**) Top-20 SHAP genera by maximum |SHAP| across cohorts for logistic regression. "
-        "Dot size ∝ mean |SHAP|; red = AD-associated; blue = CN-associated; "
-        "★ = directional flip taxon; yellow rows highlight flip taxa. "
-        "(**B**) Directional flip taxa (logistic regression): genera appearing in the top-20 for "
-        "≥2 cohorts with opposite AD/CN associations. Letters indicate cohort initials. "
-        "(**C**) Pairwise Jaccard similarity of top-20 SHAP taxa between cohort pairs "
-        "(logistic regression); mean off-diagonal Jaccard = 0.135."
+        "**Figure 6.** SHAP feature importance and coefficient-based direction analysis, logistic regression. "
+        "(**A**) Top-20 SHAP genera by maximum |SHAP| across cohorts. "
+        "Dot size ∝ mean |SHAP|; red/blue = positive/negative fitted logistic-regression coefficient "
+        "(median across 10 outer folds), not mean signed SHAP; "
+        "★ = stable directional flip (≥8/10-fold coefficient-sign stability in ≥1 cohort each direction); "
+        "yellow rows highlight flip taxa. "
+        "(**B**) The eight stable directional flip taxa: genera in the top-20 for ≥2 cohorts with a "
+        "stable positive coefficient in ≥1 cohort and a stable negative coefficient in ≥1 other. "
+        "Dot position = per-cohort mean SHAP (descriptive); dot color = fitted coefficient sign; "
+        "letters indicate cohort initials. "
+        "(**C**) Pairwise Jaccard similarity of top-20 SHAP taxa between cohort pairs; "
+        "mean of the six unique pairwise values = 0.135, significantly above a null matched to this "
+        "statistic's construction (100,000 replicates of four random top-20 sets; p<0.0001)."
     ),
 ]
 
