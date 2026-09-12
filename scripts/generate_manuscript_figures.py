@@ -616,8 +616,16 @@ def make_fig5():
 def make_fig6():
     print("  Generating Figure 6 (SHAP Taxa Analysis)…")
     shap_df  = pd.read_csv(f"{TABLES}/shap_within_cohort_importance.csv")
-    flip_df  = pd.read_csv(f"{TABLES}/shap_directional_flips.csv")
     over_df  = pd.read_csv(f"{TABLES}/shap_taxa_overlap.csv")
+    # Round 2 (Reviewer 3, concern #3): direction now comes from the fitted
+    # logistic-regression coefficient (per cohort, median across 10 outer
+    # folds), not from mean signed SHAP -- and the "directional flip" set
+    # comes from the pre-specified coefficient-stability criterion (>=8/10
+    # folds agreeing in sign in each direction), not a naive sign check on
+    # mean_shap. shap_directional_flips.csv is no longer read here.
+    coef_stab = pd.read_csv(f"{TABLES}/logreg_coefficient_stability.csv")
+    stable_flips_df = pd.read_csv(f"{TABLES}/logreg_directional_flips_stable.csv")
+    coef_lookup = coef_stab.set_index(["cohort", "taxon"])["median_coefficient"]
 
     fig_h = WIDTH_IN * 0.92
     fig = plt.figure(figsize=(WIDTH_IN, fig_h), dpi=DPI)
@@ -665,17 +673,9 @@ def make_fig6():
     y_pos  = {t: (n_taxa - 1 - i) for i, t in enumerate(taxa_order_plot)}
     x_pos  = {c: j for j, c in enumerate(cohort_order)}
 
-    # Same fix as Panel B: flip_df contains every taxon shared across >=2
-    # cohorts' top-20, not just the ones that actually flip sign (e.g.
-    # Agathobacter is shared but does not flip). Filter to genuine sign-flips.
-    _lr_candidates = flip_df[flip_df["model"] == "logreg"]["taxon"].unique()
-    flip_taxa_lr = {
-        t for t in _lr_candidates
-        if (np.sign(flip_df[(flip_df["model"] == "logreg") &
-                            (flip_df["taxon"] == t)]["mean_shap"]).min() < 0
-            and np.sign(flip_df[(flip_df["model"] == "logreg") &
-                                (flip_df["taxon"] == t)]["mean_shap"]).max() > 0)
-    }
+    # Stable, coefficient-based flip set (Reviewer 3 Round 2, concern #3) --
+    # replaces the old naive mean-signed-SHAP sign check.
+    flip_taxa_lr = set(stable_flips_df[stable_flips_df["is_stable_directional_flip"]]["taxon"])
 
     for _, row in sub.iterrows():
         t = row["taxon"]
@@ -685,12 +685,12 @@ def make_fig6():
         yy = y_pos[t]
         xx = x_pos[c]
         size  = max(25, row["mean_abs_shap"] * 220)
-        # mean_shap_AD > mean_shap_CN is ~always true for any feature the
-        # model actually uses (background cancels out of that comparison,
-        # regardless of the taxon's real abundance direction) -- it doesn't
-        # indicate direction. Use signed mean_shap instead, consistent with
-        # Panel B and every other AD/CN call in the paper.
-        color = AD_COL if row["mean_shap"] > 0 else CN_COL
+        # Direction = sign of the fitted logistic-regression coefficient for
+        # this (cohort, taxon), median across the 10 outer folds -- NOT the
+        # sign of mean SHAP (which is background-relative and not a valid
+        # global direction statistic; see Methods / audit).
+        coef = coef_lookup.get((c, t), 0.0)
+        color = AD_COL if coef > 0 else CN_COL
         ax_a.scatter(xx, yy, s=size, color=color, alpha=0.82,
                      zorder=3, linewidths=0.3, edgecolors="white")
         ax_a.text(xx, yy, f"{row['mean_abs_shap']:.2f}",
@@ -717,8 +717,8 @@ def make_fig6():
     ax_a.set_ylabel("Genus (top-20 by max |SHAP|)", fontsize=8.5)
     ax_a.set_title(
         "Top-20 SHAP Taxa — Logistic Regression  "
-        "(dot size ∝ |SHAP|; red = AD↑, blue = CN↑; ★ = directional flip; "
-        "yellow = flip rows)",
+        "(dot size ∝ |SHAP|; red/blue = positive/negative fitted-model coefficient; "
+        "★ = stable directional flip; yellow = flip rows)",
         fontsize=8, pad=4)
     ax_a.grid(axis="both", linestyle=":", lw=0.4, alpha=0.45, zorder=0)
     ax_a.spines["top"].set_visible(False)
@@ -726,28 +726,21 @@ def make_fig6():
     ax_a.spines["bottom"].set_visible(False)
     legend_elements = [
         Line2D([0], [0], marker="o", color="w", markerfacecolor=AD_COL,
-               markersize=8, label="AD-associated"),
+               markersize=8, label="Positive coefficient"),
         Line2D([0], [0], marker="o", color="w", markerfacecolor=CN_COL,
-               markersize=8, label="CN-associated"),
+               markersize=8, label="Negative coefficient"),
         mpatches.Patch(facecolor="#fff3b0", ec="#ccaa00",
-                       label="Directional flip"),
+                       label="Stable directional flip"),
     ]
     ax_a.legend(handles=legend_elements, fontsize=7.5, loc="lower right",
                 framealpha=0.92, ncol=3, columnspacing=0.8)
 
-    # flip_df["in_top_n"] marks whether a (taxon, cohort) row was in that
-    # cohort's own top-N -- taking the union over cohorts (the old logic)
-    # selects every taxon SHARED across >=2 cohorts' top-20, not just the
-    # ones that actually flip sign. Filter to genuine sign-flips explicitly,
-    # matching the definition used in Section 3.6 / directional_analysis().
-    candidate_taxa = flip_df[flip_df["model"] == "logreg"]["taxon"].unique()
-    flip_taxa = [
-        t for t in candidate_taxa
-        if (np.sign(flip_df[(flip_df["model"] == "logreg") &
-                            (flip_df["taxon"] == t)]["mean_shap"]).min() < 0
-            and np.sign(flip_df[(flip_df["model"] == "logreg") &
-                                (flip_df["taxon"] == t)]["mean_shap"]).max() > 0)
-    ]
+    # Same stable, coefficient-based flip set as Panel A (Reviewer 3 Round 2,
+    # concern #3) -- a taxon appears in Panel B only if it is top-20 in >=2
+    # cohorts AND has a stable positive coefficient in >=1 cohort AND a
+    # stable negative coefficient in >=1 other cohort (pre-specified
+    # >=8/10-fold sign-agreement threshold; see Methods).
+    flip_taxa = sorted(flip_taxa_lr)
     flip_sub = shap_df[(shap_df["model"] == "logreg") &
                        (shap_df["taxon"].isin(flip_taxa)) &
                        (shap_df["cohort"].isin(LABELED_COHORTS))]
@@ -792,9 +785,14 @@ def make_fig6():
         yy_base = taxa_flip_order.index(taxon)
         for (_, row), y_off in zip(t_rows.iterrows(), y_offsets):
             c = row["cohort"]
+            taxon = row["taxon"]
             shap_v = row["mean_shap"]
             size = max(30, abs(row["mean_abs_shap"]) * 180)
-            color = AD_COL if shap_v > 0 else CN_COL
+            # Dot X-position = per-cohort mean OOF SHAP (descriptive); dot
+            # COLOR = fitted logistic-regression coefficient sign for that
+            # (cohort, taxon) -- the paper's official direction definition.
+            coef = coef_lookup.get((c, taxon), 0.0)
+            color = AD_COL if coef > 0 else CN_COL
             ax_b.scatter(shap_v, yy_base + y_off, s=size, color=color, alpha=0.8,
                          zorder=3, linewidths=0.4, edgecolors="white")
             ax_b.text(shap_v, yy_base + y_off, COHORT_SHORT_FLAT[c][0],
@@ -805,13 +803,13 @@ def make_fig6():
     ax_b.set_yticks(range(len(taxa_flip_order)))
     ax_b.set_yticklabels([f"★ {t}" for t in taxa_flip_order], fontsize=7.5)
     ax_b.set_ylim(-0.6, len(taxa_flip_order) - 0.4)
-    ax_b.set_xlabel("Mean SHAP (AD-direction → positive)", fontsize=8)
-    ax_b.set_title("Directional Flip Taxa\n(LogReg; letter = cohort initial)", fontsize=8.5)
+    ax_b.set_xlabel("Mean SHAP (dot position; color = fitted coefficient sign)", fontsize=8)
+    ax_b.set_title("Stable Directional Flip Taxa\n(LogReg; letter = cohort initial)", fontsize=8.5)
     ax_b.set_xlim(ax_b.get_xlim()[0] * 1.15, ax_b.get_xlim()[1] * 1.15)
     ax_b.grid(axis="x", linestyle=":", lw=0.5, alpha=0.6, zorder=0)
     ax_b.spines["top"].set_visible(False)
     ax_b.spines["right"].set_visible(False)
-    ax_b.text(0.04, 0.98, "← CN↑ | AD↑ →", transform=ax_b.transAxes,
+    ax_b.text(0.04, 0.98, "← negative coef | positive coef →", transform=ax_b.transAxes,
               ha="left", va="top", fontsize=6.5, color="#555555")
 
     sub_over = over_df[(over_df["model"] == "logreg") & (over_df["top_n"] == 20)]

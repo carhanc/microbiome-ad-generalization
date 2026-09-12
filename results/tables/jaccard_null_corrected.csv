@@ -1,0 +1,7 @@
+model,top_n,n_perm,observed_mean_jaccard_six_pairs,mean_null_jaccard,ci_lower_null,ci_upper_null,p_value_empirical
+logreg,10,100000,0.085,0.0134,0.0,0.0361,1e-05
+logreg,20,100000,0.135,0.0265,0.0085,0.0491,1e-05
+logreg,50,100000,0.2296,0.068,0.0491,0.0895,1e-05
+lgbm,10,100000,0.0175,0.0135,0.0,0.0361,0.449386
+lgbm,20,100000,0.0584,0.0265,0.0085,0.0491,0.0048
+lgbm,50,100000,0.143,0.068,0.0492,0.0894,1e-05

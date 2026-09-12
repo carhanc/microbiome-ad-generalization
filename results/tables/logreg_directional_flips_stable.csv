@@ -1,0 +1,15 @@
+taxon,n_cohorts_in_top_n,stable_positive_cohorts,stable_negative_cohorts,is_stable_directional_flip
+Agathobacter,2,kazakhstan2022,ling2020+zhuang2018,True
+Akkermansia,4,kazakhstan2022+ling2020+shanghai2022+zhuang2018,,False
+Bifidobacterium,3,ling2020+shanghai2022+zhuang2018,kazakhstan2022,True
+Christensenellaceae R-7 group,3,kazakhstan2022+ling2020+shanghai2022+zhuang2018,,False
+Coprococcus,2,shanghai2022+zhuang2018,kazakhstan2022+ling2020,True
+Dorea,2,ling2020+shanghai2022,kazakhstan2022,True
+Eisenbergiella,2,kazakhstan2022+ling2020+shanghai2022+zhuang2018,,False
+Enterococcus,2,kazakhstan2022+ling2020+shanghai2022+zhuang2018,,False
+Lactobacillus,3,kazakhstan2022+ling2020+shanghai2022,zhuang2018,True
+NK4A214 group,2,kazakhstan2022+zhuang2018,ling2020+shanghai2022,True
+Parasutterella,2,,kazakhstan2022+ling2020+shanghai2022+zhuang2018,False
+Romboutsia,2,kazakhstan2022,ling2020+shanghai2022+zhuang2018,True
+Ruminococcus gnavus group,3,ling2020+shanghai2022,zhuang2018,True
+Subdoligranulum,2,shanghai2022+zhuang2018,,False
