@@ -137,7 +137,7 @@ The retained genus count for LOCO training-only selection is lower when Kazakhst
 
 ### Table S5. Within-Cohort AUC on Batch-Corrected Data: Label-Blind vs. Label-Informed (Round 2)
 
-Within-cohort nested-CV AUC (Section 2.4 procedure) computed on batch-corrected features, under both correction designs (Section 2.7). The label-blind comparison is unconfounded by label use during correction; the label-informed comparison is confounded (Section 3.5) and is shown only for completeness/continuity with the original analysis.
+Within-cohort nested-CV AUC (Section 2.4 procedure) computed on batch-corrected features, under both correction designs (Section 2.7). The label-blind comparison is free of diagnosis-label leakage during correction; the label-informed comparison is not (Section 3.5) and is shown only for completeness/continuity with the original analysis.
 
 | Cohort | Model | Uncorrected | ComBat-seq (label-blind) | MMUPHin (label-blind) | ComBat-seq (label-informed, exploratory) | MMUPHin (label-informed, exploratory) |
 |---|---|---|---|---|---|---|
