@@ -228,12 +228,13 @@ def run_within_cohort_shap(cohort_data, genus_cols, outer_folds=OUTER_FOLDS):
         all_rows.append(imp_lr)
         all_rows.append(imp_gb)
 
+        # Console logging only (importance ranking, not a direction claim) --
+        # direction is reported elsewhere from the coefficient-stability
+        # table (build_coefficient_stability_table), never from mean_shap.
         print(f"    OOF top taxon (logreg): {imp_lr.iloc[0]['taxon']} "
-              f"(|SHAP|={imp_lr.iloc[0]['mean_abs_shap']:.4f}, "
-              f"dir={'AD↑' if imp_lr.iloc[0]['mean_shap']>0 else 'CN↑'})")
+              f"(|SHAP|={imp_lr.iloc[0]['mean_abs_shap']:.4f})")
         print(f"    OOF top taxon (lgbm):   {imp_gb.iloc[0]['taxon']} "
-              f"(|SHAP|={imp_gb.iloc[0]['mean_abs_shap']:.4f}, "
-              f"dir={'AD↑' if imp_gb.iloc[0]['mean_shap']>0 else 'CN↑'})")
+              f"(|SHAP|={imp_gb.iloc[0]['mean_abs_shap']:.4f})")
 
     return pd.concat(all_rows, ignore_index=True)
 

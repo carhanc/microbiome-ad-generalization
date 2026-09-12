@@ -349,4 +349,38 @@ red/positive in all four cohorts, matching the corrected text) all render as
 intended. One grammar slip ("an label-informed" → "a label-informed") was caught
 during this visual pass and fixed, then the docx/pdf were rebuilt again.
 
+**Final cleanup pass (Gates 1-9):** ran the full Section I validation gate sequence.
+Confirmed via `training_only_feature_counts.csv` that each LOCO split_id is named
+by its held-out cohort and its retained-genus count is computed only from the
+other three (Gate 1); confirmed via R console output that no diagnosis variable
+reaches `ComBat_seq`/`adjust_batch` in the label-blind script (Gate 2); grepped
+both manuscript files and all modified scripts for any remaining
+mean-signed-SHAP-as-direction usage and found two harmless console-log-only
+print statements in `08_shap_taxa_comparison.py` (lines ~231-236, printing
+"dir=AD↑/CN↑" for a per-fold debug message that was never saved to any CSV or
+cited in the manuscript) — removed for full consistency (Gate 3); confirmed via
+code assertion (`assert len(pairwise) == 6`) that the Jaccard null matches the
+observed statistic's construction (Gate 4); grepped `draft.md` for PERMANOVA
+overreach language and found none remaining (Gate 5); re-ran the full gate-check
+grep sweep from earlier in this log (Gate 6); re-ran `py_compile` on all 15
+`scripts/*.py` files and R `parse()` on all 4 `scripts/*.R` files (all clean),
+and confirmed zero NaNs across all ten new/modified Round 2 result CSVs (Gate 7);
+re-verified all figures visually (Gate 8, done inline above); confirmed the PDF
+build gate (Gate 9, done inline above). One additional broken reference was
+found and fixed during this pass: Supplementary Figure S4's "Source figure"
+line still pointed to the pre-rename filename `supp_sensitivity_loco.png`
+(the file was renamed to `supp_sensitivity_loco (supp_fig_s4).png/.jpg` on the
+pre-audit branch, before this session began) — corrected to the `.jpg` path
+that actually exists. `supplementary.docx` was rebuilt once more to pick up
+this fix.
+
+**Final deliverables written:** `review/REVIEWER3_ROUND2_RESPONSE_DRAFT.md`
+(point-by-point response to all five concerns) and
+`audit/REVIEWER3_ROUND2_FINAL_VALIDATION_2026-09-12.md` (comprehensive final
+validation report, including a "final skeptical self-review" section
+identifying three remaining, deliberately-not-fixed limitations: no
+multiple-comparisons correction on the 14-candidate directional-flip screen,
+single-seed feature-selection sensitivity comparison, and a pre-existing
+Figure 6 Panel A/B taxa-pool windowing mismatch).
+
 ---

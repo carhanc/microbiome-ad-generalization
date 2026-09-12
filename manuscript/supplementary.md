@@ -221,7 +221,7 @@ LOCO SHAP **feature importance** (mean |SHAP|, magnitude only, no direction) rem
 **Caption:** Sensitivity analysis: LOCO AUC under three cohort exclusion configurations. Each panel shows the 3-cohort LOCO experiment with one cohort excluded from the full analysis. Left: excluding Kazakhstan (Zhuang+Ling+Zhu trained, each held out in turn). Center: excluding Zhuang 2018. Right: excluding Ling 2020. Error bars = 95% bootstrap CI. Generalization degradation persisted across all three prespecified cohort-exclusion configurations.
 
 *Source data:* `results/tables/sensitivity_loco.csv`
-*Source figure:* `results/figures/supp_sensitivity_loco.png`
+*Source figure:* `results/figures/supp_sensitivity_loco (supp_fig_s4).jpg`
 
 ---
 
