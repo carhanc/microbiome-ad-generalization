@@ -80,6 +80,12 @@ def youden_threshold_metrics(y_true: np.ndarray,
 
 
 def make_logreg_pipeline():
+    # NOTE: penalty is never set to "elasticnet" here, so this is L2 (ridge)
+    # logistic regression -- l1_ratio has no effect under the actual default
+    # penalty="l2" and is retained unchanged for exact reproducibility with
+    # every already-reported AUC/SHAP/coefficient value in this repository
+    # (see manuscript Methods 2.4 and Limitations for the terminology
+    # correction; not fixed here to avoid an unrequested pipeline-wide rerun).
     model = LogisticRegression(
         solver="saga",
         l1_ratio=0.5,
@@ -286,6 +292,8 @@ def main():
         y_tr, y_te = y_sh[train_idx], y_sh[test_idx]
 
         # sklearn 1.7 dropped multi_class — saga figures it out
+        # NOTE: penalty="elasticnet" is never set -- this is L2, l1_ratio is inert
+        # (see manuscript Methods 2.4/Limitations; unchanged to avoid an unrequested rerun)
         gs3 = GridSearchCV(
             estimator=LogisticRegression(
                 solver="saga",

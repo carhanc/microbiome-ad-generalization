@@ -145,6 +145,8 @@ def project_and_clr(raw_tables, cohort, sample_ids, retained_genera_sorted):
 def tune_and_fit(X_train, y_train, model_name):
     inner_cv = StratifiedKFold(n_splits=INNER_FOLDS, shuffle=True, random_state=RANDOM_STATE)
     if model_name == "logreg":
+        # NOTE: penalty="elasticnet" is never set -- this is L2, l1_ratio is inert.
+        # Matches the historical model construction exactly for comparability.
         base = LogisticRegression(solver="saga", l1_ratio=0.5, max_iter=10000, random_state=RANDOM_STATE)
         grid = LOGREG_GRID
     else:

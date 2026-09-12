@@ -100,6 +100,8 @@ def load_data():
 def fit_best_logreg(X, y, groups=None):
     inner_cv = (StratifiedGroupKFold(n_splits=5) if groups is not None
                 else StratifiedKFold(n_splits=5, shuffle=True, random_state=RANDOM_STATE))
+    # NOTE: penalty="elasticnet" is never set -- this is L2, l1_ratio is inert
+    # (see manuscript Methods 2.4/Limitations; unchanged to avoid an unrequested rerun)
     base = LogisticRegression(solver="saga", l1_ratio=0.5,
                               max_iter=10000, random_state=RANDOM_STATE)
     gs = GridSearchCV(base, LOGREG_GRID, cv=inner_cv, scoring="roc_auc", n_jobs=-1)
@@ -559,74 +561,20 @@ def plot_jaccard_heatmap(importance_df, out_path):
     print(f"  Saved: {out_path}")
 
 
-def plot_direction_dotplot(dir_df, model_name, out_path, stable_flip_taxa=None):
-    if dir_df.empty:
-        print(f"  No shared taxa at top-{TOP_N} across ≥{MIN_COHORTS} cohorts, skipping plot.")
-        return
-
-    model_label = "Logistic Regression" if model_name == "logreg" else "LightGBM"
-
-    taxon_order = (
-        dir_df.groupby("taxon")["mean_abs_shap"].mean()
-        .sort_values(ascending=True)
-        .index.tolist()
-    )
-
-    # Reviewer 3 Round 2, concern #3: the star/highlight marker uses the
-    # coefficient-stability-based flip definition (build_stable_directional_flips),
-    # NOT a naive mean-signed-SHAP sign check. Dot x-position remains the
-    # per-cohort OOF mean SHAP value (a legitimate per-cohort local-attribution
-    # summary); only the cross-cohort "flip" call is now stability-gated.
-    flip_taxa = stable_flip_taxa if stable_flip_taxa is not None else set()
-
-    fig_height = max(5, 0.45 * len(taxon_order))
-    fig, ax = plt.subplots(figsize=(9, fig_height))
-
-    for cohort in SUPERVISED_COHORTS:
-        sub = dir_df[dir_df["cohort"] == cohort]
-        y_pos = [taxon_order.index(t) for t in sub["taxon"] if t in taxon_order]
-        x_val = [sub[sub["taxon"] == t]["mean_shap"].values[0]
-                 for t in taxon_order if t in sub["taxon"].values]
-        sizes = [sub[sub["taxon"] == t]["mean_abs_shap"].values[0] * 600
-                 for t in taxon_order if t in sub["taxon"].values]
-
-        ax.scatter(x_val, y_pos, label=cohort,
-                   color=COHORT_COLOURS[cohort], s=sizes,
-                   alpha=0.75, edgecolors="white", linewidths=0.5, zorder=3)
-
-    ax.axvline(0, color="black", linewidth=0.8, linestyle="--", zorder=2)
-    ax.set_yticks(range(len(taxon_order)))
-    ax.set_yticklabels(
-        [f"{'★ ' if t in flip_taxa else ''}{t}" for t in taxon_order],
-        fontsize=8
-    )
-    for i, t in enumerate(taxon_order):
-        if t in flip_taxa:
-            ax.axhspan(i - 0.5, i + 0.5, color="#FFFACD", alpha=0.6, zorder=1)
-
-    ax.set_xlabel("Mean SHAP value (positive → AD, negative → CN)", fontsize=10)
-    ax.set_title(
-        f"Cross-Cohort SHAP Direction — {model_label}\n"
-        f"Taxa in top-{TOP_N} for ≥{MIN_COHORTS} cohorts "
-        f"(★ = stable coefficient-based directional flip, ≥{STABILITY_MIN_FOLDS}/{OUTER_FOLDS} "
-        f"folds agreeing in ≥1 cohort each direction; dot size ∝ |SHAP|)",
-        fontsize=10
-    )
-    ax.legend(title="Cohort", fontsize=8, title_fontsize=8,
-              loc="lower right", framealpha=0.9)
-    ax.grid(axis="x", alpha=0.25)
-    ax.set_xlim(left=None)
-
-    ax.text(0.01, 0.01, "← CN-associated", transform=ax.transAxes,
-            fontsize=8, color="#1F77B4", va="bottom")
-    ax.text(0.99, 0.01, "AD-associated →", transform=ax.transAxes,
-            fontsize=8, color="#D62728", va="bottom", ha="right")
-
-    plt.tight_layout()
-    fig.savefig(out_path, dpi=150, bbox_inches="tight")
-    plt.close(fig)
-    print(f"  Saved: {out_path}  "
-          f"({len(taxon_order)} taxa shown, {len(flip_taxa)} direction flips ★)")
+# plot_direction_dotplot() was removed as part of the Round 2 publication-
+# consistency patch: it plotted mean signed SHAP on its x-axis and labeled
+# the axes/title "Mean SHAP value (positive -> AD, negative -> CN)",
+# "Cross-Cohort SHAP Direction", "<- CN-associated" / "AD-associated ->" --
+# exactly the invalid direction statistic Reviewer 3 concern #3 identified,
+# even though its star/highlight marker had already been switched to the
+# coefficient-stability definition. Rather than patch the axis semantics of
+# an auxiliary, non-manuscript figure, this function was deleted outright:
+# the manuscript's actual Figure 6 Panel B (generate_manuscript_figures.py::
+# make_fig6) now shows the same eight-genus coefficient-stability screen as
+# a coefficient-value grid (rows = taxa, columns = cohorts, cell = median
+# fitted coefficient + fold-count stability annotation), which supersedes
+# what this dot plot was for. No coefficient-like mean-SHAP-as-direction
+# visualization remains anywhere in this script.
 
 
 # plot_loco_direction() was removed in Round 2 (Reviewer 3, concern #3): it
@@ -755,18 +703,14 @@ def main():
         FIGURES_DIR / "shap_overlap_jaccard.png"
     )
 
-    dir_sub_logreg = dir_all[dir_all["model"] == "logreg"]
-    plot_direction_dotplot(
-        dir_sub_logreg, "logreg",
-        FIGURES_DIR / "shap_direction_dotplot_logreg.png",
-        stable_flip_taxa=stable_flip_taxa,
-    )
-    # No plot_direction_dotplot / plot_loco_direction call for lgbm, and no
-    # plot_loco_direction call for either model -- both would assign a global
-    # AD/CN direction from mean signed SHAP, which Reviewer 3 Round 2 concern
-    # #3 establishes is not valid (LightGBM: no coefficient exists at all;
-    # LOCO: background/eval cohort mismatch confounds sign with raw
-    # cross-cohort abundance shifts for both models).
+    # No dot-plot direction figure and no plot_loco_direction call for either
+    # model -- both would assign a global AD/CN direction from mean signed
+    # SHAP, which Reviewer 3 Round 2 concern #3 establishes is not valid
+    # (LightGBM: no coefficient exists at all; LOCO: background/eval cohort
+    # mismatch confounds sign with raw cross-cohort abundance shifts for both
+    # models). The coefficient-stability screen (stable_flip_taxa) is
+    # visualized in the manuscript's Figure 6 Panel B (generate_manuscript_
+    # figures.py::make_fig6) as a coefficient-value grid, not as a dot plot.
 
     print("\nKey findings")
 
@@ -811,7 +755,7 @@ def main():
         print(f"  {TABLES_DIR}/{f}")
     for f in [
         "shap_top15_per_cohort_logreg.png", "shap_top15_per_cohort_lgbm.png",
-        "shap_overlap_jaccard.png", "shap_direction_dotplot_logreg.png",
+        "shap_overlap_jaccard.png",
     ]:
         print(f"  {FIGURES_DIR}/{f}")
     print("\nNext step: manuscript draft (manuscript/draft.md)")

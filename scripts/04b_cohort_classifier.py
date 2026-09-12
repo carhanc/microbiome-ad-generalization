@@ -52,6 +52,8 @@ def main():
         X_train, X_test = X[train_idx], X[test_idx]
         y_train, y_test = y[train_idx], y[test_idx]
 
+        # NOTE: penalty="elasticnet" is never set -- this is L2, l1_ratio is inert
+        # (see manuscript Methods 2.4/Limitations; unchanged to avoid an unrequested rerun)
         base = LogisticRegression(
             solver="saga",
             l1_ratio=0.5,

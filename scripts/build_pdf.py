@@ -51,7 +51,7 @@ FIGURES = [
         "(F=13.93, p=0.0001, 9,999 permutations)."
     ),
     (
-        "### 3.6 SHAP Analysis Reveals Cohort-Specific Taxonomic Signatures and a Conservative Set of Stable Directional Flips",
+        "### 3.6 SHAP Analysis Reveals Cohort-Specific Taxonomic Signatures and a Descriptive Coefficient-Stability Screen",
         5,
         "**Figure 5.** Effect of label-blind batch correction on LOCO cross-cohort AUC-ROC "
         "(primary analysis; no diagnosis information used during correction). "
@@ -70,15 +70,15 @@ FIGURES = [
         "---\n\n## 4. Discussion",
         6,
         "**Figure 6.** SHAP feature importance and coefficient-based direction analysis, logistic regression. "
-        "(**A**) Top-20 SHAP genera by maximum |SHAP| across cohorts. "
-        "Dot size ∝ mean |SHAP|; red/blue = positive/negative fitted logistic-regression coefficient "
-        "(median across 10 outer folds), not mean signed SHAP; "
-        "★ = stable directional flip (≥8/10-fold coefficient-sign stability in ≥1 cohort each direction); "
-        "yellow rows highlight flip taxa. "
-        "(**B**) The eight stable directional flip taxa: genera in the top-20 for ≥2 cohorts with a "
-        "stable positive coefficient in ≥1 cohort and a stable negative coefficient in ≥1 other. "
-        "Dot position = per-cohort mean SHAP (descriptive); dot color = fitted coefficient sign; "
-        "letters indicate cohort initials. "
+        "(**A**) Top-20 SHAP genera by maximum |SHAP| across cohorts. Dot size ∝ mean |SHAP|; "
+        "feature importance only — no direction is encoded in this panel. "
+        "(**B**) Fitted-coefficient direction by cohort for the eight genera meeting a pre-specified "
+        "descriptive coefficient-sign-stability screen (top-20 in ≥2 cohorts; a stable positive "
+        "coefficient sign in ≥8/10 outer folds in ≥1 cohort and a stable negative sign in ≥8/10 folds "
+        "in ≥1 other). Cell color/value = median fitted logistic-regression coefficient across the 10 "
+        "outer folds (positive → higher predicted AD log-odds; negative → lower); cell text = the fold "
+        "count backing that direction; bordered cells meet the ≥8/10 stability criterion. This is a "
+        "descriptive screen, not a multiplicity-corrected hypothesis test. "
         "(**C**) Pairwise Jaccard similarity of top-20 SHAP taxa between cohort pairs; "
         "mean of the six unique pairwise values = 0.135, significantly above a null matched to this "
         "statistic's construction (100,000 replicates of four random top-20 sets; p<0.0001)."

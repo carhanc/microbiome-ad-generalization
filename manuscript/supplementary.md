@@ -154,18 +154,22 @@ Within-cohort nested-CV AUC (Section 2.4 procedure) computed on batch-corrected 
 
 ---
 
-### Table S6. Logistic-Regression Coefficient Sign Stability, Directional-Flip Candidates and *Akkermansia* (Round 2)
+### Table S6. Logistic-Regression Coefficient Sign Stability: Screened Candidates and the *Akkermansia* Negative Control (Round 2)
 
-Per (cohort, genus), counts of positive/negative/zero fitted coefficients across the 10 outer OOF folds (Section 2.8). `sign_stability` uses the pre-specified ≥8/10-fold threshold. Full table (1,584 cohort×genus rows) in `results/tables/logreg_coefficient_stability.csv`; below, the eight confirmed stable-flip taxa (Section 3.6) plus *Akkermansia* as a negative-control illustration (Section 3.6, Section 4.4).
+Per (cohort, genus), counts of positive/negative/zero fitted coefficients across the 10 outer OOF folds (Section 2.8). `sign_stability` uses the pre-specified ≥8/10-fold threshold. This is a descriptive screen, not a hypothesis test: the 10 outer folds share overlapping training data and are not independent replications, so no p-value is assigned to any row. Full table (1,584 cohort×genus rows) in `results/tables/logreg_coefficient_stability.csv`; below, *Romboutsia* (the cleanest population-level pattern among the eight genera meeting the screen; Section 3.6) and *Akkermansia* (a negative-control illustration: appears to flip under the old, invalid mean-SHAP statistic but does not meet the coefficient-based screen; Section 3.6, Section 4.4).
 
 | Cohort | Taxon | n_positive/10 | n_negative/10 | Median Coefficient | Sign Stability |
 |---|---|---|---|---|---|
+| Zhuang 2018 | Romboutsia | 0 | 10 | −0.0107 | stable_negative |
+| Ling 2020 | Romboutsia | 0 | 10 | −0.1166 | stable_negative |
+| Zhu 2022 | Romboutsia | 0 | 10 | −0.0190 | stable_negative |
+| Kazakhstan | Romboutsia | 9 | 1 | 0.0109 | stable_positive |
 | Zhuang 2018 | Akkermansia | 10 | 0 | 0.0124 | stable_positive |
 | Ling 2020 | Akkermansia | 10 | 0 | 0.1181 | stable_positive |
 | Zhu 2022 | Akkermansia | 10 | 0 | 0.0709 | stable_positive |
 | Kazakhstan | Akkermansia | 10 | 0 | 0.0682 | stable_positive |
 
-*Akkermansia*'s coefficient is stable and positive in all four cohorts — it is not a stable directional flip despite its pooled mean SHAP value appearing to reverse sign (Section 3.6); see the full CSV for the corresponding rows for each of the eight confirmed flip taxa (*Agathobacter*, *Bifidobacterium*, *Coprococcus*, *Dorea*, *Lactobacillus*, *NK4A214 group*, *Romboutsia*, *Ruminococcus gnavus group*) and for `logreg_directional_flips_stable.csv`, which lists, per candidate taxon, which cohorts carried a stable positive vs. stable negative coefficient.
+*Romboutsia* is stable-negative in all three Chinese cohorts and stable-positive in Kazakhstan — the cleanest country-level split among the eight genera meeting the screen. *Akkermansia*'s coefficient is stable and positive in all four cohorts — it does not meet the screen at all, despite its pooled mean SHAP value appearing to reverse sign (Section 3.6). See the full CSV for the corresponding rows for each of the eight genera meeting the descriptive screen (*Agathobacter*, *Bifidobacterium*, *Coprococcus*, *Dorea*, *Lactobacillus*, *NK4A214 group*, *Romboutsia*, *Ruminococcus gnavus group*) and for `logreg_directional_flips_stable.csv`, which lists, per candidate taxon, which cohorts carried a stable positive vs. stable negative coefficient.
 
 *Source data:* `results/tables/logreg_coefficient_stability.csv`, `results/tables/logreg_directional_flips_stable.csv`.
 
