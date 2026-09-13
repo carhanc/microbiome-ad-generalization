@@ -1,0 +1,9 @@
+test_cohort,train_cohorts,model,n_train,n_test,n_retained_genera,auc_training_only,ci_lo_training_only,ci_hi_training_only
+zhuang2018,ling2020+shanghai2022+kazakhstan2022,logreg,315,86,370,0.5057,0.3925,0.6288
+zhuang2018,ling2020+shanghai2022+kazakhstan2022,lgbm,315,86,370,0.596,0.483,0.7166
+ling2020,zhuang2018+shanghai2022+kazakhstan2022,logreg,230,171,370,0.6794,0.6042,0.7541
+ling2020,zhuang2018+shanghai2022+kazakhstan2022,lgbm,230,171,370,0.6534,0.568,0.7409
+shanghai2022,zhuang2018+ling2020+kazakhstan2022,logreg,341,60,373,0.8122,0.6867,0.9283
+shanghai2022,zhuang2018+ling2020+kazakhstan2022,lgbm,341,60,373,0.7878,0.6595,0.8944
+kazakhstan2022,zhuang2018+ling2020+shanghai2022,logreg,317,84,150,0.6092,0.474,0.7299
+kazakhstan2022,zhuang2018+ling2020+shanghai2022,lgbm,317,84,150,0.5247,0.3847,0.6574

@@ -64,6 +64,8 @@ def tune_and_fit(X_train: np.ndarray, y_train: np.ndarray,
                                random_state=RANDOM_STATE)
 
     if model_name == "logreg":
+        # NOTE: penalty="elasticnet" is never set -- this is L2, l1_ratio is inert
+        # (see manuscript Methods 2.4/Limitations; unchanged to avoid an unrequested rerun)
         base = LogisticRegression(
             solver="saga",
             l1_ratio=0.5,

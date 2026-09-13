@@ -62,6 +62,8 @@ CORRECTION_COLORS = {
     "uncorrected": "#4dac26",
     "combatseq":   "#d01c8b",
     "mmuphin":     "#f4a582",
+    "combatseq_labelblind": "#d01c8b",
+    "mmuphin_labelblind":   "#f4a582",
 }
 
 LABELED_COHORTS = ["zhuang2018", "ling2020", "shanghai2022", "kazakhstan2022"]
@@ -551,15 +553,20 @@ def make_fig4():
 
 
 def make_fig5():
-    print("  Generating Figure 5 (Batch Correction Comparison)…")
-    df = pd.read_csv(f"{TABLES}/auc_comparison_table.csv")
+    print("  Generating Figure 5 (Batch Correction Comparison — label-blind, primary)…")
+    # Round 2 (Reviewer 3, concern #2): the main-text figure now shows the
+    # label-blind correction (no diagnosis information used during ComBat-seq/
+    # MMUPHin fitting) as the primary batch-correction result. The original
+    # label-informed/oracle-style comparison (auc_comparison_table.csv) is
+    # retained as Supplementary Figure S5, explicitly labeled exploratory.
+    df = pd.read_csv(f"{TABLES}/auc_comparison_labelblind.csv")
 
     fig, axes = plt.subplots(1, 2, figsize=(WIDTH_IN, WIDTH_IN * 0.46), dpi=DPI)
     fig.patch.set_facecolor("white")
 
-    corrections = ["uncorrected", "combatseq", "mmuphin"]
-    corr_labels = {"uncorrected": "Uncorrected", "combatseq": "ComBat-seq",
-                   "mmuphin": "MMUPHin"}
+    corrections = ["uncorrected", "combatseq_labelblind", "mmuphin_labelblind"]
+    corr_labels = {"uncorrected": "Uncorrected", "combatseq_labelblind": "ComBat-seq (label-blind)",
+                   "mmuphin_labelblind": "MMUPHin (label-blind)"}
     cohorts = LABELED_COHORTS
     n = len(cohorts)
     x = np.arange(n)
@@ -592,7 +599,7 @@ def make_fig5():
         ax.set_xticklabels([COHORT_SHORT_FLAT[c] for c in cohorts],
                             fontsize=8, rotation=15, ha="right")
         ax.set_ylabel("LOCO AUC-ROC", fontsize=8.5)
-        ax.set_title(f"LOCO AUC: Batch Correction Effect\n({model_lbl})", fontsize=8.5)
+        ax.set_title(f"LOCO AUC: Label-Blind Batch Correction\n({model_lbl})", fontsize=8.5)
         ax.set_ylim(0.15, 1.05)
         # Bars/error bars span most of the y-range in both panels (e.g. Zhu
         # 2022 reaches ~0.9 at top, Zhuang/Kazakhstan dip to ~0.2 at bottom),
@@ -616,8 +623,16 @@ def make_fig5():
 def make_fig6():
     print("  Generating Figure 6 (SHAP Taxa Analysis)…")
     shap_df  = pd.read_csv(f"{TABLES}/shap_within_cohort_importance.csv")
-    flip_df  = pd.read_csv(f"{TABLES}/shap_directional_flips.csv")
     over_df  = pd.read_csv(f"{TABLES}/shap_taxa_overlap.csv")
+    # Round 2 (Reviewer 3, concern #3): direction now comes from the fitted
+    # logistic-regression coefficient (per cohort, median across 10 outer
+    # folds), not from mean signed SHAP -- and the "directional flip" set
+    # comes from the pre-specified coefficient-stability criterion (>=8/10
+    # folds agreeing in sign in each direction), not a naive sign check on
+    # mean_shap. shap_directional_flips.csv is no longer read here.
+    coef_stab = pd.read_csv(f"{TABLES}/logreg_coefficient_stability.csv")
+    stable_flips_df = pd.read_csv(f"{TABLES}/logreg_directional_flips_stable.csv")
+    coef_lookup = coef_stab.set_index(["cohort", "taxon"])["median_coefficient"]
 
     fig_h = WIDTH_IN * 0.92
     fig = plt.figure(figsize=(WIDTH_IN, fig_h), dpi=DPI)
@@ -665,18 +680,14 @@ def make_fig6():
     y_pos  = {t: (n_taxa - 1 - i) for i, t in enumerate(taxa_order_plot)}
     x_pos  = {c: j for j, c in enumerate(cohort_order)}
 
-    # Same fix as Panel B: flip_df contains every taxon shared across >=2
-    # cohorts' top-20, not just the ones that actually flip sign (e.g.
-    # Agathobacter is shared but does not flip). Filter to genuine sign-flips.
-    _lr_candidates = flip_df[flip_df["model"] == "logreg"]["taxon"].unique()
-    flip_taxa_lr = {
-        t for t in _lr_candidates
-        if (np.sign(flip_df[(flip_df["model"] == "logreg") &
-                            (flip_df["taxon"] == t)]["mean_shap"]).min() < 0
-            and np.sign(flip_df[(flip_df["model"] == "logreg") &
-                                (flip_df["taxon"] == t)]["mean_shap"]).max() > 0)
-    }
+    # Stable, coefficient-based flip set (Reviewer 3 Round 2, concern #3) --
+    # replaces the old naive mean-signed-SHAP sign check.
+    flip_taxa_lr = set(stable_flips_df[stable_flips_df["is_stable_directional_flip"]]["taxon"])
 
+    # Panel A is feature importance ONLY (Round 2 patch, per reviewer
+    # correction): no coefficient color, no flip stars, no highlight rows.
+    # Direction/flip information lives exclusively in Panel B below.
+    IMPORTANCE_COL = "#4C72B0"
     for _, row in sub.iterrows():
         t = row["taxon"]
         c = row["cohort"]
@@ -685,22 +696,11 @@ def make_fig6():
         yy = y_pos[t]
         xx = x_pos[c]
         size  = max(25, row["mean_abs_shap"] * 220)
-        # mean_shap_AD > mean_shap_CN is ~always true for any feature the
-        # model actually uses (background cancels out of that comparison,
-        # regardless of the taxon's real abundance direction) -- it doesn't
-        # indicate direction. Use signed mean_shap instead, consistent with
-        # Panel B and every other AD/CN call in the paper.
-        color = AD_COL if row["mean_shap"] > 0 else CN_COL
-        ax_a.scatter(xx, yy, s=size, color=color, alpha=0.82,
+        ax_a.scatter(xx, yy, s=size, color=IMPORTANCE_COL, alpha=0.82,
                      zorder=3, linewidths=0.3, edgecolors="white")
         ax_a.text(xx, yy, f"{row['mean_abs_shap']:.2f}",
                   ha="center", va="center", fontsize=5.0,
                   color="white", fontweight="bold", zorder=4)
-
-    for t, yy in y_pos.items():
-        if t in flip_taxa_lr:
-            ax_a.axhspan(yy - 0.46, yy + 0.46, facecolor="#fff3b0",
-                         alpha=0.55, zorder=1)
 
     ax_a.set_xlim(-0.55, n_coh - 0.45)
     ax_a.set_ylim(-0.55, n_taxa - 0.45)
@@ -710,109 +710,75 @@ def make_fig6():
     ax_a.xaxis.set_label_position("top")
     ax_a.set_xlabel("Cohort", fontsize=9, labelpad=4)
 
-    ylabels = [f"★ {t}" if t in flip_taxa_lr else f"   {t}"
-               for t in sorted(y_pos, key=lambda t: y_pos[t], reverse=True)]
     ax_a.set_yticks(sorted(y_pos.values(), reverse=True))
-    ax_a.set_yticklabels(ylabels, fontsize=7.5)
+    ax_a.set_yticklabels(sorted(y_pos, key=lambda t: y_pos[t], reverse=True), fontsize=7.5)
     ax_a.set_ylabel("Genus (top-20 by max |SHAP|)", fontsize=8.5)
     ax_a.set_title(
-        "Top-20 SHAP Taxa — Logistic Regression  "
-        "(dot size ∝ |SHAP|; red = AD↑, blue = CN↑; ★ = directional flip; "
-        "yellow = flip rows)",
+        "Top-20 SHAP Taxa — Logistic Regression\n"
+        "(feature importance only; dot size ∝ mean |SHAP|; no direction encoded here — see Panel B)",
         fontsize=8, pad=4)
     ax_a.grid(axis="both", linestyle=":", lw=0.4, alpha=0.45, zorder=0)
     ax_a.spines["top"].set_visible(False)
     ax_a.spines["right"].set_visible(False)
     ax_a.spines["bottom"].set_visible(False)
-    legend_elements = [
-        Line2D([0], [0], marker="o", color="w", markerfacecolor=AD_COL,
-               markersize=8, label="AD-associated"),
-        Line2D([0], [0], marker="o", color="w", markerfacecolor=CN_COL,
-               markersize=8, label="CN-associated"),
-        mpatches.Patch(facecolor="#fff3b0", ec="#ccaa00",
-                       label="Directional flip"),
-    ]
-    ax_a.legend(handles=legend_elements, fontsize=7.5, loc="lower right",
-                framealpha=0.92, ncol=3, columnspacing=0.8)
 
-    # flip_df["in_top_n"] marks whether a (taxon, cohort) row was in that
-    # cohort's own top-N -- taking the union over cohorts (the old logic)
-    # selects every taxon SHARED across >=2 cohorts' top-20, not just the
-    # ones that actually flip sign. Filter to genuine sign-flips explicitly,
-    # matching the definition used in Section 3.6 / directional_analysis().
-    candidate_taxa = flip_df[flip_df["model"] == "logreg"]["taxon"].unique()
-    flip_taxa = [
-        t for t in candidate_taxa
-        if (np.sign(flip_df[(flip_df["model"] == "logreg") &
-                            (flip_df["taxon"] == t)]["mean_shap"]).min() < 0
-            and np.sign(flip_df[(flip_df["model"] == "logreg") &
-                                (flip_df["taxon"] == t)]["mean_shap"]).max() > 0)
-    ]
-    flip_sub = shap_df[(shap_df["model"] == "logreg") &
-                       (shap_df["taxon"].isin(flip_taxa)) &
-                       (shap_df["cohort"].isin(LABELED_COHORTS))]
-
-    flip_sub = flip_sub.sort_values("rank").drop_duplicates(["taxon","cohort"])
-
-    taxa_flip_order = (flip_sub.groupby("taxon")["mean_abs_shap"].max()
-                               .sort_values(ascending=False).index.tolist())
-
-    # Vertical stagger for dots that crowd together in x within the same row:
-    # deterministic (sorted-x, symmetric spread), not random -- exactly
-    # reproducible without needing to carry a seed. Horizontal position is
-    # never touched: it's the actual mean_shap value being reported.
-    CLUSTER_X_THRESH = 0.003
-    STAGGER_STEP     = 0.17
-
-    def stagger_offsets(xs: np.ndarray) -> np.ndarray:
-        order = np.argsort(xs)
-        offsets = np.zeros(len(xs))
-        cluster = [order[0]]
-        for idx in order[1:]:
-            if xs[idx] - xs[cluster[-1]] <= CLUSTER_X_THRESH:
-                cluster.append(idx)
+    # --- Panel B: coefficient-stability grid (Round 2 patch) -------------
+    # Replaces the old mean-signed-SHAP dot plot entirely. Rows = the eight
+    # taxa meeting the pre-specified descriptive coefficient-sign-stability
+    # screen (>=8/10 outer folds agreeing in sign in >=1 cohort AND the
+    # opposite sign stable in >=1 other cohort); columns = the four labeled
+    # cohorts. Cell color = median fitted logistic-regression coefficient
+    # (10-fold median); cell text = fold count backing that direction. This
+    # is a descriptive screen, not a hypothesis test -- no p-values are
+    # assigned to individual taxa (see Methods/Limitations).
+    final_flip_taxa = sorted(flip_taxa_lr)
+    grid = np.full((len(final_flip_taxa), len(cohort_order)), np.nan)
+    cell_text = [["" for _ in cohort_order] for _ in final_flip_taxa]
+    for i, t in enumerate(final_flip_taxa):
+        for j, c in enumerate(cohort_order):
+            row = coef_stab[(coef_stab["cohort"] == c) & (coef_stab["taxon"] == t)]
+            if len(row) == 0:
+                continue
+            row = row.iloc[0]
+            grid[i, j] = row["median_coefficient"]
+            n_pos, n_neg = int(row["n_positive"]), int(row["n_negative"])
+            stability = row["sign_stability"]
+            if stability == "stable_positive":
+                cell_text[i][j] = f"{n_pos}/10\n+"
+            elif stability == "stable_negative":
+                cell_text[i][j] = f"{n_neg}/10\n−"
             else:
-                if len(cluster) > 1:
-                    spread = np.linspace(-(len(cluster)-1)/2, (len(cluster)-1)/2,
-                                         len(cluster)) * STAGGER_STEP
-                    for off, i in zip(spread, cluster):
-                        offsets[i] = off
-                cluster = [idx]
-        if len(cluster) > 1:
-            spread = np.linspace(-(len(cluster)-1)/2, (len(cluster)-1)/2,
-                                 len(cluster)) * STAGGER_STEP
-            for off, i in zip(spread, cluster):
-                offsets[i] = off
-        return offsets
+                cell_text[i][j] = f"{n_pos}+/{n_neg}−\n(unstable)"
 
-    for taxon in taxa_flip_order:
-        t_rows = flip_sub[flip_sub["taxon"] == taxon]
-        xs = t_rows["mean_shap"].to_numpy()
-        y_offsets = stagger_offsets(xs)
-        yy_base = taxa_flip_order.index(taxon)
-        for (_, row), y_off in zip(t_rows.iterrows(), y_offsets):
-            c = row["cohort"]
-            shap_v = row["mean_shap"]
-            size = max(30, abs(row["mean_abs_shap"]) * 180)
-            color = AD_COL if shap_v > 0 else CN_COL
-            ax_b.scatter(shap_v, yy_base + y_off, s=size, color=color, alpha=0.8,
-                         zorder=3, linewidths=0.4, edgecolors="white")
-            ax_b.text(shap_v, yy_base + y_off, COHORT_SHORT_FLAT[c][0],
-                      ha="center", va="center", fontsize=5,
-                      color="white", fontweight="bold", zorder=4)
+    vmax = np.nanmax(np.abs(grid))
+    im_b = ax_b.imshow(grid, cmap="RdBu_r", vmin=-vmax, vmax=vmax, aspect="auto")
+    for i, t in enumerate(final_flip_taxa):
+        for j, c in enumerate(cohort_order):
+            if np.isnan(grid[i, j]):
+                continue
+            stability = coef_stab[(coef_stab["cohort"] == c) & (coef_stab["taxon"] == t)].iloc[0]["sign_stability"]
+            txt_color = "white" if abs(grid[i, j]) > vmax * 0.5 else "black"
+            fontweight = "bold" if stability != "unstable" else "normal"
+            ax_b.text(j, i, cell_text[i][j], ha="center", va="center",
+                      fontsize=6, color=txt_color, fontweight=fontweight)
+            if stability != "unstable":
+                # Solid black border = meets the pre-specified >=8/10 stability criterion
+                ax_b.add_patch(plt.Rectangle((j - 0.5, i - 0.5), 1, 1, fill=False,
+                                             edgecolor="black", lw=1.3, zorder=5))
 
-    ax_b.axvline(0, color="black", lw=0.8, zorder=2)
-    ax_b.set_yticks(range(len(taxa_flip_order)))
-    ax_b.set_yticklabels([f"★ {t}" for t in taxa_flip_order], fontsize=7.5)
-    ax_b.set_ylim(-0.6, len(taxa_flip_order) - 0.4)
-    ax_b.set_xlabel("Mean SHAP (AD-direction → positive)", fontsize=8)
-    ax_b.set_title("Directional Flip Taxa\n(LogReg; letter = cohort initial)", fontsize=8.5)
-    ax_b.set_xlim(ax_b.get_xlim()[0] * 1.15, ax_b.get_xlim()[1] * 1.15)
-    ax_b.grid(axis="x", linestyle=":", lw=0.5, alpha=0.6, zorder=0)
-    ax_b.spines["top"].set_visible(False)
-    ax_b.spines["right"].set_visible(False)
-    ax_b.text(0.04, 0.98, "← CN↑ | AD↑ →", transform=ax_b.transAxes,
-              ha="left", va="top", fontsize=6.5, color="#555555")
+    ax_b.set_xticks(range(len(cohort_order)))
+    ax_b.set_xticklabels(cohort_short, fontsize=8)
+    ax_b.set_yticks(range(len(final_flip_taxa)))
+    ax_b.set_yticklabels(final_flip_taxa, fontsize=7.5)
+    ax_b.set_title(
+        "Fitted-Coefficient Direction by Cohort\n"
+        "(eight-taxon descriptive stability screen)",
+        fontsize=8, pad=4)
+    cb_b = fig.colorbar(im_b, ax=ax_b, fraction=0.046, pad=0.04, shrink=0.85)
+    cb_b.ax.tick_params(labelsize=6)
+    cb_b.ax.set_title("Median\ncoef.", fontsize=6, pad=4)
+    ax_b.set_xlabel("Bordered = ≥8/10-fold criterion met. + = higher AD log-odds; − = lower.",
+                     fontsize=6)
 
     sub_over = over_df[(over_df["model"] == "logreg") & (over_df["top_n"] == 20)]
     cohorts4 = LABELED_COHORTS
@@ -928,8 +894,11 @@ def make_supp_fig_s2():
                .head(15)
                .sort_values("mean_abs_shap", ascending=True))
 
-        colours = ["#d73027" if v >= 0 else "#4575b4" for v in sub["mean_shap"]]
-        ax.barh(sub["taxon"], sub["mean_abs_shap"], color=colours, alpha=0.85)
+        # Round 2 (Reviewer 3, concern #3): LightGBM has no single
+        # coefficient-like global direction, and its SHAP relationships may
+        # be nonlinear/nonmonotonic, so bars are a single neutral color --
+        # magnitude (feature importance) only, no AD/CN direction implied.
+        ax.barh(sub["taxon"], sub["mean_abs_shap"], color="#4C72B0", alpha=0.85)
         ax.set_xlabel("Mean |SHAP value| (CLR units)", fontsize=8)
         label = COHORT_LABELS_S2.get(cohort, cohort)
         ax.set_title(label, fontsize=8.5, fontweight="bold",
@@ -940,10 +909,80 @@ def make_supp_fig_s2():
         ax.spines["right"].set_visible(False)
 
     fig.suptitle("Top-15 SHAP taxa per cohort (LightGBM)\n"
-                 "Red = AD-associated; Blue = CN-associated",
+                 "Bars show OOF mean |SHAP| feature importance only; no AD/CN "
+                 "direction is assigned (see Methods)",
                  fontsize=9, y=1.01)
     plt.tight_layout()
     out = f"{FIGS}/supp_fig_s2.png"
+    fig.savefig(out, dpi=DPI, bbox_inches="tight", facecolor="white")
+    plt.close(fig)
+    print(f"  Saved: {out}")
+
+
+def make_supp_fig_s5():
+    print("  Generating Figure S5 (Batch Correction, label-informed exploratory sensitivity)…")
+    # Round 2 (Reviewer 3, concern #2): this is the ORIGINAL label-informed
+    # (oracle-style) batch-correction comparison -- each sample's own true
+    # diagnosis label was used during ComBat-seq/MMUPHin fitting. Retained
+    # here only as an explicitly-labeled exploratory sensitivity; the
+    # label-blind comparison in the main-text Figure 5 is the primary result.
+    df = pd.read_csv(f"{TABLES}/auc_comparison_table.csv")
+
+    fig, axes = plt.subplots(1, 2, figsize=(WIDTH_IN, WIDTH_IN * 0.46), dpi=DPI)
+    fig.patch.set_facecolor("white")
+
+    corrections = ["uncorrected", "combatseq", "mmuphin"]
+    corr_labels = {"uncorrected": "Uncorrected", "combatseq": "ComBat-seq (label-informed)",
+                   "mmuphin": "MMUPHin (label-informed)"}
+    cohorts = LABELED_COHORTS
+    n = len(cohorts)
+    x = np.arange(n)
+    bar_w = 0.24
+
+    for ax, model, model_lbl in zip(axes, ["logreg", "lgbm"],
+                                     ["Logistic Regression", "LightGBM"]):
+        offsets = np.array([-0.25, 0.0, 0.25])
+        for corr, offset in zip(corrections, offsets):
+            aucs, ci_lo, ci_hi = [], [], []
+            for c in cohorts:
+                row = df[(df["test_cohort"] == c) & (df["model"] == model) &
+                         (df["correction"] == corr)]
+                if len(row) == 0:
+                    aucs.append(np.nan); ci_lo.append(0); ci_hi.append(0)
+                else:
+                    row = row.iloc[0]
+                    aucs.append(row["loco_auc"])
+                    ci_lo.append(row["loco_auc"] - row["loco_ci_lo"])
+                    ci_hi.append(row["loco_ci_hi"] - row["loco_auc"])
+            ax.bar(x + offset, aucs, bar_w, color=CORRECTION_COLORS[corr],
+                   alpha=0.85, label=corr_labels[corr], zorder=3)
+            ax.errorbar(x + offset, aucs, yerr=[ci_lo, ci_hi],
+                        fmt="none", color="#222222", capsize=2.5,
+                        capthick=0.7, elinewidth=0.7, zorder=4)
+
+        ax.axhline(0.5, color="gray", linestyle="--", lw=0.8, zorder=2,
+                   label="Chance (0.5)")
+        ax.set_xticks(x)
+        ax.set_xticklabels([COHORT_SHORT_FLAT[c] for c in cohorts],
+                            fontsize=8, rotation=15, ha="right")
+        ax.set_ylabel("LOCO AUC-ROC", fontsize=8.5)
+        ax.set_title(f"LOCO AUC: Label-Informed Correction\n(exploratory; {model_lbl})", fontsize=8.5)
+        ax.set_ylim(0.15, 1.05)
+        ax.legend(fontsize=7, loc="upper center", bbox_to_anchor=(0.5, -0.28),
+                  ncol=2, framealpha=0.9, columnspacing=1.0, handletextpad=0.4)
+        ax.grid(axis="y", linestyle=":", lw=0.5, alpha=0.6, zorder=1)
+        ax.spines["top"].set_visible(False)
+        ax.spines["right"].set_visible(False)
+        ax.text(-0.12, 1.08, "AB"[list(axes).index(ax)],
+                transform=ax.transAxes, fontsize=11, fontweight="bold",
+                va="bottom")
+
+    fig.suptitle("Exploratory sensitivity: label-informed transductive correction\n"
+                 "(each sample's own true diagnosis label was used during correction; "
+                 "not a prospective or deployable design -- see Methods)",
+                 fontsize=8.5, y=1.06, color="#993300")
+    plt.tight_layout()
+    out = f"{FIGS}/supp_fig_s5.png"
     fig.savefig(out, dpi=DPI, bbox_inches="tight", facecolor="white")
     plt.close(fig)
     print(f"  Saved: {out}")
@@ -964,5 +1003,6 @@ if __name__ == "__main__":
     make_fig6()
     make_supp_fig_s1()
     make_supp_fig_s2()
+    make_supp_fig_s5()
 
     print("\nAll figures saved to results/figures/")

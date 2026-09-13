@@ -1,0 +1,9 @@
+cohort,model,n_samples,n_AD,n_CN,auc_oof_training_only,auc_ci_lo_training_only,auc_ci_hi_training_only,auc_mean_folds_training_only
+zhuang2018,logreg,86,43,43,0.6647,0.5462,0.7744,0.675
+zhuang2018,lgbm,86,43,43,0.6733,0.5466,0.7805,0.6863
+ling2020,logreg,171,100,71,0.8896,0.8357,0.933,0.8777
+ling2020,lgbm,171,100,71,0.8415,0.7809,0.8935,0.8648
+shanghai2022,logreg,60,30,30,0.9956,0.9833,1.0,1.0
+shanghai2022,lgbm,60,30,30,0.97,0.928,0.9964,0.9667
+kazakhstan2022,logreg,84,41,43,0.7368,0.6256,0.8409,0.7263
+kazakhstan2022,lgbm,84,41,43,0.6109,0.4932,0.7295,0.6275

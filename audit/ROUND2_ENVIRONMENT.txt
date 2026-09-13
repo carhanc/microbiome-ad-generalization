@@ -1,0 +1,61 @@
+Round 2 fix environment provenance
+Recorded: 2026-09-12, on branch frontiers-r3-round2-fixes-2026-09-12
+Conda env used for all new/rerun analyses: microbiome-ad
+
+R (via Rscript, /usr/local/bin/Rscript):
+  R version 4.5.1 (2025-06-13)
+  vegan     2.7.1
+  sva       3.58.0
+  MMUPHin   1.24.0
+  dada2     1.38.0   (installed; NOT invoked — DADA2 was not rerun for Round 2)
+  phyloseq  1.54.2
+
+Python (via /opt/anaconda3/envs/microbiome-ad/bin/python):
+  Python    3.11.15
+  numpy     2.4.6
+  pandas    3.0.3
+  scipy     1.17.1
+  scikit-learn 1.5.2
+  lightgbm  4.6.0
+  shap      0.51.0
+  matplotlib 3.11.0
+  seaborn   0.13.2
+  statsmodels 0.14.6
+
+Comparison to the manuscript's originally stated Statistical Analysis Environment
+(draft.md Section 2.6, describing the ORIGINAL Round 1 analysis):
+  Python 3.11 (matches: 3.11.15)
+  scikit-learn v1.5 (matches: 1.5.2)
+  lightgbm v4 (matches: 4.6.0)
+  shap v0.51 (matches: 0.51.0)
+  R v4.3 (Round 2 actual: 4.5.1 — newer)
+  vegan v2.6 (Round 2 actual: 2.7.1 — newer)
+  MMUPHin v1.15 (Round 2 actual: 1.24.0 — newer)
+
+IMPORTANT DRIFT NOT PREVIOUSLY FLAGGED IN THE PRE-AUDIT:
+  numpy and pandas were NOT checked against the correct (microbiome-ad) conda
+  env during the pre-audit — only sklearn/lightgbm/shap were checked there.
+  This session found:
+    numpy  2.4.6  (a major-version jump from the 1.26.x line implied by
+                   environment.yml's `numpy>=1.26` pin and used historically)
+    pandas 3.0.3  (a major-version jump from the 2.x line implied by
+                   environment.yml's `pandas>=2.0` pin and used historically)
+  These are floating `>=` pins in environment.yml, so this drift is consistent
+  with the environment having been updated since Round 1 was originally run,
+  not a sign of a corrupted environment. All Round 2 Python analyses below were
+  smoke-tested against this exact numpy 2.4.6 / pandas 3.0.3 combination before
+  being trusted (see implementation log). No code in this repository was found
+  to break under pandas 3.0 during Round 2 execution; this is recorded for
+  transparency, not because a failure was observed.
+
+Accurate manuscript disclosure going forward:
+  - DADA2 preprocessing (Phase 1, genus_table.csv per cohort) was NOT rerun for
+    Round 2 and reflects the original DADA2 v1.28 / R v4.3 environment.
+  - All new/rerun Round 2 downstream analyses (training-only feature
+    sensitivity, label-blind batch correction, corrected generalization, SHAP
+    coefficient-stability, Jaccard null) were executed under R 4.5.1 / Python
+    3.11.15 with the package versions listed above — newer than the original
+    Round 1 R environment, matching for the Python side.
+  - The manuscript's Statistical Analysis Environment section is updated to
+    describe this mixed provenance explicitly rather than implying a single
+    uniform environment across all reported numbers.

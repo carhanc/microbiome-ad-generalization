@@ -135,7 +135,7 @@ write_csv(cohort_results,
 cat(sprintf("\n  Wrote: %s/permanova_cohort.csv\n\n",
             TABLES_DIR))
 
-cat("PERMANOVA — cohort + diagnosis (n=521)...\n")
+cat("PERMANOVA — cohort + diagnosis (n=401 labeled)...\n")
 
 labeled_mask <- !is.na(meta$diagnosis) & meta$diagnosis %in% c("AD", "CN")
 meta_labeled <- meta[labeled_mask, ]
