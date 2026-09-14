@@ -60,13 +60,14 @@ FIGURES = [
         "(primary analysis; no diagnosis information used during correction). "
         "(**A**) Logistic regression and (**B**) LightGBM LOCO AUC for each held-out cohort "
         "under three conditions: uncorrected (green), ComBat-seq label-blind corrected (magenta), and "
-        "MMUPHin label-blind corrected (salmon). Error bars = 95% bootstrap CI. Dashed line = chance (0.50). "
+        "MMUPHin label-blind corrected (salmon). Error bars = 95% bootstrap CI (1,000 non-stratified "
+        "resamples on held-out test predictions; Section 2.5). Dashed line = chance (0.50). "
         "Under this label-blind design, both methods left mean LOCO AUC essentially unchanged "
         "relative to uncorrected (within 0.007 AUC for both methods and models), neither "
         "recovering nor substantially worsening cross-cohort generalization. An exploratory "
         "label-informed transductive sensitivity comparison, in which correction used each sample's own "
         "true diagnosis label and which produced substantially different, more severe "
-        "degradation for some cohorts, is reported separately in Supplementary Figure S5 "
+        "degradation for some cohorts, is reported separately in Supplementary Figure S4 "
         "and is not treated as evidence about prospective performance (Section 2.7, Section 3.5)."
     ),
     (
