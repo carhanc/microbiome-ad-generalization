@@ -167,7 +167,7 @@ Per (cohort, genus), counts of positive/negative/zero fitted coefficients across
 | Zhu 2022 | Akkermansia | 10 | 0 | 0.0709 | stable_positive |
 | Kazakhstan | Akkermansia | 10 | 0 | 0.0682 | stable_positive |
 
-*Romboutsia* is stable-negative in all three Chinese cohorts and stable-positive in Kazakhstan — the cleanest country-level split among the eight genera meeting the screen. *Akkermansia*'s coefficient is stable and positive in all four cohorts — it does not meet the screen at all, despite its pooled mean SHAP value appearing to reverse sign (Section 3.6). See the full CSV for the corresponding rows for each of the eight genera meeting the descriptive screen (*Agathobacter*, *Bifidobacterium*, *Coprococcus*, *Dorea*, *Lactobacillus*, *NK4A214 group*, *Romboutsia*, *Ruminococcus gnavus group*) and for `logreg_directional_flips_stable.csv`, which lists, per candidate taxon, which cohorts carried a stable positive vs. stable negative coefficient.
+*Romboutsia* is stable-negative in all three Chinese cohorts and stable-positive in Kazakhstan — the cleanest observed cross-cohort pattern among the eight genera meeting the screen. *Akkermansia*'s coefficient is stable and positive in all four cohorts — it does not meet the screen at all, despite its pooled mean SHAP value appearing to reverse sign (Section 3.6). See the full CSV for the corresponding rows for each of the eight genera meeting the descriptive screen (*Agathobacter*, *Bifidobacterium*, *Coprococcus*, *Dorea*, *Lactobacillus*, *NK4A214 group*, *Romboutsia*, *Ruminococcus gnavus group*) and for `logreg_directional_flips_stable.csv`, which lists, per candidate taxon, which cohorts carried a stable positive vs. stable negative coefficient.
 
 *Source data:* `results/tables/logreg_coefficient_stability.csv`, `results/tables/logreg_directional_flips_stable.csv`.
 
@@ -222,7 +222,7 @@ No permutation among the 1,000 drawn reached the observed AUC for either model; 
 
 ### Table S10. Formal Within-Cohort vs. LOCO AUC Difference (Paired, Diagnosis-Stratified Bootstrap)
 
-Paired, diagnosis-stratified, participant-level bootstrap (10,000 replicates; Section 2.5.2). $\Delta = \text{AUC}_{\text{within}} - \text{AUC}_{\text{LOCO}}$, computed on identical resampled participants for both AUC values in each replicate. "Proportion Δ≤0" is the fraction of bootstrap replicates with a non-positive delta.
+Paired, diagnosis-stratified, participant-level bootstrap (10,000 replicates; Section 2.5.2). Δ (= AUC-within minus AUC-LOCO) is computed on identical resampled participants for both AUC values in each replicate. "Proportion Δ≤0" is the fraction of bootstrap replicates with a non-positive delta.
 
 | Cohort | Model | N | AUC Within | AUC LOCO | Observed Δ | Bootstrap Mean Δ | 95% CI | Proportion Δ≤0 |
 |---|---|---|---|---|---|---|---|---|
