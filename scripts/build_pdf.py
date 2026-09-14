@@ -25,7 +25,8 @@ FIGURES = [
         2,
         "**Figure 2.** Within-cohort classification performance under nested cross-validation "
         "(10-fold outer / 5-fold inner CV). Bars show out-of-fold AUC-ROC; error bars represent "
-        "95% bootstrap confidence intervals (1,000 resamples). Dashed line = chance (AUC = 0.50). "
+        "95% CIs from the diagnosis-stratified, participant-level bootstrap (10,000 replicates; "
+        "Section 2.5.2), matching Table 2. Dashed line = chance (AUC = 0.50). "
         "LogReg = L2-regularized logistic regression; LGBM = LightGBM."
     ),
     (
@@ -33,7 +34,9 @@ FIGURES = [
         3,
         "**Figure 3.** Cross-cohort generalization failure. "
         "(**A**) Within-cohort (solid bars) versus LOCO cross-cohort (hatched bars) AUC-ROC for "
-        "logistic regression (blue) and LightGBM (pink). Error bars = 95% bootstrap CI. "
+        "logistic regression (blue) and LightGBM (pink). Error bars on the LOCO bars = 95% CI from "
+        "the diagnosis-stratified, participant-level bootstrap (10,000 replicates; Section 2.5.2), "
+        "matching Table 3; within-cohort bars are shown without error bars in this panel. "
         "(**B**, **C**) Pairwise single-cohort-train / single-cohort-test AUC heatmaps for "
         "logistic regression and LightGBM respectively. Diagonal (within-cohort) values are "
         "omitted; colour scale: red = near chance, green = high AUC."

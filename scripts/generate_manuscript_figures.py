@@ -227,7 +227,12 @@ def make_fig1():
 
 def make_fig2():
     print("  Generating Figure 2 (Within-Cohort Baseline AUC)…")
-    df = pd.read_csv(f"{TABLES}/within_cohort_auc.csv")
+    # CIs from the diagnosis-stratified, participant-level bootstrap
+    # (Section 2.5.2; 10,000 replicates) -- the same procedure Table 2's
+    # text values use, so the plotted error bars match the reported CIs.
+    # Point estimates (auc_oof) are unchanged from the original OOF
+    # predictions either way.
+    df = pd.read_csv(f"{TABLES}/within_cohort_auc_ci_stratified_bootstrap.csv")
     df = df[df["cohort"].isin(LABELED_COHORTS)]
 
     fig, ax = plt.subplots(figsize=(WIDTH_IN * 0.7, WIDTH_IN * 0.5), dpi=DPI)
@@ -292,7 +297,12 @@ def make_fig2():
 def make_fig3():
     print("  Generating Figure 3 (Cross-Cohort Generalization)…")
     drop_df  = pd.read_csv(f"{TABLES}/auc_drop_summary.csv")
-    loco_df  = pd.read_csv(f"{TABLES}/loco_auc.csv")
+    # LOCO CIs from the diagnosis-stratified, participant-level bootstrap
+    # (Section 2.5.2; 10,000 replicates) -- matches the values in Table 3's
+    # text/CI column. Point estimates (auc) are unchanged from the original
+    # LOCO predictions; only the CI procedure differs from the historical
+    # loco_auc.csv table.
+    loco_df  = pd.read_csv(f"{TABLES}/loco_auc_ci_stratified_bootstrap.csv")
     pair_df  = pd.read_csv(f"{TABLES}/pairwise_auc.csv")
 
     # Wider canvas and larger wspace: panel B/C's "Train Cohort" y-axis
@@ -326,7 +336,7 @@ def make_fig3():
         w_aucs, l_aucs, l_lo, l_hi = [], [], [], []
         for c in cohorts:
             wr = within_df[(within_df["cohort"] == c) & (within_df["model"] == m)].iloc[0]
-            lr = loco_df[(loco_df["test_cohort"] == c) & (loco_df["model"] == m)].iloc[0]
+            lr = loco_df[(loco_df["cohort"] == c) & (loco_df["model"] == m)].iloc[0]
             w_aucs.append(wr["auc_oof"])
             l_aucs.append(lr["auc"])
             l_lo.append(lr["auc"] - lr["ci_lo"])
@@ -639,16 +649,19 @@ def make_fig6():
     # labels into less room than B's 12).
     gs = gridspec.GridSpec(2, 2, figure=fig,
                            height_ratios=[1.55, 1.0],
-                           hspace=0.38, wspace=0.40,
+                           hspace=0.55, wspace=0.55,
                            left=0.15, right=0.97,
-                           top=0.95, bottom=0.06)
+                           top=0.95, bottom=0.09)
     ax_a = fig.add_subplot(gs[0, :])   # top full-width
     ax_b = fig.add_subplot(gs[1, 0])   # bottom-left
     ax_c = fig.add_subplot(gs[1, 1])   # bottom-right
 
+    # Panel B's title is long relative to its (narrower) panel width, so its
+    # left edge sits close to the axes' left edge -- give the "B" label extra
+    # horizontal clearance so it doesn't touch the title text.
+    panel_label_x_off = {"A": -0.04, "B": -0.16, "C": -0.08}
     for ax, lbl in zip([ax_a, ax_b, ax_c], "ABC"):
-        x_off = -0.04 if ax is ax_a else -0.08
-        ax.text(x_off, 1.05, lbl, transform=ax.transAxes, fontsize=11,
+        ax.text(panel_label_x_off[lbl], 1.05, lbl, transform=ax.transAxes, fontsize=11,
                 fontweight="bold", va="bottom")
 
     AD_COL = "#d62728"
@@ -764,18 +777,23 @@ def make_fig6():
                                              edgecolor="black", lw=1.3, zorder=5))
 
     ax_b.set_xticks(range(len(cohort_order)))
-    ax_b.set_xticklabels(cohort_short, fontsize=8)
+    # Rotated + right-aligned (matching Panel C) so "Zhu 2022" and
+    # "Kazakhstan" don't collide with their neighbors in this narrower panel.
+    ax_b.set_xticklabels(cohort_short, fontsize=8, rotation=20, ha="right")
     ax_b.set_yticks(range(len(final_flip_taxa)))
     ax_b.set_yticklabels(final_flip_taxa, fontsize=7.5)
     ax_b.set_title(
         "Fitted-Coefficient Direction by Cohort\n"
         "(eight-taxon descriptive stability screen)",
-        fontsize=8, pad=4)
+        fontsize=8, pad=6)
     cb_b = fig.colorbar(im_b, ax=ax_b, fraction=0.046, pad=0.04, shrink=0.85)
     cb_b.ax.tick_params(labelsize=6)
-    cb_b.ax.set_title("Median\ncoef.", fontsize=6, pad=4)
+    # Short title directly over the (narrow) colorbar strip only -- long text
+    # here previously collided with ax_b's own title one column over, and a
+    # rotated side label crowded into Panel C's left margin instead.
+    cb_b.ax.set_title("Coef.", fontsize=6, pad=4)
     ax_b.set_xlabel("Bordered = ≥8/10-fold criterion met. + = higher AD log-odds; − = lower.",
-                     fontsize=6)
+                     fontsize=6, labelpad=6)
 
     sub_over = over_df[(over_df["model"] == "logreg") & (over_df["top_n"] == 20)]
     cohorts4 = LABELED_COHORTS
@@ -819,7 +837,10 @@ def make_supp_fig_s1():
 
     WIDTH_S = 85 / 25.4
 
-    wc = pd.read_csv(f"{TABLES}/within_cohort_auc.csv")
+    # Same diagnosis-stratified, participant-level bootstrap CI (10,000
+    # replicates) used for the final Zhu 2022 within-cohort CI reported in
+    # the main text and Table 2 (Section 2.5.2). Point estimate unchanged.
+    wc = pd.read_csv(f"{TABLES}/within_cohort_auc_ci_stratified_bootstrap.csv")
     sh = wc[wc["cohort"] == "shanghai2022"].set_index("model")
 
     lr_auc   = sh.loc["logreg", "auc_oof"]

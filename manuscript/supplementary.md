@@ -1,7 +1,5 @@
 # Supplementary Materials
 
-**Title:** Cross-Cohort Generalization Failure in Gut Microbiome-Based Alzheimer's Disease Classifiers: Evidence from Five Independent Cohorts with Batch Correction Analysis
-
 ---
 
 ## Supplementary Tables
@@ -304,9 +302,12 @@ Logistic regression remains significant at all three thresholds under this more 
 
 ### Figure S1. Zhu 2022: Fecal-Only Within-Cohort AUC
 
-**Caption:** Within-cohort AUC-ROC for Zhu 2022 fecal samples only (n=60 binary: 30 AD + 30 CN), estimated using standard StratifiedKFold 10-fold nested cross-validation. Blood microbiome (B_*) samples were excluded from all analyses; each participant appears exactly once in the fecal-only dataset, making standard StratifiedKFold appropriate. Logistic regression achieves AUC=0.998 [0.99–1.00] and LightGBM achieves AUC=0.979 [0.95–1.00]. The near-perfect within-cohort AUC should be interpreted cautiously given the small sample size (30 per class); see Section 3.2 and Section 4.3 for discussion. Error bars = 95% bootstrap CI (1,000 resamples).
+**Caption:** Within-cohort AUC-ROC for Zhu 2022 fecal samples only (n=60 binary: 30 AD + 30 CN), estimated using standard StratifiedKFold 10-fold nested cross-validation. Blood microbiome (B_*) samples were excluded from all analyses; each participant appears exactly once in the fecal-only dataset, making standard StratifiedKFold appropriate. Logistic regression achieves AUC=0.998 [0.99–1.00] and LightGBM achieves AUC=0.979 [0.94–1.00]. The near-perfect within-cohort AUC should be interpreted cautiously given the small sample size (30 per class); see Section 3.2 and Section 4.3 for discussion. Error bars = 95% CI from the diagnosis-stratified, participant-level bootstrap (10,000 replicates; Section 2.5.2), matching Table 2.
 
 *Source data:* results/model_outputs/within_cohort_cv/shanghai2022_*.csv
+![Figure S1](/Users/arhan/Desktop/microbiome-ad-generalization/results/figures/final_supplementary/Figure_S1.jpg){width=70%}
+
+*Source figure:* `results/figures/final_supplementary/Figure_S1.jpg`
 
 ---
 
@@ -314,42 +315,42 @@ Logistic regression remains significant at all three thresholds under this more 
 
 **Caption:** Horizontal bar charts showing mean |SHAP| value (CLR units) for the top-15 genera by importance in each of the four labeled cohorts under out-of-fold LightGBM evaluation. Bars are a single neutral color and show feature-importance magnitude only — **no AD/CN direction is assigned**, because a tree ensemble has no single coefficient-like global direction and LightGBM's SHAP-feature relationships may be nonlinear or non-monotonic (Section 2.8). Top taxon per cohort (by |SHAP| magnitude only): Lachnoclostridium (Zhuang 2018, |SHAP|=0.560), Akkermansia (Ling 2020, |SHAP|=0.947), Bacteroides (Zhu 2022, |SHAP|=1.243), Castellaniella (Kazakhstan, |SHAP|=0.614). Mean pairwise Jaccard similarity at top-20: 0.058, significant against the shared-pool null (p=0.0048 at N=20; not significant at N=10, p=0.45; Table S7) but not significant at any N against the prevalence-restricted null (Table S13). **No LightGBM directional-flip claim is made anywhere in this paper**, because a tree ensemble has no single coefficient-like global direction (Section 2.8).
 
-*Source figure:* `results/figures/supp_fig_s2.jpg` (built from `results/figures/working/shap_top15_per_cohort_lgbm.png`, neutral-color bars, no direction assigned)
+![Figure S2](/Users/arhan/Desktop/microbiome-ad-generalization/results/figures/final_supplementary/Figure_S2.jpg){width=100%}
+
+*Source figure:* `results/figures/final_supplementary/Figure_S2.jpg`
 
 ---
 
-### Figure S3a/S3b. LOCO SHAP Direction — Not Reported
+### Figure S3. Sensitivity Analysis: LOCO AUC Under Cohort Exclusion
 
-**No figure showing a signed AD/CN direction for LOCO SHAP values is included in this paper.** Mean signed SHAP is not a valid direction statistic in general (Section 2.8), and this is especially severe for LOCO SHAP specifically: the SHAP background (the three pooled training cohorts) and the evaluation set (the held-out cohort) are drawn from systematically different populations by construction, so the sign of a LOCO mean SHAP value is confounded with the raw cross-cohort compositional difference quantified by PERMANOVA (Section 3.4), independent of anything the model learned. No coefficient-based replacement direction is offered for LOCO SHAP either, because LOCO models are refit on pooled multi-cohort training data each time and a single stable-fold coefficient analysis analogous to Section 2.8's within-cohort procedure is not part of this design.
-
-LOCO SHAP **feature importance** (mean |SHAP|, magnitude only, no direction) remains available and is unaffected by this issue: see `results/tables/shap_loco_importance.csv`. For reference, the previously reported top-importance genus per held-out cohort was: Zhuang 2018 — *Akkermansia* (logistic regression |SHAP|=0.470); Ling 2020 — *Subdoligranulum* (|SHAP|=0.269); Zhu 2022 — *Akkermansia* (|SHAP|=0.372); Kazakhstan — *Christensenellaceae R-7 group* (|SHAP|=0.368); no genus ranked first across all four held-out conditions for either model (Section 3.6).
-
----
-
-### Figure S4. Sensitivity Analysis: LOCO AUC Under Cohort Exclusion
-
-**Caption:** Sensitivity analysis: LOCO AUC under three cohort exclusion configurations. Each panel shows the 3-cohort LOCO experiment with one cohort excluded from the full analysis. Left: excluding Kazakhstan (Zhuang+Ling+Zhu trained, each held out in turn). Center: excluding Zhuang 2018. Right: excluding Ling 2020. Error bars = 95% bootstrap CI. Generalization degradation persisted across all three prespecified cohort-exclusion configurations.
+**Caption:** Sensitivity analysis: LOCO AUC under three cohort exclusion configurations. Each panel shows the 3-cohort LOCO experiment with one cohort excluded from the full analysis. Left: excluding Kazakhstan (Zhuang+Ling+Zhu trained, each held out in turn). Center: excluding Zhuang 2018. Right: excluding Ling 2020. Error bars = 95% bootstrap CI (1,000 resamples on the test-set predictions; the non-stratified procedure described in Section 2.5, not the diagnosis-stratified 10,000-replicate procedure used for the main four-cohort LOCO results). Generalization degradation persisted across all three prespecified cohort-exclusion configurations.
 
 *Source data:* `results/tables/sensitivity_loco.csv`
-*Source figure:* `results/figures/supp_sensitivity_loco (supp_fig_s4).jpg`
+![Figure S3](/Users/arhan/Desktop/microbiome-ad-generalization/results/figures/final_supplementary/Figure_S3.jpg){width=100%}
+
+*Source figure:* `results/figures/final_supplementary/Figure_S3.jpg`
 
 ---
 
-### Figure S5. Batch Correction, Label-Informed Design (Exploratory Sensitivity)
+### Figure S4. Batch Correction, Label-Informed Design (Exploratory Sensitivity)
 
-**Caption:** LOCO AUC-ROC under the label-informed transductive batch-correction design (ComBat-seq/MMUPHin fit using every sample's own true diagnosis label; Section 2.7), shown for (**A**) logistic regression and (**B**) LightGBM. This design is retained as an **explicitly-labeled exploratory sensitivity analysis only**, because a correction step that is fit using every sample's own true diagnosis label cannot estimate prospective external-validation performance, and because the resulting within-cohort AUC on corrected data cannot be used as evidence that genuine, correction-independent biological signal survived (Section 3.5). The main-text Figure 5 shows the label-blind design (no diagnosis information used during correction), which is the paper's primary batch-correction result. Note the severe, cohort-specific degradation visible here (e.g., Kazakhstan logistic regression LOCO AUC=0.308) that is **not** reproduced under the label-blind design (Kazakhstan label-blind LOCO AUC=0.560, closely matching the uncorrected value of 0.564) — indicating this degradation was driven substantially by the label-informed design itself.
+**Caption:** LOCO AUC-ROC under the label-informed transductive batch-correction design (ComBat-seq/MMUPHin fit using every sample's own true diagnosis label; Section 2.7), shown for (**A**) logistic regression and (**B**) LightGBM. Error bars = 95% bootstrap CI (1,000 resamples on the test-set predictions, the same non-stratified procedure used for Table 4/Figure 5; not part of the diagnosis-stratified 10,000-replicate regeneration in Section 2.5.2). This design is retained as an **explicitly-labeled exploratory sensitivity analysis only**, because a correction step that is fit using every sample's own true diagnosis label cannot estimate prospective external-validation performance, and because the resulting within-cohort AUC on corrected data cannot be used as evidence that genuine, correction-independent biological signal survived (Section 3.5). The main-text Figure 5 shows the label-blind design (no diagnosis information used during correction), which is the paper's primary batch-correction result. Note the severe, cohort-specific degradation visible here (e.g., Kazakhstan logistic regression LOCO AUC=0.308) that is **not** reproduced under the label-blind design (Kazakhstan label-blind LOCO AUC=0.560, closely matching the uncorrected value of 0.564) — indicating this degradation was driven substantially by the label-informed design itself.
 
 *Source data:* `results/tables/auc_comparison_table.csv`, `results/tables/loco_auc_corrected.csv`
-*Source figure:* `results/figures/supp_fig_s5.jpg`
+![Figure S4](/Users/arhan/Desktop/microbiome-ad-generalization/results/figures/final_supplementary/Figure_S4.jpg){width=100%}
+
+*Source figure:* `results/figures/final_supplementary/Figure_S4.jpg`
 
 ---
 
-### Figure S6. Zhu 2022 Robustness: Repeated Cross-Validation and Label Permutation
+### Figure S5. Zhu 2022 Robustness: Repeated Cross-Validation and Label Permutation
 
 **Caption:** Robustness analyses for Zhu 2022's near-perfect within-cohort AUC (Section 2.4.1, Section 3.2), both run under the strict training-only feature-selection pipeline. Top row: distribution of pooled-OOF AUC across 50 repetitions of the nested-CV partition (different pre-specified seed per repetition) for logistic regression (left) and LightGBM (right), with the single-partition training-only AUC marked. Bottom row: null distribution of pooled-OOF AUC under label permutation (labels shuffled, class balance preserved, entire training-only pipeline re-run inside every outer fold for each permutation), with the observed single-partition AUC marked and the empirical p-value shown in the panel title. The repeated-CV panels quantify sensitivity to fold assignment on the same 60 participants (not independent replication); the permutation panels are the formal test of whether the observed AUC exceeds a chance-label null.
 
 *Source data:* `results/tables/zhu_repeated_nested_cv.csv`, `results/tables/zhu_label_permutation.csv`.
-*Source figure:* `results/figures/supp_zhu_robustness.png`
+![Figure S5](/Users/arhan/Desktop/microbiome-ad-generalization/results/figures/final_supplementary/Figure_S5.png){width=90%}
+
+*Source figure:* `results/figures/final_supplementary/Figure_S5.png`
 
 ---
 
@@ -396,6 +397,14 @@ The following metadata sources were queried for per-sample diagnosis labels:
 **DADA2 workflow difference:** The single-end workflow did not include `mergePairs()`. The full single-end DADA2 pipeline applied: `filterAndTrim()` → `learnErrors()` → `dada()` → `makeSequenceTable()` → `removeBimeraDenovo()`. Error learning was performed independently on Kazakhstan samples; sharing error models across cohorts would be inappropriate because error profiles differ by sequencer and run.
 
 **Interaction with batch correction:** The single-end/paired-end asymmetry is an additional source of between-cohort technical heterogeneity that batch correction methods cannot fully address, because the fundamental difference in read length and sequencing chemistry affects all genera' abundance estimates rather than a subset. This is a study limitation that applies to any analysis including Kazakhstan and should be acknowledged in the Methods section of any manuscript using this dataset.
+
+---
+
+### Note S3. LOCO SHAP Direction Not Reported
+
+**No figure or table showing a signed AD/CN direction for LOCO SHAP values is included in this paper.** Mean signed SHAP is not a valid direction statistic in general (Section 2.8), and this is especially severe for LOCO SHAP specifically: the SHAP background (the three pooled training cohorts) and the evaluation set (the held-out cohort) are drawn from systematically different populations by construction, so the sign of a LOCO mean SHAP value is confounded with the raw cross-cohort compositional difference quantified by PERMANOVA (Section 3.4), independent of anything the model learned. No coefficient-based replacement direction is offered for LOCO SHAP either, because LOCO models are refit on pooled multi-cohort training data each time and a single stable-fold coefficient analysis analogous to Section 2.8's within-cohort procedure is not part of this design.
+
+LOCO SHAP **feature importance** (mean |SHAP|, magnitude only, no direction) remains available and is unaffected by this issue: see `results/tables/shap_loco_importance.csv`. For reference, the top-importance genus per held-out cohort is: Zhuang 2018 — *Akkermansia* (logistic regression |SHAP|=0.470); Ling 2020 — *Subdoligranulum* (|SHAP|=0.269); Zhu 2022 — *Akkermansia* (|SHAP|=0.372); Kazakhstan — *Christensenellaceae R-7 group* (|SHAP|=0.368); no genus ranked first across all four held-out conditions for either model (Section 3.6).
 
 ---
 

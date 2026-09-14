@@ -11,3 +11,6 @@ data/silva/
 data/processed/*_ORIG.csv
 manuscript/~*.docx
 .claude/
+
+review/
+audit/
