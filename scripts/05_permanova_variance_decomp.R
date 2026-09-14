@@ -216,10 +216,12 @@ bd_result_df <- data.frame(
 
 pw_bd <- bd_perm_ait$pairwise
 if (!is.null(pw_bd)) {
+  # $observed is the parametric (asymptotic t) two-sided p-value for each
+  # pair, not an F-statistic -- see note in 14_permanova_dispersion_sensitivity.R.
   pw_df <- data.frame(
-    comparison = names(pw_bd$observed),
-    F_obs      = unname(pw_bd$observed),
-    p_perm     = unname(pw_bd$permuted)
+    comparison   = names(pw_bd$observed),
+    p_parametric = unname(pw_bd$observed),
+    p_perm       = unname(pw_bd$permuted)
   )
   cat("\n  Pairwise betadisper p-values (Aitchison):\n")
   print(pw_df)

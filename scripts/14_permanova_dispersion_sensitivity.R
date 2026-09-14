@@ -63,10 +63,15 @@ cat("  Overall betadisper permutation test:\n")
 print(bd_perm_ait)
 
 pw <- bd_perm_ait$pairwise
-# permutest$pairwise$permuted holds unadjusted permutation p-values per pair
+# permutest.betadisper()$pairwise$observed is NOT an F-statistic: per vegan's
+# source (permutest.betadisper.R), pairwise comparisons use a pooled-variance
+# two-sample t-test, and $observed holds the two-sided PARAMETRIC p-value
+# (2 * pt(-abs(T0), df), from the asymptotic t reference distribution) for
+# that pair's observed (unpermuted) data -- distinct from $permuted, the
+# empirical permutation-based p-value used below for multiplicity adjustment.
 pw_df <- data.frame(
   comparison   = names(pw$observed),
-  F_obs        = unname(pw$observed),
+  p_parametric = unname(pw$observed),
   p_perm       = unname(pw$permuted)
 )
 pw_df$p_holm <- p.adjust(pw_df$p_perm, method = "holm")
@@ -134,11 +139,13 @@ bd_sub_result <- data.frame(
   p_value     = bd_perm_sub$tab$`Pr(>F)`[1]
 )
 pw_sub <- bd_perm_sub$pairwise
+# See note above: $observed is the parametric (asymptotic t) two-sided
+# p-value, not an F-statistic.
 pw_sub_df <- data.frame(
-  subset     = "zhuang2018+ling2020+shanghai2022",
-  comparison = names(pw_sub$observed),
-  F_obs      = unname(pw_sub$observed),
-  p_perm     = unname(pw_sub$permuted)
+  subset       = "zhuang2018+ling2020+shanghai2022",
+  comparison   = names(pw_sub$observed),
+  p_parametric = unname(pw_sub$observed),
+  p_perm       = unname(pw_sub$permuted)
 )
 pw_sub_df$p_holm <- p.adjust(pw_sub_df$p_perm, method = "holm")
 

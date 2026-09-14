@@ -154,7 +154,7 @@ Within-cohort nested-CV AUC (Section 2.4 procedure) computed on batch-corrected 
 
 ### Table S6. Logistic-Regression Coefficient Sign Stability: Screened Candidates and the *Akkermansia* Negative Control
 
-Per (cohort, genus), counts of positive/negative/zero fitted coefficients across the 10 outer OOF folds (Section 2.8). `sign_stability` uses the pre-specified ≥8/10-fold threshold. This is a descriptive screen, not a hypothesis test: the 10 outer folds share overlapping training data and are not independent replications, so no p-value is assigned to any row. Full table (1,584 cohort×genus rows) in `results/tables/logreg_coefficient_stability.csv`; below, *Romboutsia* (the cleanest cohort-level pattern among the eight genera meeting the screen; Section 3.6) and *Akkermansia* (a negative-control illustration: appears to flip under the old, invalid mean-SHAP statistic but does not meet the coefficient-based screen; Section 3.6, Section 4.4).
+Per (cohort, genus), counts of positive/negative/zero fitted coefficients across the 10 outer OOF folds (Section 2.8). `sign_stability` uses the pre-specified ≥8/10-fold threshold. This is a descriptive screen, not a hypothesis test: the 10 outer folds share overlapping training data and are not independent replications, so no p-value is assigned to any row. Full table (1,584 cohort×genus rows) in `results/tables/logreg_coefficient_stability.csv`; below, *Romboutsia* (the cleanest cohort-level pattern among the eight genera meeting the screen; Section 3.6) and *Akkermansia* (a negative-control illustration: appears to flip under the prior mean-signed-SHAP direction statistic but does not meet the coefficient-based screen; Section 3.6, Section 4.4).
 
 | Cohort | Taxon | n_positive/10 | n_negative/10 | Median Coefficient | Sign Stability |
 |---|---|---|---|---|---|
@@ -243,14 +243,24 @@ Five of eight pairs have a 95% CI excluding zero (Ling 2020 both models, Zhu 202
 
 ### Table S11. PERMANOVA Sensitivity: Chinese Paired-End MiSeq Cohorts Only (Zhuang 2018 + Ling 2020 + Zhu 2022)
 
-Marginal PERMANOVA (Aitchison distance, `by="margin"`, 9,999 permutations), binary AD/CN only, restricted to the three cohorts that are more technically comparable to one another (same country, same paired-end MiSeq V3–V4 platform; Section 2.6). n=317 (zhuang2018=86, ling2020=171, shanghai2022/Zhu 2022=60).
+Marginal PERMANOVA (Aitchison distance, `by="margin"`, 9,999 permutations), binary AD/CN only, restricted to the three cohorts that are more technically comparable to one another (same country, same paired-end MiSeq V3–V4 platform; Section 2.6). n=317 (Zhuang 2018=86, Ling 2020=171, Zhu 2022=60).
 
 | Term | Df | Sum of Squares | R² (marginal) | F | p-value |
 |---|---|---|---|---|---|
 | Cohort | 2 | 17,532.9 | 0.0588 | 10.05 | 0.0001 |
 | Diagnosis | 1 | 6,821.2 | 0.0229 | 7.83 | 0.0001 |
 
-Compare to the full four-cohort marginal model (Table S3, Model 2): cohort R²=0.172, diagnosis R²=0.014 (~12-fold disparity). Restricted to this more technically comparable three-cohort subset, the disparity falls to ~2.6-fold (0.0588/0.0229). Beta-dispersion on this subset: F=7.946, p=0.0004 (9,999 permutations); pairwise (Table S12): zhuang2018 vs. ling2020 p=0.0001, zhuang2018 vs. shanghai2022 p=0.026, ling2020 vs. shanghai2022 p=0.343 (not significant).
+Compare to the full four-cohort marginal model (Table S3, Model 2): cohort R²=0.172, diagnosis R²=0.014 (~12-fold disparity). Restricted to this more technically comparable three-cohort subset, the disparity falls to ~2.6-fold (0.0588/0.0229). Beta-dispersion on this subset: F=7.946, p=0.0004 (9,999 permutations).
+
+Pairwise betadisper post-hoc comparisons within this three-cohort subset (permutation p, with Holm adjustment across these three tests only — this is a separate multiplicity family from the five-cohort Table S12 below, not a subset of it):
+
+| Comparison | p (permutation, unadjusted) | p (Holm, 3 tests) | Significant after Holm correction? |
+|---|---|---|---|
+| Zhuang 2018 vs. Ling 2020 | 0.0001 | 0.0003 | Yes |
+| Zhuang 2018 vs. Zhu 2022 | 0.026 | 0.052 | No |
+| Ling 2020 vs. Zhu 2022 | 0.343 | 0.343 | No |
+
+Zhuang 2018 differs significantly in dispersion from Ling 2020 after Holm correction; its difference from Zhu 2022 does not survive multiplicity correction (raw p=0.026, Holm-adjusted p=0.052 — at or above the conventional 0.05 threshold, so not called significant here). Ling 2020 and Zhu 2022 do not differ.
 
 *Source data:* `results/tables/permanova_chinese_miseq_sensitivity.csv`, `results/tables/betadisper_chinese_miseq_sensitivity.csv`, `results/tables/betadisper_chinese_miseq_pairwise.csv`.
 
@@ -258,22 +268,22 @@ Compare to the full four-cohort marginal model (Table S3, Model 2): cohort R²=0
 
 ### Table S12. Pairwise Beta-Dispersion Post-Hoc Comparisons (All Five Cohorts, Aitchison Distance)
 
-All 10 pairwise betadisper comparisons among the five cohorts (9,999 permutations per pair), with Holm and Benjamini-Hochberg (BH) multiplicity adjustment across the 10 comparisons (Section 2.6). Sorted by unadjusted p.
+All 10 pairwise betadisper comparisons among the five cohorts (9,999 permutations per pair), with Holm and Benjamini-Hochberg (BH) multiplicity adjustment across the 10 comparisons (Section 2.6). Sorted by unadjusted (permutation) p. The "p (parametric)" column is vegan's `permutest.betadisper(..., pairwise=TRUE)$pairwise$observed` — the two-sided p-value from a pooled-variance two-sample t-test evaluated on the observed (unpermuted) distances-to-centroid, using the asymptotic t reference distribution. It is not an F-statistic (pairwise betadisper comparisons use a t-test, not an F-test — only the omnibus test across all groups, Table S12's parent analysis, uses F) and is reported here for completeness; all significance calls in this paper use the permutation-based p-value and its Holm/BH adjustment, not this parametric column.
 
-| Comparison | F (observed) | p (unadjusted) | p (Holm) | p (BH) |
+| Comparison | p (parametric) | p (permutation, unadjusted) | p (Holm) | p (BH) |
 |---|---|---|---|---|
-| kazakhstan2022–ling2020 | 1.434×10⁻⁸ | 0.0001 | 0.0010 | 0.000333 |
-| kbase2022–ling2020 | 4.178×10⁻⁹ | 0.0001 | 0.0010 | 0.000333 |
-| ling2020–zhuang2018 | 5.442×10⁻⁵ | 0.0001 | 0.0010 | 0.000333 |
-| kazakhstan2022–shanghai2022 | 1.313×10⁻³ | 0.0009 | 0.0063 | 0.00225 |
-| kbase2022–shanghai2022 | 1.670×10⁻³ | 0.0018 | 0.0108 | 0.0036 |
-| ling2020–shanghai2022 | 8.277×10⁻³ | 0.0084 | 0.0420 | 0.0140 |
-| kazakhstan2022–zhuang2018 | 1.047×10⁻² | 0.0101 | 0.0420 | 0.01443 |
-| kbase2022–zhuang2018 | 2.507×10⁻² | 0.0216 | 0.0648 | 0.0270 |
-| shanghai2022–zhuang2018 | 2.213×10⁻¹ | 0.2197 | 0.4394 | 0.2441 |
-| kazakhstan2022–kbase2022 | 3.487×10⁻¹ | 0.3544 | 0.4394 | 0.3544 |
+| Kazakhstan–Ling 2020 | 1.434×10⁻⁸ | 0.0001 | 0.0010 | 0.000333 |
+| Kim/KBASE 2022–Ling 2020 | 4.178×10⁻⁹ | 0.0001 | 0.0010 | 0.000333 |
+| Ling 2020–Zhuang 2018 | 5.442×10⁻⁵ | 0.0001 | 0.0010 | 0.000333 |
+| Kazakhstan–Zhu 2022 | 1.313×10⁻³ | 0.0009 | 0.0063 | 0.00225 |
+| Kim/KBASE 2022–Zhu 2022 | 1.670×10⁻³ | 0.0018 | 0.0108 | 0.0036 |
+| Ling 2020–Zhu 2022 | 8.277×10⁻³ | 0.0084 | 0.0420 | 0.0140 |
+| Kazakhstan–Zhuang 2018 | 1.047×10⁻² | 0.0101 | 0.0420 | 0.01443 |
+| Kim/KBASE 2022–Zhuang 2018 | 2.507×10⁻² | 0.0216 | 0.0648 | 0.0270 |
+| Zhu 2022–Zhuang 2018 | 2.213×10⁻¹ | 0.2197 | 0.4394 | 0.2441 |
+| Kazakhstan–Kim/KBASE 2022 | 3.487×10⁻¹ | 0.3544 | 0.4394 | 0.3544 |
 
-Ling 2020 differs significantly in dispersion from every other cohort (all Holm-adjusted p≤0.0063) and is the cohort driving most of the overall significant dispersion difference (Section 3.4). shanghai2022 (Zhu 2022) vs. zhuang2018 and kazakhstan2022 vs. kbase2022 are not significantly different in dispersion after adjustment.
+Seven of ten pairwise comparisons reach Holm-adjusted significance (p<0.05); the largest significant Holm-adjusted p-value is 0.0420 (Ling 2020–Zhu 2022 and Kazakhstan–Zhuang 2018). Ling 2020 differs significantly in dispersion from every other cohort (all Holm-adjusted p≤0.0420) and is the cohort driving most of the overall significant dispersion difference (Section 3.4). Zhu 2022 vs. Zhuang 2018, Kim/KBASE 2022 vs. Zhuang 2018, and Kazakhstan vs. Kim/KBASE 2022 are not significantly different in dispersion after Holm adjustment (all Holm p≥0.065).
 
 *Source data:* `results/tables/betadisper_pairwise.csv`.
 
@@ -281,7 +291,7 @@ Ling 2020 differs significantly in dispersion from every other cohort (all Holm-
 
 ### Table S13. Prevalence-Restricted Jaccard Null Sensitivity
 
-Per-cohort eligible universe = genera reaching ≥20% prevalence within that cohort's own AD/CN-labeled samples (eligible universe sizes: zhuang2018=131, ling2020=126, shanghai2022=115, kazakhstan2022=356). 100,000 replicates per (model, N) combination (Section 2.8). This supersedes the shared-pool null (Table S7) as the more realistic sensitivity check; the two null models disagree for LightGBM.
+Per-cohort eligible universe = genera reaching ≥20% prevalence within that cohort's own AD/CN-labeled samples (eligible universe sizes: Zhuang 2018=131, Ling 2020=126, Zhu 2022=115, Kazakhstan=356). 100,000 replicates per (model, N) combination (Section 2.8). This supersedes the shared-pool null (Table S7) as the more realistic sensitivity check; the two null models disagree for LightGBM.
 
 | Model | Top-N | Observed Mean (6 pairs) | Null Mean | Null 95% CI | Empirical p |
 |---|---|---|---|---|---|
@@ -345,7 +355,7 @@ Logistic regression remains significant at all three thresholds under this more 
 
 ### Figure S5. Zhu 2022 Robustness: Repeated Cross-Validation and Label Permutation
 
-**Caption:** Robustness analyses for Zhu 2022's near-perfect within-cohort AUC (Section 2.4.1, Section 3.2), both run under the strict training-only feature-selection pipeline. Top row: distribution of pooled-OOF AUC across 50 repetitions of the nested-CV partition (different pre-specified seed per repetition) for logistic regression (left) and LightGBM (right), with the single-partition training-only AUC marked. Bottom row: null distribution of pooled-OOF AUC under label permutation (labels shuffled, class balance preserved, entire training-only pipeline re-run inside every outer fold for each permutation), with the observed single-partition AUC marked and the empirical p-value shown in the panel title. The repeated-CV panels quantify sensitivity to fold assignment on the same 60 participants (not independent replication); the permutation panels are the formal test of whether the observed AUC exceeds a chance-label null.
+**Caption:** Robustness analyses for Zhu 2022's near-perfect within-cohort AUC (Section 2.4.1, Section 3.2), both run under the strict training-only feature-selection pipeline. Top row: distribution of pooled-OOF AUC across 50 repetitions of the nested-CV partition (different pre-specified seed per repetition) for logistic regression (left) and LightGBM (right), with the single-partition training-only AUC marked. Bottom row: null distribution of pooled-OOF AUC under label permutation (labels shuffled, class balance preserved; all label-dependent model fitting and hyperparameter tuning re-run inside every outer fold for each permutation, while fold-specific genus selection and CLR construction — which depend only on fold membership, not labels — were precomputed once per partition and reused across permutations), with the observed single-partition AUC marked and the empirical p-value shown in the panel title. The repeated-CV panels quantify sensitivity to fold assignment on the same 60 participants (not independent replication); the permutation panels are the formal test of whether the observed AUC exceeds a chance-label null.
 
 *Source data:* `results/tables/zhu_repeated_nested_cv.csv`, `results/tables/zhu_label_permutation.csv`.
 ![Figure S5](/Users/arhan/Desktop/microbiome-ad-generalization/results/figures/final_supplementary/Figure_S5.png){width=90%}
@@ -374,7 +384,7 @@ The following metadata sources were queried for per-sample diagnosis labels:
 
 **Published paper finding:** The corresponding publication (Kim et al., 2022; PRJEB50447) reports group-level counts (18 amyloid-positive preclinical AD; 60 cognitively normal) and notes that per-sample data are withheld under institutional IRB protocol. The amyloid-PET classifications are considered clinical data and are protected. The published paper does not provide a supplementary file with per-sample labels.
 
-**Consequence for analysis:** kbase2022 was included only in PERMANOVA variance decomposition (Phase 4), where cohort identity — not per-sample diagnosis — is the grouping variable of interest. All supervised classifier training, evaluation, batch correction, and SHAP analyses were restricted to the four labeled cohorts (Zhuang 2018, Ling 2020, Zhu 2022, Kazakhstan).
+**Consequence for analysis:** Kim/KBASE 2022 was included only in PERMANOVA variance decomposition (Phase 4), where cohort identity — not per-sample diagnosis — is the grouping variable of interest. All supervised classifier training, evaluation, batch correction, and SHAP analyses were restricted to the four labeled cohorts (Zhuang 2018, Ling 2020, Zhu 2022, Kazakhstan).
 
 **Additional caveat:** Even if per-sample labels were available, direct comparison with the other four cohorts would require caution. Kim/KBASE 2022 uses amyloid-PET positivity as the case definition (preclinical AD — cognitively normal by neuropsychological testing but amyloid-positive), while the other four cohorts use clinical AD diagnosis (cognitive impairment criterion). These phenotype definitions are not equivalent.
 
@@ -402,7 +412,7 @@ The following metadata sources were queried for per-sample diagnosis labels:
 
 ### Note S3. LOCO SHAP Direction Not Reported
 
-**No figure or table showing a signed AD/CN direction for LOCO SHAP values is included in this paper.** Mean signed SHAP is not a valid direction statistic in general (Section 2.8), and this is especially severe for LOCO SHAP specifically: the SHAP background (the three pooled training cohorts) and the evaluation set (the held-out cohort) are drawn from systematically different populations by construction, so the sign of a LOCO mean SHAP value is confounded with the raw cross-cohort compositional difference quantified by PERMANOVA (Section 3.4), independent of anything the model learned. No coefficient-based replacement direction is offered for LOCO SHAP either, because LOCO models are refit on pooled multi-cohort training data each time and a single stable-fold coefficient analysis analogous to Section 2.8's within-cohort procedure is not part of this design.
+**No figure or table showing a signed AD/CN direction for LOCO SHAP values is included in this paper.** Mean signed SHAP is not used here as a global fitted-direction statistic, because it is background-relative and does not identify the sign of the fitted logistic coefficient (Section 2.8), and this is especially severe for LOCO SHAP specifically: the SHAP background (the three pooled training cohorts) and the evaluation set (the held-out cohort) are drawn from systematically different populations by construction, so the sign of a LOCO mean SHAP value is confounded with the raw cross-cohort compositional difference quantified by PERMANOVA (Section 3.4), independent of anything the model learned. No coefficient-based replacement direction is offered for LOCO SHAP either, because LOCO models are refit on pooled multi-cohort training data each time and a single stable-fold coefficient analysis analogous to Section 2.8's within-cohort procedure is not part of this design.
 
 LOCO SHAP **feature importance** (mean |SHAP|, magnitude only, no direction) remains available and is unaffected by this issue: see `results/tables/shap_loco_importance.csv`. For reference, the top-importance genus per held-out cohort is: Zhuang 2018 — *Akkermansia* (logistic regression |SHAP|=0.470); Ling 2020 — *Subdoligranulum* (|SHAP|=0.269); Zhu 2022 — *Akkermansia* (|SHAP|=0.372); Kazakhstan — *Christensenellaceae R-7 group* (|SHAP|=0.368); no genus ranked first across all four held-out conditions for either model (Section 3.6).
 

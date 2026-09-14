@@ -70,20 +70,24 @@ LABELED_COHORTS = ["zhuang2018", "ling2020", "shanghai2022", "kazakhstan2022"]
 
 def make_fig1():
     print("  Generating Figure 1 (Study Design)…")
-    fig = plt.figure(figsize=(WIDTH_IN, WIDTH_IN * 0.88), dpi=DPI)
+    # Height multiplier increased (0.88 -> 1.30) solely to give the enlarged
+    # table/box text (below) enough vertical room at >=8pt final print size
+    # (Frontiers minimum legible font size); no data, value, or panel
+    # meaning changes with this taller canvas.
+    fig = plt.figure(figsize=(WIDTH_IN, WIDTH_IN * 1.30), dpi=DPI)
     fig.patch.set_facecolor("white")
 
-    gs = gridspec.GridSpec(1, 2, figure=fig, width_ratios=[1.05, 0.95],
-                           wspace=0.06, left=0.01, right=0.99,
+    gs = gridspec.GridSpec(1, 2, figure=fig, width_ratios=[1.65, 0.75],
+                           wspace=0.10, left=0.01, right=0.99,
                            top=0.92, bottom=0.04)
     ax_a = fig.add_subplot(gs[0])
     ax_b = fig.add_subplot(gs[1])
     ax_a.axis("off")
     ax_b.axis("off")
 
-    ax_a.text(0.0, 1.02, "A", transform=ax_a.transAxes, fontsize=11,
+    ax_a.text(0.0, 1.01, "A", transform=ax_a.transAxes, fontsize=13,
               fontweight="bold", va="bottom")
-    ax_b.text(0.0, 1.02, "B", transform=ax_b.transAxes, fontsize=11,
+    ax_b.text(0.0, 1.01, "B", transform=ax_b.transAxes, fontsize=13,
               fontweight="bold", va="bottom")
 
     ax = ax_a
@@ -94,26 +98,29 @@ def make_fig1():
         "S. Korea":   "#4575b4",
     }
 
-    col_headers = ["Cohort", "Country", "N (labels)", "Seq.",
-                   "Region", "Diagnosis", "Analysis"]
+    # Seq. platform and V3-V4 region merged into one column (all five
+    # cohorts use the same V3-V4 region, so this loses no information)
+    # so the table fits six columns instead of seven at >=8pt font.
+    col_headers = ["Cohort", "Country", "N", "Sequencing\n(V3–V4)",
+                   "Diagnosis", "Analysis"]
 
     rows = [
-        ["Zhuang 2018\nPRJNA554111",      "China",      "86\n43AD/43CN",
-         "PE MiSeq\n2×300 bp",  "V3–V4", "AD / CN",        "✓ Ph. 2–6"],
-        ["Ling 2020\nPRJNA633959",        "China",      "171\n100AD/71CN",
-         "PE MiSeq\n2×300 bp",  "V3–V4", "AD / CN",        "✓ Ph. 2–6"],
-        ["Zhu 2022\nPRJNA489760",          "China",      "90†\n(30 each)",
-         "PE MiSeq\n2×300 bp",  "V3–V4", "AD/MCI/CN",      "✓ Ph. 2–6"],
-        ["Kaiyrlykyzy 2022\nPRJNA811324", "Kazakhstan", "84\n41AD/43CN",
-         "SE NovaSeq",           "V3–V4", "AD / CN",        "✓ Ph. 2–6"],
-        ["Kim 2022\nPRJEB50447",          "S. Korea",   "78\n18pcAD/60CN",
-         "PE MiSeq\n2×300 bp",  "V3–V4", "IRB-restricted", "Ph. 4 only"],
+        ["Zhuang 2018\nPRJNA554111",           "China",      "86\n43AD/43CN",
+         "PE MiSeq\n2×300",  "AD / CN",        "✓ Ph. 2–6"],
+        ["Ling 2020\nPRJNA633959",             "China",      "171\n100AD/71CN",
+         "PE MiSeq\n2×300",  "AD / CN",        "✓ Ph. 2–6"],
+        ["Zhu 2022\nPRJNA489760",              "China",      "90†\n(30 each)",
+         "PE MiSeq\n2×300",  "AD/MCI/CN",      "✓ Ph. 2–6"],
+        ["Kaiyrlykyzy\n2022\nPRJNA811324",     "Kazakhstan", "84\n41AD/43CN",
+         "SE NovaSeq",       "AD / CN",        "✓ Ph. 2–6"],
+        ["Kim 2022\nPRJEB50447",               "S. Korea",   "78\n18pcAD\n/60CN",
+         "PE MiSeq\n2×300",  "IRB-\nrestricted", "Ph. 4 only"],
     ]
 
     row_countries = ["China", "China", "China", "Kazakhstan", "S. Korea"]
     row_colors    = ["#f7fbff", "#deebf7", "#c6dbef", "#9ecae1", "#d8e9f8"]
 
-    col_w = [0.18, 0.13, 0.13, 0.12, 0.09, 0.19, 0.16]  # sum = 1.00
+    col_w = [0.21, 0.16, 0.17, 0.18, 0.15, 0.13]  # sum = 1.00
 
     n_rows = len(rows)
     n_cols = len(col_headers)
@@ -122,16 +129,16 @@ def make_fig1():
         cellText=rows,
         colLabels=col_headers,
         colWidths=col_w,
-        bbox=[0.0, 0.28, 1.0, 0.65],
+        bbox=[0.0, 0.30, 1.0, 0.62],
         cellLoc="center",
     )
     the_table.auto_set_font_size(False)
-    the_table.set_fontsize(5.0)
+    the_table.set_fontsize(8.5)
 
     for j in range(n_cols):
         cell = the_table[0, j]
         cell.set_facecolor("#2c3e50")
-        cell.set_text_props(color="white", fontweight="bold", fontsize=5.2)
+        cell.set_text_props(color="white", fontweight="bold", fontsize=8.5)
         cell.set_edgecolor("#2c3e50")
 
     for i in range(n_rows):
@@ -146,36 +153,36 @@ def make_fig1():
             cell.set_linewidth(0.4)
 
             if j == 0:
-                cell.set_text_props(fontweight="bold", fontsize=4.5,
+                cell.set_text_props(fontweight="bold", fontsize=8.5,
                                     color="#111111")
             elif j == 1:
                 cell.set_text_props(color=cdot_color, fontweight="normal",
-                                    fontsize=5.0)
+                                    fontsize=8.5)
             elif j == n_cols - 1:
                 txt_color = "#27ae60" if "✓" in rows[i][j] else "#c0392b"
                 cell.set_text_props(color=txt_color, fontweight="bold",
-                                    fontsize=5.0)
+                                    fontsize=8.5)
             else:
-                cell.set_text_props(fontsize=5.0, color="#111111")
+                cell.set_text_props(fontsize=8.5, color="#111111")
 
-    legend_y = 0.18
+    legend_y = 0.14
     ax.text(0.0, legend_y, "Country:", transform=ax.transAxes,
-            fontsize=5.5, va="center", fontweight="bold", color="#333333")
-    offset_x = 0.14
+            fontsize=8.5, va="center", fontweight="bold", color="#333333")
+    offset_x = 0.17
     for cname, cc in country_colors.items():
-        ax.add_patch(plt.Circle((offset_x, legend_y), 0.010, color=cc,
+        ax.add_patch(plt.Circle((offset_x, legend_y), 0.011, color=cc,
                                 transform=ax.transAxes, clip_on=False, zorder=4))
-        ax.text(offset_x + 0.018, legend_y, cname,
-                transform=ax.transAxes, fontsize=5.0, va="center", color="#333333")
-        offset_x += 0.28
-    ax.text(0.0, 0.08, "pcAD = preclinical AD (amyloid-PET+, cognitively normal); "
-            "Seq. = sequencing; SE = single-end; PE = paired-end",
-            transform=ax.transAxes, fontsize=4.2, va="center", color="#666666",
+        ax.text(offset_x + 0.022, legend_y, cname,
+                transform=ax.transAxes, fontsize=8.5, va="center", color="#333333")
+        offset_x += 0.32
+    ax.text(0.0, 0.05, "pcAD = preclinical AD (amyloid-PET+, cognitively normal); "
+            "SE = single-end; PE = paired-end",
+            transform=ax.transAxes, fontsize=8.5, va="center", color="#666666",
             style="italic")
 
     ax.set_xlim(0, 1); ax.set_ylim(0, 1)
-    ax.text(0.5, 1.04, "Cohort Overview", transform=ax.transAxes,
-            ha="center", va="bottom", fontsize=9, fontweight="bold")
+    ax.text(0.5, 1.03, "Cohort Overview", transform=ax.transAxes,
+            ha="center", va="bottom", fontsize=10, fontweight="bold")
 
     ax = ax_b
     steps = [
@@ -183,41 +190,44 @@ def make_fig1():
         ("Phase 2", "Within-Cohort Baseline\nNested 10×5 CV\n(LogReg + LGBM)", "#2ca02c"),
         ("Phase 3", "Cross-Cohort\nGeneralization\n(LOCO + Pairwise)", "#d62728"),
         ("Phase 4", "PERMANOVA Variance\nDecomposition\n(Aitchison + Bray-Curtis)", "#8c564b"),
-        ("Phase 5", "Batch Correction\n(ComBat-seq + MMUPHin)\n& LOCO Re-test", "#9467bd"),
-        ("Phase 6", "SHAP Feature\nImportance\n(Within-cohort + LOCO)", "#e377c2"),
+        ("Phase 5", "Batch Correction (label-blind\nprimary; ComBat-seq + MMUPHin)\n& LOCO Re-test", "#9467bd"),
+        ("Phase 6", "SHAP Feature Importance +\nCoefficient-Stability Screen\n(Within-cohort + LOCO)", "#e377c2"),
     ]
-    box_h = 0.105
-    gap   = 0.035
-    start_y = 0.92
-    box_w = 0.78
-    box_x = 0.11
+    box_h = 0.125
+    gap   = 0.028
+    start_y = 0.90
+    box_w = 0.90
+    box_x = 0.06
 
     y_pos = start_y
     for i, (phase, desc, color) in enumerate(steps):
-        arr_src_y = y_pos + box_h + gap * 0.5   # midpoint of gap above this box
-        if i == 0:
-            arr_src_y = y_pos + box_h + gap      # just above Phase 1
-        ax.annotate("", xy=(box_x + box_w/2, y_pos + box_h),
-                    xytext=(box_x + box_w/2, arr_src_y),
-                    xycoords="axes fraction", textcoords="axes fraction",
-                    arrowprops=dict(arrowstyle="-|>", color="#555555",
-                                   lw=1.0, mutation_scale=8))
+        # Arrow drawn between consecutive boxes only (not above Phase 1,
+        # which would otherwise overlap the "Analysis Pipeline" title).
+        if i > 0:
+            arr_src_y = y_pos + box_h + gap * 0.85
+            ax.annotate("", xy=(box_x + box_w/2, y_pos + box_h),
+                        xytext=(box_x + box_w/2, arr_src_y),
+                        xycoords="axes fraction", textcoords="axes fraction",
+                        arrowprops=dict(arrowstyle="-|>", color="#555555",
+                                       lw=1.0, mutation_scale=8))
         ax.add_patch(FancyBboxPatch((box_x, y_pos), box_w, box_h,
                                     boxstyle="round,pad=0.015",
                                     fc=color, ec="none",
                                     transform=ax.transAxes, clip_on=False,
                                     alpha=0.88))
-        ax.text(box_x + 0.03, y_pos + box_h / 2, phase,
-                transform=ax.transAxes, ha="left", va="center",
-                fontsize=6.5, fontweight="bold", color="white")
-        ax.text(box_x + 0.22, y_pos + box_h / 2, desc,
-                transform=ax.transAxes, ha="left", va="center",
-                fontsize=6.5, color="white")
+        # Phase label stacked above its description (not side-by-side) so
+        # neither competes with the other for horizontal room at >=8pt font.
+        ax.text(box_x + 0.04, y_pos + box_h - 0.018, phase,
+                transform=ax.transAxes, ha="left", va="top",
+                fontsize=8.5, fontweight="bold", color="white")
+        ax.text(box_x + 0.04, y_pos + box_h - 0.045, desc,
+                transform=ax.transAxes, ha="left", va="top",
+                fontsize=8.5, color="white", linespacing=1.35)
         y_pos -= (box_h + gap)
 
     ax.set_xlim(0, 1); ax.set_ylim(0, 1)
-    ax.text(0.5, 1.04, "Analysis Pipeline", transform=ax.transAxes,
-            ha="center", va="bottom", fontsize=9, fontweight="bold")
+    ax.text(0.5, 1.03, "Analysis Pipeline", transform=ax.transAxes,
+            ha="center", va="bottom", fontsize=10, fontweight="bold")
 
     out = f"{FIGS}/manuscript_fig1.png"
     fig.savefig(out, dpi=DPI, bbox_inches="tight", facecolor="white")
@@ -641,14 +651,17 @@ def make_fig6():
     stable_flips_df = pd.read_csv(f"{TABLES}/logreg_directional_flips_stable.csv")
     coef_lookup = coef_stab.set_index(["cohort", "taxon"])["median_coefficient"]
 
-    fig_h = WIDTH_IN * 0.92
+    # Height multiplier increased (0.92 -> 1.10) to give the enlarged text
+    # below (>=8pt at final print size, the Frontiers minimum) enough room;
+    # no data, value, or panel meaning changes with the taller canvas.
+    fig_h = WIDTH_IN * 1.32
     fig = plt.figure(figsize=(WIDTH_IN, fig_h), dpi=DPI)
     fig.patch.set_facecolor("white")
     # Panel A has 20 taxon rows, Panel B (bottom-left) has 12 -- give A the
     # larger height share (previously inverted, which squeezed A's 20 genus
     # labels into less room than B's 12).
     gs = gridspec.GridSpec(2, 2, figure=fig,
-                           height_ratios=[1.55, 1.0],
+                           height_ratios=[2.4, 1.0],
                            hspace=0.55, wspace=0.55,
                            left=0.15, right=0.97,
                            top=0.95, bottom=0.09)
@@ -705,11 +718,17 @@ def make_fig6():
             continue
         yy = y_pos[t]
         xx = x_pos[c]
-        size  = max(25, row["mean_abs_shap"] * 220)
+        # Size floor/scale raised, and the in-dot label shortened to 1
+        # decimal place, so every dot is large enough to contain its label
+        # at >=8pt final print size without the label spilling onto the
+        # white background (where white-on-white text disappears). Size
+        # still scales with mean |SHAP| exactly as before -- only the floor
+        # and multiplier changed to fit the larger, Frontiers-compliant font.
+        size  = 135 + row["mean_abs_shap"] * 650
         ax_a.scatter(xx, yy, s=size, color=IMPORTANCE_COL, alpha=0.82,
                      zorder=3, linewidths=0.3, edgecolors="white")
-        ax_a.text(xx, yy, f"{row['mean_abs_shap']:.2f}",
-                  ha="center", va="center", fontsize=5.0,
+        ax_a.text(xx, yy, f"{row['mean_abs_shap']:.1f}",
+                  ha="center", va="center", fontsize=8.5,
                   color="white", fontweight="bold", zorder=4)
 
     ax_a.set_xlim(-0.55, n_coh - 0.45)
@@ -721,12 +740,12 @@ def make_fig6():
     ax_a.set_xlabel("Cohort", fontsize=9, labelpad=4)
 
     ax_a.set_yticks(sorted(y_pos.values(), reverse=True))
-    ax_a.set_yticklabels(sorted(y_pos, key=lambda t: y_pos[t], reverse=True), fontsize=7.5)
-    ax_a.set_ylabel("Genus (top-20 by max |SHAP|)", fontsize=8.5)
+    ax_a.set_yticklabels(sorted(y_pos, key=lambda t: y_pos[t], reverse=True), fontsize=8.5)
+    ax_a.set_ylabel("Genus (top-20 by max |SHAP|)", fontsize=9)
     ax_a.set_title(
         "Top-20 SHAP Taxa — Logistic Regression\n"
         "(feature importance only; dot size ∝ mean |SHAP|; no direction encoded here — see Panel B)",
-        fontsize=8, pad=4)
+        fontsize=8.5, pad=6)
     ax_a.grid(axis="both", linestyle=":", lw=0.4, alpha=0.45, zorder=0)
     ax_a.spines["top"].set_visible(False)
     ax_a.spines["right"].set_visible(False)
@@ -758,7 +777,7 @@ def make_fig6():
             elif stability == "stable_negative":
                 cell_text[i][j] = f"{n_neg}/10\n−"
             else:
-                cell_text[i][j] = f"{n_pos}+/{n_neg}−\n(unstable)"
+                cell_text[i][j] = f"{n_pos}+/{n_neg}−\n(unst.)"
 
     vmax = np.nanmax(np.abs(grid))
     im_b = ax_b.imshow(grid, cmap="RdBu_r", vmin=-vmax, vmax=vmax, aspect="auto")
@@ -770,7 +789,7 @@ def make_fig6():
             txt_color = "white" if abs(grid[i, j]) > vmax * 0.5 else "black"
             fontweight = "bold" if stability != "unstable" else "normal"
             ax_b.text(j, i, cell_text[i][j], ha="center", va="center",
-                      fontsize=6, color=txt_color, fontweight=fontweight)
+                      fontsize=8.5, color=txt_color, fontweight=fontweight)
             if stability != "unstable":
                 # Solid black border = meets the pre-specified >=8/10 stability criterion
                 ax_b.add_patch(plt.Rectangle((j - 0.5, i - 0.5), 1, 1, fill=False,
@@ -779,21 +798,21 @@ def make_fig6():
     ax_b.set_xticks(range(len(cohort_order)))
     # Rotated + right-aligned (matching Panel C) so "Zhu 2022" and
     # "Kazakhstan" don't collide with their neighbors in this narrower panel.
-    ax_b.set_xticklabels(cohort_short, fontsize=8, rotation=20, ha="right")
+    ax_b.set_xticklabels(cohort_short, fontsize=8.5, rotation=20, ha="right")
     ax_b.set_yticks(range(len(final_flip_taxa)))
-    ax_b.set_yticklabels(final_flip_taxa, fontsize=7.5)
+    ax_b.set_yticklabels(final_flip_taxa, fontsize=8.5)
     ax_b.set_title(
         "Fitted-Coefficient Direction by Cohort\n"
         "(eight-taxon descriptive stability screen)",
-        fontsize=8, pad=6)
+        fontsize=8.5, pad=6)
     cb_b = fig.colorbar(im_b, ax=ax_b, fraction=0.046, pad=0.04, shrink=0.85)
-    cb_b.ax.tick_params(labelsize=6)
+    cb_b.ax.tick_params(labelsize=8.5)
     # Short title directly over the (narrow) colorbar strip only -- long text
     # here previously collided with ax_b's own title one column over, and a
     # rotated side label crowded into Panel C's left margin instead.
-    cb_b.ax.set_title("Coef.", fontsize=6, pad=4)
-    ax_b.set_xlabel("Bordered = ≥8/10-fold criterion met. + = higher AD log-odds; − = lower.",
-                     fontsize=6, labelpad=6)
+    cb_b.ax.set_title("Coef.", fontsize=8.5, pad=4)
+    ax_b.set_xlabel("Bordered = ≥8/10-fold criterion met.\n+ = higher AD log-odds; − = lower.",
+                     fontsize=8.5, labelpad=8)
 
     sub_over = over_df[(over_df["model"] == "logreg") & (over_df["top_n"] == 20)]
     cohorts4 = LABELED_COHORTS
@@ -814,16 +833,16 @@ def make_fig6():
             v = jac_mat[i, j]
             tc = "white" if v > 0.18 else "black"
             ax_c.text(j, i, f"{v:.3f}", ha="center", va="center",
-                      fontsize=8, color=tc, fontweight="bold")
+                      fontsize=8.5, color=tc, fontweight="bold")
 
     short_labels = [COHORT_SHORT_FLAT[c] for c in cohorts4]
     ax_c.set_xticks(range(4)); ax_c.set_yticks(range(4))
-    ax_c.set_xticklabels(short_labels, fontsize=8, rotation=20, ha="right")
-    ax_c.set_yticklabels(short_labels, fontsize=8)
+    ax_c.set_xticklabels(short_labels, fontsize=8.5, rotation=20, ha="right")
+    ax_c.set_yticklabels(short_labels, fontsize=8.5)
     ax_c.set_title("Pairwise Jaccard Similarity\n(Top-20 SHAP taxa, LogReg)", fontsize=8.5)
     cb = fig.colorbar(im, ax=ax_c, fraction=0.046, pad=0.04, shrink=0.85)
-    cb.set_label("Jaccard Index", fontsize=7.5)
-    cb.ax.tick_params(labelsize=7)
+    cb.set_label("Jaccard Index", fontsize=8.5)
+    cb.ax.tick_params(labelsize=8.5)
 
     plt.tight_layout()
     out = f"{FIGS}/manuscript_fig6.png"
