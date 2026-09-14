@@ -1,0 +1,7 @@
+model,top_n,observed_mean_jaccard_prevalence_restricted,null_mean,null_ci_lo,null_ci_hi,empirical_p,n_perm,eligible_universe_zhuang2018,eligible_universe_ling2020,eligible_universe_shanghai2022,eligible_universe_kazakhstan2022
+logreg,10,0.085,0.026,0.0,0.0624,0.00167,100000,131,126,115,356
+logreg,20,0.135,0.0522,0.0261,0.0841,3e-05,100000,131,126,115,356
+logreg,50,0.2308,0.1422,0.114,0.1737,1e-05,100000,131,126,115,356
+lgbm,10,0.0175,0.026,0.0,0.0624,0.799592,100000,131,126,115,356
+lgbm,20,0.0629,0.0522,0.0261,0.0841,0.240838,100000,131,126,115,356
+lgbm,50,0.1665,0.1422,0.114,0.1737,0.061309,100000,131,126,115,356

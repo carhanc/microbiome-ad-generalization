@@ -477,9 +477,6 @@ def make_fig4():
     ax_a.set_ylim(-0.7, 1.7)
     ax_a.set_xlabel("Marginal R² (Aitchison)", fontsize=8)
     ax_a.set_title("PERMANOVA Marginal R²\n(4 labeled cohorts, n=401)", fontsize=8.5)
-    ax_a.text(0.97, 0.93, "~12× disparity", transform=ax_a.transAxes,
-              ha="right", va="top", fontsize=8.5, fontweight="bold",
-              color="#333333", style="italic")
     ax_a.spines["top"].set_visible(False)
     ax_a.spines["right"].set_visible(False)
 

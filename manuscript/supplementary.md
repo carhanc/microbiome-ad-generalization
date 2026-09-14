@@ -74,7 +74,7 @@ All PERMANOVA models used 9,999 permutations with Type III (marginal) sums of sq
 | Cohort | 3 | 45,476.8 | 0.172 | 28.03 | 0.0001 |
 | Diagnosis | 1 | 3,689.7 | 0.014 | 6.82 | 0.0001 |
 
-Note: Marginal R² values for cohort and diagnosis do not sum to total R² because marginal effects are estimated independently (Type III SS), adjusting for the other variable. The sum of marginal R² values underestimates total explained variance.
+Note: Marginal R² values for cohort and diagnosis do not sum to total R² because marginal effects are estimated independently (Type III SS), adjusting for the other variable. The sum of marginal R² values underestimates total explained variance. "Cohort" here is a composite study-of-origin variable (platform, library prep, recruitment site, diagnostic ascertainment, diet, and other unmeasured differences bundled together); this model does not, and cannot, decompose the cohort term into technical versus biological components (Section 2.6). See Table S11 for a sensitivity analysis showing this cohort-vs-diagnosis disparity is highly sensitive to which cohorts are included.
 
 **Model 3: Within-cohort Diagnosis effects (Aitchison distance)**
 
@@ -99,7 +99,7 @@ Zhu 2022 analysis restricted to fecal samples only (n=60 binary: 30 AD + 30 CN).
 
 ---
 
-### Table S4. Training-Only Feature-Selection Sensitivity (Round 2)
+### Table S4. Training-Only Feature-Selection Sensitivity
 
 Genus retention (≥20% prevalence) re-derived independently within every split, using only that split's training-side samples (Section 2.5.1), compared against the main analysis's global (all-five-cohort) feature selection.
 
@@ -135,7 +135,7 @@ The retained genus count for LOCO training-only selection is lower when Kazakhst
 
 ---
 
-### Table S5. Within-Cohort AUC on Batch-Corrected Data: Label-Blind vs. Label-Informed (Round 2)
+### Table S5. Within-Cohort AUC on Batch-Corrected Data: Label-Blind vs. Label-Informed
 
 Within-cohort nested-CV AUC (Section 2.4 procedure) computed on batch-corrected features, under both correction designs (Section 2.7). The label-blind comparison is free of diagnosis-label leakage during correction; the label-informed comparison is not (Section 3.5) and is shown only for completeness/continuity with the original analysis.
 
@@ -154,7 +154,7 @@ Within-cohort nested-CV AUC (Section 2.4 procedure) computed on batch-corrected 
 
 ---
 
-### Table S6. Logistic-Regression Coefficient Sign Stability: Screened Candidates and the *Akkermansia* Negative Control (Round 2)
+### Table S6. Logistic-Regression Coefficient Sign Stability: Screened Candidates and the *Akkermansia* Negative Control
 
 Per (cohort, genus), counts of positive/negative/zero fitted coefficients across the 10 outer OOF folds (Section 2.8). `sign_stability` uses the pre-specified ≥8/10-fold threshold. This is a descriptive screen, not a hypothesis test: the 10 outer folds share overlapping training data and are not independent replications, so no p-value is assigned to any row. Full table (1,584 cohort×genus rows) in `results/tables/logreg_coefficient_stability.csv`; below, *Romboutsia* (the cleanest population-level pattern among the eight genera meeting the screen; Section 3.6) and *Akkermansia* (a negative-control illustration: appears to flip under the old, invalid mean-SHAP statistic but does not meet the coefficient-based screen; Section 3.6, Section 4.4).
 
@@ -175,9 +175,9 @@ Per (cohort, genus), counts of positive/negative/zero fitted coefficients across
 
 ---
 
-### Table S7. Matched-Null Jaccard Overlap Across Top-N Thresholds (Round 2)
+### Table S7. Matched-Null (Shared-Pool) Jaccard Overlap Across Top-N Thresholds
 
-Observed statistic = mean of the six unique pairwise Jaccard similarities among the four labeled cohorts' top-N SHAP taxa sets. Null = 100,000 replicates, each drawing four independent random top-N gene sets from the 396-genus pool and averaging the same six pairwise Jaccards among them (Section 2.8). Empirical one-sided p = (1 + #{null ≥ observed}) / (n_perm + 1).
+Observed statistic = mean of the six unique pairwise Jaccard similarities among the four labeled cohorts' top-N SHAP taxa sets. Null = 100,000 replicates, each drawing four independent random top-N gene sets from the shared 396-genus pool and averaging the same six pairwise Jaccards among them (Section 2.8). Empirical one-sided p = (1 + #{null ≥ observed}) / (n_perm + 1). See Table S13 for the prevalence-restricted (per-cohort eligible universe) sensitivity analysis, which reverses the LightGBM result reported here.
 
 | Model | Top-N | Observed Mean (6 pairs) | Null Mean | Null 95% CI | Empirical p |
 |---|---|---|---|---|---|
@@ -188,9 +188,115 @@ Observed statistic = mean of the six unique pairwise Jaccard similarities among 
 | LightGBM | **20 (primary)** | **0.0584** | 0.0265 | [0.0085, 0.0491] | **0.0048** |
 | LightGBM | 50 | 0.1430 | 0.0680 | [0.0492, 0.0894] | <0.0001 |
 
-LightGBM's overlap is significant at N=20 and N=50 but not at N=10, indicating a real but small-magnitude and N-sensitive signal — smaller and less consistent than logistic regression's overlap at every threshold tested. This supersedes an earlier, incorrectly-calibrated null (Section 2.8) that had reported LightGBM's N=20 overlap as "within the random baseline" (p=0.068); that earlier null drew only two random sets per replicate rather than the four-set, six-pair statistic actually being tested.
+LightGBM's overlap is significant at N=20 and N=50 but not at N=10 under this shared-pool null. Table S13 shows this result does not survive a prevalence-restricted null model.
 
-*Source data:* `results/tables/jaccard_null_corrected.csv`. The superseded `results/tables/jaccard_null.csv` is retained on disk for audit-trail provenance only and is not used by this manuscript.
+*Source data:* `results/tables/jaccard_null_corrected.csv`.
+
+---
+
+### Table S8. Zhu 2022 Repeated Nested Cross-Validation (Fold-Assignment Stability)
+
+50 repetitions of the 10-fold outer / 5-fold inner nested-CV partition, each under a different pre-specified seed, strict training-only genus selection re-derived within every outer fold of every repetition (Section 2.4.1). This is a fold-assignment stability check on the same 60 participants, not an independent-sample replication.
+
+| Model | Historical Single-Partition AUC | Training-Only Single-Partition AUC | Repeated-CV Mean | SD | Median | P2.5 | P97.5 | Min | Max | N Repeats |
+|---|---|---|---|---|---|---|---|---|---|---|
+| LogReg | 0.998 | 0.9956 | 0.9955 | 0.0027 | 0.9956 | 0.9900 | 0.9989 | 0.9889 | 0.9989 | 50 |
+| LGBM | 0.979 | 0.9700 | 0.9760 | 0.0103 | 0.9767 | 0.9519 | 0.9917 | 0.9378 | 0.9944 | 50 |
+
+*Source data:* `results/tables/zhu_repeated_nested_cv.csv` (per-repeat), `results/tables/zhu_repeated_nested_cv_summary.csv`.
+
+---
+
+### Table S9. Zhu 2022 Label Permutation Test
+
+Label-permutation test under the strict training-only pipeline and the fixed outer-fold partition (random_state=42; Section 2.4.1). Empirical p = (1 + #{null AUC ≥ observed}) / (n_perm + 1).
+
+| Model | Observed AUC (Training-Only) | N Permutations | Null Mean | Null SD | Null P2.5 | Null P97.5 | Empirical p | p Resolution Floor |
+|---|---|---|---|---|---|---|---|---|
+| LogReg | 0.9956 | 1000 | 0.4731 | 0.1017 | 0.2800 | 0.6734 | 0.000999 | 0.000999 |
+| LGBM | 0.9700 | 1000 | 0.4719 | 0.1094 | 0.2643 | 0.6878 | 0.000999 | 0.000999 |
+
+No permutation among the 1,000 drawn reached the observed AUC for either model; the empirical p-value is therefore at the resolution floor for this permutation count (1/1,001) and should not be interpreted as more precise than that floor.
+
+*Source data:* `results/tables/zhu_label_permutation.csv` (per-permutation), `results/tables/zhu_label_permutation_summary.csv`.
+
+---
+
+### Table S10. Formal Within-Cohort vs. LOCO AUC Difference (Paired, Diagnosis-Stratified Bootstrap)
+
+Paired, diagnosis-stratified, participant-level bootstrap (10,000 replicates; Section 2.5.2). $\Delta = \text{AUC}_{\text{within}} - \text{AUC}_{\text{LOCO}}$, computed on identical resampled participants for both AUC values in each replicate. "Proportion Δ≤0" is the fraction of bootstrap replicates with a non-positive delta.
+
+| Cohort | Model | N | AUC Within | AUC LOCO | Observed Δ | Bootstrap Mean Δ | 95% CI | Proportion Δ≤0 |
+|---|---|---|---|---|---|---|---|---|
+| Zhuang 2018 | LogReg | 86 | 0.6333 | 0.5041 | 0.1293 | 0.1280 | [−0.047, 0.303] | 0.0787 |
+| Zhuang 2018 | LGBM | 86 | 0.6349 | 0.5646 | 0.0703 | 0.0705 | [−0.100, 0.239] | 0.2138 |
+| Ling 2020 | LogReg | 171 | 0.8648 | 0.6775 | 0.1873 | 0.1871 | [0.097, 0.277] | 0.0001 |
+| Ling 2020 | LGBM | 171 | 0.8618 | 0.6735 | 0.1883 | 0.1886 | [0.096, 0.284] | 0.0001 |
+| Zhu 2022 | LogReg | 60 | 0.9978 | 0.8133 | 0.1844 | 0.1848 | [0.072, 0.312] | 0.0000 |
+| Zhu 2022 | LGBM | 60 | 0.9789 | 0.7578 | 0.2211 | 0.2211 | [0.111, 0.346] | 0.0000 |
+| Kazakhstan | LogReg | 84 | 0.7657 | 0.5644 | 0.2014 | 0.2013 | [0.044, 0.357] | 0.0051 |
+| Kazakhstan | LGBM | 84 | 0.6943 | 0.5905 | 0.1038 | 0.1038 | [−0.049, 0.255] | 0.0917 |
+
+Five of eight pairs have a 95% CI excluding zero (Ling 2020 both models, Zhu 2022 both models, Kazakhstan LogReg). Three (Zhuang 2018 both models, Kazakhstan LGBM) show the same-signed delta with a CI that includes zero and are not formally significant at this sample size.
+
+*Source data:* `results/tables/within_vs_loco_auc_difference_bootstrap.csv`, `results/tables/within_cohort_auc_ci_stratified_bootstrap.csv`, `results/tables/loco_auc_ci_stratified_bootstrap.csv`.
+
+---
+
+### Table S11. PERMANOVA Sensitivity: Chinese Paired-End MiSeq Cohorts Only (Zhuang 2018 + Ling 2020 + Zhu 2022)
+
+Marginal PERMANOVA (Aitchison distance, `by="margin"`, 9,999 permutations), binary AD/CN only, restricted to the three cohorts that are more technically comparable to one another (same country, same paired-end MiSeq V3–V4 platform; Section 2.6). n=317 (zhuang2018=86, ling2020=171, shanghai2022/Zhu 2022=60).
+
+| Term | Df | Sum of Squares | R² (marginal) | F | p-value |
+|---|---|---|---|---|---|
+| Cohort | 2 | 17,532.9 | 0.0588 | 10.05 | 0.0001 |
+| Diagnosis | 1 | 6,821.2 | 0.0229 | 7.83 | 0.0001 |
+
+Compare to the full four-cohort marginal model (Table S3, Model 2): cohort R²=0.172, diagnosis R²=0.014 (~12-fold disparity). Restricted to this more technically comparable three-cohort subset, the disparity falls to ~2.6-fold (0.0588/0.0229). Beta-dispersion on this subset: F=7.946, p=0.0004 (9,999 permutations); pairwise (Table S12): zhuang2018 vs. ling2020 p=0.0001, zhuang2018 vs. shanghai2022 p=0.026, ling2020 vs. shanghai2022 p=0.343 (not significant).
+
+*Source data:* `results/tables/permanova_chinese_miseq_sensitivity.csv`, `results/tables/betadisper_chinese_miseq_sensitivity.csv`, `results/tables/betadisper_chinese_miseq_pairwise.csv`.
+
+---
+
+### Table S12. Pairwise Beta-Dispersion Post-Hoc Comparisons (All Five Cohorts, Aitchison Distance)
+
+All 10 pairwise betadisper comparisons among the five cohorts (9,999 permutations per pair), with Holm and Benjamini-Hochberg (BH) multiplicity adjustment across the 10 comparisons (Section 2.6). Sorted by unadjusted p.
+
+| Comparison | F (observed) | p (unadjusted) | p (Holm) | p (BH) |
+|---|---|---|---|---|
+| kazakhstan2022–ling2020 | 1.434×10⁻⁸ | 0.0001 | 0.0010 | 0.000333 |
+| kbase2022–ling2020 | 4.178×10⁻⁹ | 0.0001 | 0.0010 | 0.000333 |
+| ling2020–zhuang2018 | 5.442×10⁻⁵ | 0.0001 | 0.0010 | 0.000333 |
+| kazakhstan2022–shanghai2022 | 1.313×10⁻³ | 0.0009 | 0.0063 | 0.00225 |
+| kbase2022–shanghai2022 | 1.670×10⁻³ | 0.0018 | 0.0108 | 0.0036 |
+| ling2020–shanghai2022 | 8.277×10⁻³ | 0.0084 | 0.0420 | 0.0140 |
+| kazakhstan2022–zhuang2018 | 1.047×10⁻² | 0.0101 | 0.0420 | 0.01443 |
+| kbase2022–zhuang2018 | 2.507×10⁻² | 0.0216 | 0.0648 | 0.0270 |
+| shanghai2022–zhuang2018 | 2.213×10⁻¹ | 0.2197 | 0.4394 | 0.2441 |
+| kazakhstan2022–kbase2022 | 3.487×10⁻¹ | 0.3544 | 0.4394 | 0.3544 |
+
+Ling 2020 differs significantly in dispersion from every other cohort (all Holm-adjusted p≤0.0063) and is the cohort driving most of the overall significant dispersion difference (Section 3.4). shanghai2022 (Zhu 2022) vs. zhuang2018 and kazakhstan2022 vs. kbase2022 are not significantly different in dispersion after adjustment.
+
+*Source data:* `results/tables/betadisper_pairwise.csv`.
+
+---
+
+### Table S13. Prevalence-Restricted Jaccard Null Sensitivity
+
+Per-cohort eligible universe = genera reaching ≥20% prevalence within that cohort's own AD/CN-labeled samples (eligible universe sizes: zhuang2018=131, ling2020=126, shanghai2022=115, kazakhstan2022=356). 100,000 replicates per (model, N) combination (Section 2.8). This supersedes the shared-pool null (Table S7) as the more realistic sensitivity check; the two null models disagree for LightGBM.
+
+| Model | Top-N | Observed Mean (6 pairs) | Null Mean | Null 95% CI | Empirical p |
+|---|---|---|---|---|---|
+| LogReg | 10 | 0.0850 | 0.0260 | [0.0000, 0.0624] | 0.001670 |
+| LogReg | **20 (primary)** | **0.1350** | 0.0522 | [0.0261, 0.0841] | **0.000030** |
+| LogReg | 50 | 0.2308 | 0.1422 | [0.1140, 0.1737] | 0.000010 |
+| LightGBM | 10 | 0.0175 | 0.0260 | [0.0000, 0.0624] | 0.799592 (not significant) |
+| LightGBM | **20 (primary)** | **0.0629** | 0.0522 | [0.0261, 0.0841] | 0.240838 (not significant) |
+| LightGBM | 50 | 0.1665 | 0.1422 | [0.1140, 0.1737] | 0.061309 (not significant) |
+
+Logistic regression remains significant at all three thresholds under this more realistic null. LightGBM is not significant at any of N=10/20/50 under this null, reversing the shared-pool-null result at N=20/50 (Table S7). We report this reversal directly: LightGBM's apparent cross-cohort top-predictor overlap is not distinguishable from chance once the null model accounts for each cohort's own genus-prevalence structure.
+
+*Source data:* `results/tables/jaccard_prevalence_restricted_null.csv`.
 
 ---
 
@@ -206,15 +312,15 @@ LightGBM's overlap is significant at N=20 and N=50 but not at N=10, indicating a
 
 ### Figure S2. Top-15 SHAP Taxa Per Cohort (LightGBM, Out-of-Fold)
 
-**Caption (revised, Round 2):** Horizontal bar charts showing mean |SHAP| value (CLR units) for the top-15 genera by importance in each of the four labeled cohorts under out-of-fold LightGBM evaluation. Bars are a single neutral color and show feature-importance magnitude only — **no AD/CN direction is assigned**, because a tree ensemble has no single coefficient-like global direction and LightGBM's SHAP-feature relationships may be nonlinear or non-monotonic (Section 2.8). Top taxon per cohort (by |SHAP| magnitude only): Lachnoclostridium (Zhuang 2018, |SHAP|=0.560), Akkermansia (Ling 2020, |SHAP|=0.947), Bacteroides (Zhu 2022, |SHAP|=1.243), Castellaniella (Kazakhstan, |SHAP|=0.614). Mean pairwise Jaccard similarity at top-20: 0.058, significantly above a null distribution matched to this statistic's construction (p=0.0048 at N=20; not significant at N=10, p=0.45; Supplementary Table S7). **No LightGBM directional-flip claim is made in this paper**; an earlier draft's report of "12 LightGBM directional flips" (based on an invalid mean-signed-SHAP statistic) is superseded and should not be cited.
+**Caption:** Horizontal bar charts showing mean |SHAP| value (CLR units) for the top-15 genera by importance in each of the four labeled cohorts under out-of-fold LightGBM evaluation. Bars are a single neutral color and show feature-importance magnitude only — **no AD/CN direction is assigned**, because a tree ensemble has no single coefficient-like global direction and LightGBM's SHAP-feature relationships may be nonlinear or non-monotonic (Section 2.8). Top taxon per cohort (by |SHAP| magnitude only): Lachnoclostridium (Zhuang 2018, |SHAP|=0.560), Akkermansia (Ling 2020, |SHAP|=0.947), Bacteroides (Zhu 2022, |SHAP|=1.243), Castellaniella (Kazakhstan, |SHAP|=0.614). Mean pairwise Jaccard similarity at top-20: 0.058, significant against the shared-pool null (p=0.0048 at N=20; not significant at N=10, p=0.45; Table S7) but not significant at any N against the prevalence-restricted null (Table S13). **No LightGBM directional-flip claim is made anywhere in this paper**, because a tree ensemble has no single coefficient-like global direction (Section 2.8).
 
-*Source figure:* `results/figures/supp_fig_s2.jpg` (built from `results/figures/working/shap_top15_per_cohort_lgbm.png`, regenerated Round 2 with neutral-color bars)
+*Source figure:* `results/figures/supp_fig_s2.jpg` (built from `results/figures/working/shap_top15_per_cohort_lgbm.png`, neutral-color bars, no direction assigned)
 
 ---
 
-### Figure S3a/S3b. LOCO SHAP Direction — Removed in Round 2
+### Figure S3a/S3b. LOCO SHAP Direction — Not Reported
 
-**These two figures (originally: out-of-fold SHAP values for LOCO-trained classifiers, plotted with a signed x-position labeled "AD-associated"/"CN-associated") have been removed.** Reviewer 3, Round 2, concern #3 established that mean signed SHAP is not a valid direction statistic in general, and this is especially severe for LOCO SHAP specifically: the SHAP background (the three pooled training cohorts) and the evaluation set (the held-out cohort) are drawn from systematically different populations by construction, so the sign of a LOCO mean SHAP value is confounded with the raw cross-cohort compositional difference quantified by PERMANOVA (Section 3.4), independent of anything the model learned. No coefficient-based replacement direction is offered for LOCO SHAP either, because LOCO models are refit on pooled multi-cohort training data each time and a single stable-fold coefficient analysis analogous to Section 2.8's within-cohort procedure was not part of this design.
+**No figure showing a signed AD/CN direction for LOCO SHAP values is included in this paper.** Mean signed SHAP is not a valid direction statistic in general (Section 2.8), and this is especially severe for LOCO SHAP specifically: the SHAP background (the three pooled training cohorts) and the evaluation set (the held-out cohort) are drawn from systematically different populations by construction, so the sign of a LOCO mean SHAP value is confounded with the raw cross-cohort compositional difference quantified by PERMANOVA (Section 3.4), independent of anything the model learned. No coefficient-based replacement direction is offered for LOCO SHAP either, because LOCO models are refit on pooled multi-cohort training data each time and a single stable-fold coefficient analysis analogous to Section 2.8's within-cohort procedure is not part of this design.
 
 LOCO SHAP **feature importance** (mean |SHAP|, magnitude only, no direction) remains available and is unaffected by this issue: see `results/tables/shap_loco_importance.csv`. For reference, the previously reported top-importance genus per held-out cohort was: Zhuang 2018 — *Akkermansia* (logistic regression |SHAP|=0.470); Ling 2020 — *Subdoligranulum* (|SHAP|=0.269); Zhu 2022 — *Akkermansia* (|SHAP|=0.372); Kazakhstan — *Christensenellaceae R-7 group* (|SHAP|=0.368); no genus ranked first across all four held-out conditions for either model (Section 3.6).
 
@@ -229,12 +335,21 @@ LOCO SHAP **feature importance** (mean |SHAP|, magnitude only, no direction) rem
 
 ---
 
-### Figure S5. Batch Correction, Label-Informed Design (Exploratory Sensitivity, Round 2)
+### Figure S5. Batch Correction, Label-Informed Design (Exploratory Sensitivity)
 
-**Caption:** LOCO AUC-ROC under the label-informed transductive batch-correction design (ComBat-seq/MMUPHin fit using every sample's own true diagnosis label; Section 2.7), shown for (**A**) logistic regression and (**B**) LightGBM. This is the same comparison previously presented as the paper's primary batch-correction result; it is retained here as an **explicitly-labeled exploratory/oracle-style sensitivity only**, because a correction step that has already seen each sample's true label cannot estimate prospective external-validation performance, and because the resulting within-cohort AUC on corrected data cannot be used as evidence that genuine, correction-independent biological signal survived (Section 3.5). The main-text Figure 5 shows the label-blind design (no diagnosis information used during correction), which we now treat as the primary batch-correction result. Note the severe, cohort-specific degradation visible here (e.g., Kazakhstan logistic regression LOCO AUC=0.308) that is **not** reproduced under the label-blind design (Kazakhstan label-blind LOCO AUC=0.560, closely matching the uncorrected value of 0.564) — indicating this degradation was driven substantially by the label-informed design itself.
+**Caption:** LOCO AUC-ROC under the label-informed transductive batch-correction design (ComBat-seq/MMUPHin fit using every sample's own true diagnosis label; Section 2.7), shown for (**A**) logistic regression and (**B**) LightGBM. This design is retained as an **explicitly-labeled exploratory sensitivity analysis only**, because a correction step that is fit using every sample's own true diagnosis label cannot estimate prospective external-validation performance, and because the resulting within-cohort AUC on corrected data cannot be used as evidence that genuine, correction-independent biological signal survived (Section 3.5). The main-text Figure 5 shows the label-blind design (no diagnosis information used during correction), which is the paper's primary batch-correction result. Note the severe, cohort-specific degradation visible here (e.g., Kazakhstan logistic regression LOCO AUC=0.308) that is **not** reproduced under the label-blind design (Kazakhstan label-blind LOCO AUC=0.560, closely matching the uncorrected value of 0.564) — indicating this degradation was driven substantially by the label-informed design itself.
 
 *Source data:* `results/tables/auc_comparison_table.csv`, `results/tables/loco_auc_corrected.csv`
 *Source figure:* `results/figures/supp_fig_s5.jpg`
+
+---
+
+### Figure S6. Zhu 2022 Robustness: Repeated Cross-Validation and Label Permutation
+
+**Caption:** Robustness analyses for Zhu 2022's near-perfect within-cohort AUC (Section 2.4.1, Section 3.2), both run under the strict training-only feature-selection pipeline. Top row: distribution of pooled-OOF AUC across 50 repetitions of the nested-CV partition (different pre-specified seed per repetition) for logistic regression (left) and LightGBM (right), with the single-partition training-only AUC marked. Bottom row: null distribution of pooled-OOF AUC under label permutation (labels shuffled, class balance preserved, entire training-only pipeline re-run inside every outer fold for each permutation), with the observed single-partition AUC marked and the empirical p-value shown in the panel title. The repeated-CV panels quantify sensitivity to fold assignment on the same 60 participants (not independent replication); the permutation panels are the formal test of whether the observed AUC exceeds a chance-label null.
+
+*Source data:* `results/tables/zhu_repeated_nested_cv.csv`, `results/tables/zhu_label_permutation.csv`.
+*Source figure:* `results/figures/supp_zhu_robustness.png`
 
 ---
 

@@ -1,0 +1,4 @@
+term,Df,SumOfSqs,R2,F_stat,p_value,subset
+cohort,2,10074.13392825157,0.058796910933659206,10.049840991825823,1e-4,"zhuang2018+ling2020+shanghai2022 (Chinese paired-end MiSeq, binary AD/CN)"
+diagnosis,1,3925.7198467161797,0.022912163151868066,7.832506599363772,1e-4,"zhuang2018+ling2020+shanghai2022 (Chinese paired-end MiSeq, binary AD/CN)"
+Residual,313,156878.29897544862,0.9156081741593731,NA,NA,"zhuang2018+ling2020+shanghai2022 (Chinese paired-end MiSeq, binary AD/CN)"
