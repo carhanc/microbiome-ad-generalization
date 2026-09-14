@@ -168,7 +168,7 @@ A second, prevalence-restricted null addresses a limitation of drawing from the 
 
 ### 2.9 AI Tool Disclosure
 
-Initial manuscript drafts and computational scripts were prepared with minimal assistance from Claude (Anthropic). All analytical decisions, parameter choices, experimental design, statistical interpretations, and scientific conclusions were made by the author. All code and text were reviewed, validated, and substantially revised under the author's direction.
+Initial manuscript drafts and computational scripts were prepared with minimal assistance from Claude Sonnet 5 (Anthropic). All analytical decisions, parameter choices, experimental design, statistical interpretations, and scientific conclusions were made by the author. All code and text were reviewed, validated, and substantially revised under the author's direction.
 
 ### 2.10 Statistical Analysis Environment
 
