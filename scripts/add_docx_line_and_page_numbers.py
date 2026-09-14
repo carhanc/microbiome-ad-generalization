@@ -39,6 +39,17 @@ def add_page_number_footer(document):
             run._element.getparent().remove(run._element)
         p.alignment = 1  # center
 
+        # Footer paragraphs are their own line-numbering "story"; without this,
+        # some renderers (e.g. LibreOffice) number the footer paragraph itself
+        # as "line 1" at the same left-margin x-position as the body's line
+        # numbers, which reads as a second, spurious number next to the true
+        # centered PAGE field.
+        pPr = p._p.get_or_add_pPr()
+        for existing in pPr.findall(qn("w:suppressLineNumbers")):
+            pPr.remove(existing)
+        suppress = OxmlElement("w:suppressLineNumbers")
+        pPr.insert(0, suppress)
+
         run = p.add_run()
         fldChar_begin = OxmlElement("w:fldChar")
         fldChar_begin.set(qn("w:fldCharType"), "begin")
