@@ -10,9 +10,9 @@ We thank the editor and both reviewers for their careful, constructive engagemen
 
 ---
 
-## Section 1: Reviewer 3 — Round 2 Follow-Up Comments
+## Section 1: Reviewer 3 — September 11 Follow-Up Comments
 
-Reviewer 3 raised five methodological concerns in their second-round report. We note that Reviewer 3 subsequently withdrew from the review process; nevertheless, all five comments identified genuine gaps, and we addressed every one of them in full, as described below.
+Reviewer 3's original report was addressed in full via the Frontiers forum on September 2, 2026, and is not repeated here. This section responds to the five methodological concerns raised in Reviewer 3's subsequent September 11 follow-up. We note that Reviewer 3 subsequently withdrew from the review process; nevertheless, all five follow-up comments identified genuine gaps, and we addressed every one of them in full, as described below.
 
 ### 1.1 Global feature selection used held-out-cohort information
 
