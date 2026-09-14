@@ -39,7 +39,7 @@ FIGURES = [
         "omitted; colour scale: red = near chance, green = high AUC."
     ),
     (
-        "### 3.5 Batch Correction Does Not Recover Cross-Cohort Generalization",
+        "### 3.5 Label-Blind Transductive Batch Adjustment Does Not Improve Cross-Cohort Transferability",
         4,
         "**Figure 4.** PERMANOVA variance decomposition and beta-diversity structure. "
         "(**A**) Marginal R² values from a two-variable PERMANOVA model on the four labeled "
@@ -61,7 +61,7 @@ FIGURES = [
         "Under this label-blind design, both methods left mean LOCO AUC essentially unchanged "
         "relative to uncorrected (within 0.007 AUC for both methods and models), neither "
         "recovering nor substantially worsening cross-cohort generalization. An exploratory "
-        "label-informed (oracle-style) comparison, in which correction used each sample's own "
+        "label-informed transductive sensitivity comparison, in which correction used each sample's own "
         "true diagnosis label and which produced substantially different, more severe "
         "degradation for some cohorts, is reported separately in Supplementary Figure S5 "
         "and is not treated as evidence about prospective performance (Section 2.7, Section 3.5)."
@@ -81,7 +81,9 @@ FIGURES = [
         "descriptive screen, not a multiplicity-corrected hypothesis test. "
         "(**C**) Pairwise Jaccard similarity of top-20 SHAP taxa between cohort pairs; "
         "mean of the six unique pairwise values = 0.135, significantly above a null matched to this "
-        "statistic's construction (100,000 replicates of four random top-20 sets; p<0.0001)."
+        "statistic's construction (100,000 replicates of four random top-20 sets; p<0.0001). "
+        "A prevalence-restricted null sensitivity analysis (Supplementary Table S13) shows logistic "
+        "regression remains significant while LightGBM does not."
     ),
 ]
 
@@ -129,6 +131,12 @@ CSS = textwrap.dedent("""\
         margin-top: 0.3em;
     }
     hr { border: none; border-top: 1px solid #ccc; margin: 1.5em 0; }
+    /* Pandoc's standalone template renders --metadata title=... as a visible
+       H1 title block above the actual manuscript content. The manuscript
+       must start directly with its own title/authors/Abstract, so this
+       build artifact is hidden here rather than removing the metadata
+       title itself (which still sets the invisible PDF/HTML document title). */
+    #title-block-header { display: none; }
     blockquote { margin-left: 2em; color: #555; }
     @media print {
         body { margin: 15mm; }
@@ -195,8 +203,6 @@ def main():
         "--mathjax",
         "--css", css_path,
         "--metadata", "title=Microbiome AD Generalization",
-        "--toc",
-        "--toc-depth=2",
         "-o", OUT_HTML,
     ]
     run(pandoc_cmd, "pandoc markdown → HTML")
