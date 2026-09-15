@@ -87,11 +87,15 @@ def make_fig1():
 
     # Panel label sits at the same height as each panel's own title (not
     # above it) -- they don't collide since the label is left-aligned and
-    # the title is centered -- and both sit with generous, equal clearance
-    # above the panel content below (table / first phase box).
-    ax_a.text(0.0, 1.08, "A", transform=ax_a.transAxes, fontsize=13,
+    # the title is centered. Both panels' actual content (table / first
+    # phase box) is positioned to start at the same axes-fraction height
+    # (0.98) as each other, so a single small, consistent title clearance
+    # (1.02, i.e. ~0.04 above content) works for both -- previously the
+    # title height was tuned only for Panel B's taller content and reused
+    # for Panel A, leaving a large, mismatched gap above Panel A's table.
+    ax_a.text(0.0, 1.02, "A", transform=ax_a.transAxes, fontsize=13,
               fontweight="bold", va="bottom")
-    ax_b.text(0.0, 1.08, "B", transform=ax_b.transAxes, fontsize=13,
+    ax_b.text(0.0, 1.02, "B", transform=ax_b.transAxes, fontsize=13,
               fontweight="bold", va="bottom")
 
     ax = ax_a
@@ -133,7 +137,7 @@ def make_fig1():
         cellText=rows,
         colLabels=col_headers,
         colWidths=col_w,
-        bbox=[0.0, 0.28, 1.0, 0.60],
+        bbox=[0.0, 0.36, 1.0, 0.62],
         cellLoc="center",
     )
     the_table.auto_set_font_size(False)
@@ -169,11 +173,11 @@ def make_fig1():
             else:
                 cell.set_text_props(fontsize=8.5, color="#111111")
 
-    # Legend and footnote given equal, generous gaps from the table above
-    # and from each other (0.28 table-bottom -> 0.16 legend -> 0.05
-    # footnote: ~0.11-0.12 axes-fraction each), instead of the previous
-    # uneven spacing.
-    legend_y = 0.16
+    # Legend and footnote given equal ~0.10-0.11 axes-fraction gaps from the
+    # table above and from each other, and the whole block sits close under
+    # the (now much closer) table -- matching Panel B's tighter, consistent
+    # rhythm instead of drifting apart.
+    legend_y = 0.25
     ax.text(0.0, legend_y, "Country:", transform=ax.transAxes,
             fontsize=8.5, va="center", fontweight="bold", color="#333333")
     offset_x = 0.17
@@ -183,13 +187,13 @@ def make_fig1():
         ax.text(offset_x + 0.022, legend_y, cname,
                 transform=ax.transAxes, fontsize=8.5, va="center", color="#333333")
         offset_x += 0.32
-    ax.text(0.0, 0.05, "pcAD = preclinical AD (amyloid-PET+, cognitively normal); "
+    ax.text(0.0, 0.15, "pcAD = preclinical AD (amyloid-PET+, cognitively normal);\n"
             "SE = single-end; PE = paired-end",
             transform=ax.transAxes, fontsize=8.5, va="center", color="#666666",
-            style="italic")
+            style="italic", linespacing=1.4)
 
     ax.set_xlim(0, 1); ax.set_ylim(0, 1)
-    ax.text(0.5, 1.08, "Cohort Overview", transform=ax.transAxes,
+    ax.text(0.5, 1.02, "Cohort Overview", transform=ax.transAxes,
             ha="center", va="bottom", fontsize=10, fontweight="bold")
 
     ax = ax_b
@@ -202,8 +206,10 @@ def make_fig1():
         ("Phase 6", "SHAP Feature Importance\nWithin-cohort + LOCO\nLogReg Coefficient-\nStability Screen\nWithin-cohort only", "#e377c2"),
     ]
     box_h = 0.125
-    gap   = 0.026
-    start_y = 0.85
+    gap   = 0.021
+    start_y = 0.855   # box top = start_y + box_h = 0.98, matching Panel A's
+                       # table top so both panels' titles sit at the same
+                       # small, consistent 0.04 clearance above their content
     box_w = 0.90
     box_x = 0.06
 
@@ -234,7 +240,7 @@ def make_fig1():
         y_pos -= (box_h + gap)
 
     ax.set_xlim(0, 1); ax.set_ylim(0, 1)
-    ax.text(0.5, 1.08, "Analysis Pipeline", transform=ax.transAxes,
+    ax.text(0.5, 1.02, "Analysis Pipeline", transform=ax.transAxes,
             ha="center", va="bottom", fontsize=10, fontweight="bold")
 
     out = f"{FIGS}/manuscript_fig1.png"
@@ -325,11 +331,13 @@ def make_fig3():
 
     # Wider canvas and larger wspace: panel B/C's "Train Cohort" y-axis
     # label was landing in the gap right next to panel A's rightmost
-    # (Kazakhstan) bars, and the three panels felt cramped overall.
-    fig = plt.figure(figsize=(WIDTH_IN * 1.25, WIDTH_IN * 0.72), dpi=DPI)
+    # (Kazakhstan) bars, and the three panels felt cramped overall. wspace
+    # widened further (0.55 -> 0.85) so each panel reads as clearly its
+    # own distinct plot rather than the three crowding together.
+    fig = plt.figure(figsize=(WIDTH_IN * 1.30, WIDTH_IN * 0.74), dpi=DPI)
     fig.patch.set_facecolor("white")
     gs = gridspec.GridSpec(1, 3, figure=fig, width_ratios=[1.05, 1.0, 1.0],
-                           wspace=0.55, left=0.06, right=0.97,
+                           wspace=0.85, left=0.06, right=0.97,
                            top=0.86, bottom=0.2)
     ax_a = fig.add_subplot(gs[0])
     ax_b = fig.add_subplot(gs[1])
