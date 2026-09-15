@@ -74,7 +74,7 @@ def make_fig1():
     # table/box text (below) enough vertical room at >=8pt final print size
     # (Frontiers minimum legible font size); no data, value, or panel
     # meaning changes with this taller canvas.
-    fig = plt.figure(figsize=(WIDTH_IN, WIDTH_IN * 1.30), dpi=DPI)
+    fig = plt.figure(figsize=(WIDTH_IN, WIDTH_IN * 1.42), dpi=DPI)
     fig.patch.set_facecolor("white")
 
     gs = gridspec.GridSpec(1, 2, figure=fig, width_ratios=[1.65, 0.75],
@@ -190,8 +190,8 @@ def make_fig1():
         ("Phase 2", "Within-Cohort Baseline\nNested 10×5 CV\n(LogReg + LGBM)", "#2ca02c"),
         ("Phase 3", "Cross-Cohort\nGeneralization\n(LOCO + Pairwise)", "#d62728"),
         ("Phase 4", "PERMANOVA Variance\nDecomposition\n(Aitchison + Bray-Curtis)", "#8c564b"),
-        ("Phase 5", "Batch Correction (label-blind\nprimary; ComBat-seq + MMUPHin)\n& LOCO Re-test", "#9467bd"),
-        ("Phase 6", "SHAP Feature Importance +\nCoefficient-Stability Screen\n(Within-cohort + LOCO)", "#e377c2"),
+        ("Phase 5", "Batch Correction\nLabel-blind primary\nComBat-seq + MMUPHin\n& LOCO Re-test", "#9467bd"),
+        ("Phase 6", "SHAP Feature Importance\nWithin-cohort + LOCO\nLogReg Coefficient-\nStability Screen\nWithin-cohort only", "#e377c2"),
     ]
     box_h = 0.125
     gap   = 0.028
@@ -388,7 +388,7 @@ def make_fig3():
             mat[ti, vi] = row["auc"]
 
         cmap = plt.cm.RdYlGn
-        norm = mcolors.Normalize(vmin=0.45, vmax=0.85)
+        norm = mcolors.Normalize(vmin=0.40, vmax=0.90)
         im = ax.imshow(mat, cmap=cmap, norm=norm, aspect="auto")
 
         for i in range(len(train_cs)):
@@ -718,18 +718,15 @@ def make_fig6():
             continue
         yy = y_pos[t]
         xx = x_pos[c]
-        # Size floor/scale raised, and the in-dot label shortened to 1
-        # decimal place, so every dot is large enough to contain its label
-        # at >=8pt final print size without the label spilling onto the
-        # white background (where white-on-white text disappears). Size
-        # still scales with mean |SHAP| exactly as before -- only the floor
-        # and multiplier changed to fit the larger, Frontiers-compliant font.
+        # No in-dot numeric label: at 1 decimal place, several nonzero
+        # mean|SHAP| values (e.g. 0.04) rounded to a misleading "0.0", and
+        # 2-decimal labels would not legibly fit inside dots sized for
+        # >=8pt Frontiers-minimum text without re-inflating bubble size
+        # (which must not change). Size alone (unchanged) encodes the
+        # value, exactly as already stated in the caption/title.
         size  = 135 + row["mean_abs_shap"] * 650
         ax_a.scatter(xx, yy, s=size, color=IMPORTANCE_COL, alpha=0.82,
                      zorder=3, linewidths=0.3, edgecolors="white")
-        ax_a.text(xx, yy, f"{row['mean_abs_shap']:.1f}",
-                  ha="center", va="center", fontsize=8.5,
-                  color="white", fontweight="bold", zorder=4)
 
     ax_a.set_xlim(-0.55, n_coh - 0.45)
     ax_a.set_ylim(-0.55, n_taxa - 0.45)

@@ -406,7 +406,7 @@ The following metadata sources were queried for per-sample diagnosis labels:
 
 **DADA2 workflow difference:** The single-end workflow did not include `mergePairs()`. The full single-end DADA2 pipeline applied: `filterAndTrim()` → `learnErrors()` → `dada()` → `makeSequenceTable()` → `removeBimeraDenovo()`. Error learning was performed independently on Kazakhstan samples; sharing error models across cohorts would be inappropriate because error profiles differ by sequencer and run.
 
-**Interaction with batch correction:** The single-end/paired-end asymmetry is an additional source of between-cohort technical heterogeneity that batch correction methods cannot fully address, because the fundamental difference in read length and sequencing chemistry affects all genera' abundance estimates rather than a subset. This is a study limitation that applies to any analysis including Kazakhstan and should be acknowledged in the Methods section of any manuscript using this dataset.
+**Interaction with batch correction:** The single-end/paired-end asymmetry is an additional source of between-cohort technical heterogeneity that may not be fully removed by generic post-hoc batch adjustment, because sequencing mode, read length, and sequencing chemistry can broadly affect abundance estimates. This asymmetry remains a limitation of analyses including Kazakhstan.
 
 ---
 
