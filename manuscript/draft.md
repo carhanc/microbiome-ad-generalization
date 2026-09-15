@@ -11,8 +11,6 @@
 
 **Keywords:** gut microbiome; Alzheimer's disease; machine learning; cross-cohort generalization; batch correction; SHAP; PERMANOVA; 16S rRNA sequencing
 
-**Word count:** 11,999 (main text, Introduction through Conclusion, including in-text citations; excludes abstract, headings, figure/table captions, table contents, funding, acknowledgements, and references)
-
 **Figures:** 6 · **Tables:** 4
 
 ---

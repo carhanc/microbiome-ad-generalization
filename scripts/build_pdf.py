@@ -18,7 +18,7 @@ FIGURES = [
         "including country of origin, sample size, sequencing mode, 16S variable region, diagnosis "
         "label availability, and analytic phases in which each cohort participates. "
         "(**B**) Summary of the six-phase analysis pipeline, from DADA2 processing through "
-        "SHAP feature importance analysis."
+        "SHAP feature-importance and logistic-regression coefficient-stability analyses."
     ),
     (
         "**Table 2.** Within-cohort nested cross-validation performance",
@@ -39,7 +39,7 @@ FIGURES = [
         "matching Table 3; within-cohort bars are shown without error bars in this panel. "
         "(**B**, **C**) Pairwise single-cohort-train / single-cohort-test AUC heatmaps for "
         "logistic regression and LightGBM respectively. Diagonal (within-cohort) values are "
-        "omitted; colour scale: red = near chance, green = high AUC."
+        "omitted; colour scale: red = lower AUC, green = higher AUC."
     ),
     (
         "### 3.5 Label-Blind Transductive Batch Adjustment Does Not Improve Cross-Cohort Transferability",
