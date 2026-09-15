@@ -85,9 +85,13 @@ def make_fig1():
     ax_a.axis("off")
     ax_b.axis("off")
 
-    ax_a.text(0.0, 1.01, "A", transform=ax_a.transAxes, fontsize=13,
+    # Panel label sits at the same height as each panel's own title (not
+    # above it) -- they don't collide since the label is left-aligned and
+    # the title is centered -- and both sit with generous, equal clearance
+    # above the panel content below (table / first phase box).
+    ax_a.text(0.0, 1.08, "A", transform=ax_a.transAxes, fontsize=13,
               fontweight="bold", va="bottom")
-    ax_b.text(0.0, 1.01, "B", transform=ax_b.transAxes, fontsize=13,
+    ax_b.text(0.0, 1.08, "B", transform=ax_b.transAxes, fontsize=13,
               fontweight="bold", va="bottom")
 
     ax = ax_a
@@ -129,7 +133,7 @@ def make_fig1():
         cellText=rows,
         colLabels=col_headers,
         colWidths=col_w,
-        bbox=[0.0, 0.30, 1.0, 0.62],
+        bbox=[0.0, 0.28, 1.0, 0.60],
         cellLoc="center",
     )
     the_table.auto_set_font_size(False)
@@ -165,7 +169,11 @@ def make_fig1():
             else:
                 cell.set_text_props(fontsize=8.5, color="#111111")
 
-    legend_y = 0.14
+    # Legend and footnote given equal, generous gaps from the table above
+    # and from each other (0.28 table-bottom -> 0.16 legend -> 0.05
+    # footnote: ~0.11-0.12 axes-fraction each), instead of the previous
+    # uneven spacing.
+    legend_y = 0.16
     ax.text(0.0, legend_y, "Country:", transform=ax.transAxes,
             fontsize=8.5, va="center", fontweight="bold", color="#333333")
     offset_x = 0.17
@@ -181,7 +189,7 @@ def make_fig1():
             style="italic")
 
     ax.set_xlim(0, 1); ax.set_ylim(0, 1)
-    ax.text(0.5, 1.03, "Cohort Overview", transform=ax.transAxes,
+    ax.text(0.5, 1.08, "Cohort Overview", transform=ax.transAxes,
             ha="center", va="bottom", fontsize=10, fontweight="bold")
 
     ax = ax_b
@@ -194,8 +202,8 @@ def make_fig1():
         ("Phase 6", "SHAP Feature Importance\nWithin-cohort + LOCO\nLogReg Coefficient-\nStability Screen\nWithin-cohort only", "#e377c2"),
     ]
     box_h = 0.125
-    gap   = 0.028
-    start_y = 0.90
+    gap   = 0.026
+    start_y = 0.85
     box_w = 0.90
     box_x = 0.06
 
@@ -226,7 +234,7 @@ def make_fig1():
         y_pos -= (box_h + gap)
 
     ax.set_xlim(0, 1); ax.set_ylim(0, 1)
-    ax.text(0.5, 1.03, "Analysis Pipeline", transform=ax.transAxes,
+    ax.text(0.5, 1.08, "Analysis Pipeline", transform=ax.transAxes,
             ha="center", va="bottom", fontsize=10, fontweight="bold")
 
     out = f"{FIGS}/manuscript_fig1.png"
@@ -651,18 +659,22 @@ def make_fig6():
     stable_flips_df = pd.read_csv(f"{TABLES}/logreg_directional_flips_stable.csv")
     coef_lookup = coef_stab.set_index(["cohort", "taxon"])["median_coefficient"]
 
-    # Height multiplier increased (0.92 -> 1.10) to give the enlarged text
+    # Height multiplier increased (0.92 -> 1.55) to give the enlarged text
     # below (>=8pt at final print size, the Frontiers minimum) enough room;
     # no data, value, or panel meaning changes with the taller canvas.
-    fig_h = WIDTH_IN * 1.32
+    fig_h = WIDTH_IN * 1.55
     fig = plt.figure(figsize=(WIDTH_IN, fig_h), dpi=DPI)
     fig.patch.set_facecolor("white")
-    # Panel A has 20 taxon rows, Panel B (bottom-left) has 12 -- give A the
-    # larger height share (previously inverted, which squeezed A's 20 genus
-    # labels into less room than B's 12).
+    # Panel A has 20 taxon rows, Panel B (bottom-left) has 8 -- height_ratios
+    # tuned together with fig_h above so Panel A's absolute height stays
+    # essentially unchanged from the previous version (which already fit
+    # comfortably) while Panel B/C's absolute height grows substantially --
+    # B's grid cells were reading as visually cramped even though every
+    # number was individually >=8pt. wspace widened too, for clearer visual
+    # separation between B and C.
     gs = gridspec.GridSpec(2, 2, figure=fig,
-                           height_ratios=[2.4, 1.0],
-                           hspace=0.55, wspace=0.55,
+                           height_ratios=[2.0, 1.3],
+                           hspace=0.38, wspace=0.70,
                            left=0.15, right=0.97,
                            top=0.95, bottom=0.09)
     ax_a = fig.add_subplot(gs[0, :])   # top full-width
