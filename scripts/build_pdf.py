@@ -14,32 +14,45 @@ FIGURES = [
         "**Table 1.** Cohort characteristics.",
         1,
         "**Figure 1.** Study design. "
-        "(**A**) Overview of the five 16S rRNA amplicon sequencing cohorts assembled for this study, "
-        "including country of origin, sample size, sequencing mode, 16S variable region, diagnosis "
-        "label availability, and analytic phases in which each cohort participates. "
+        "(**A**) Overview of the five 16S rRNA amplicon sequencing cohorts assembled for this study: "
+        "four with per-sample diagnosis labels supporting supervised classification (Phases 2–3, "
+        "5–6) and a fifth (Kim/KBASE 2022) contributing only to unsupervised compositional analysis "
+        "(Phase 4). Columns give country of origin, sample size, sequencing mode, 16S variable "
+        "region, diagnosis label availability, and analytic phases in which each cohort participates. "
         "(**B**) Summary of the six-phase analysis pipeline, from DADA2 processing through "
-        "SHAP feature-importance and logistic-regression coefficient-stability analyses."
+        "SHAP feature-importance and logistic-regression coefficient-stability analyses. Phases 2–3 "
+        "(within-cohort baseline and cross-cohort generalization) use strict training-only genus "
+        "selection, re-derived independently within every split, as the primary classifier-"
+        "performance pipeline (Section 2.5.1); Phases 4–6 use the fixed common 396-genus universe "
+        "(Section 2.2), which those specific analyses require as a single, shared feature space "
+        "across cohorts."
     ),
     (
         "**Table 2.** Within-cohort nested cross-validation performance",
         2,
         "**Figure 2.** Within-cohort classification performance under nested cross-validation "
-        "(10-fold outer / 5-fold inner CV). Bars show out-of-fold AUC-ROC; error bars represent "
-        "95% CIs from the diagnosis-stratified, participant-level bootstrap (10,000 replicates; "
-        "Section 2.5.2), matching Table 2. Dashed line = chance (AUC = 0.50). "
-        "LogReg = L2-regularized logistic regression; LGBM = LightGBM."
+        "(10-fold outer / 5-fold inner CV), using strict training-only genus selection as the "
+        "primary classifier-performance pipeline (Section 2.5.1). Bars show out-of-fold AUC-ROC; "
+        "error bars represent 95% CIs from the diagnosis-stratified, participant-level bootstrap "
+        "(10,000 replicates; Section 2.5.2), matching Table 2. Dashed line = chance (AUC = 0.50). "
+        "LogReg = L2-regularized logistic regression; LGBM = LightGBM. Matched values under the "
+        "fixed common-universe (396-genus) schema are given in Supplementary Table S4."
     ),
     (
         "### 3.4 PERMANOVA Variance Decomposition",
         3,
-        "**Figure 3.** Cross-cohort generalization failure. "
+        "**Figure 3.** Cross-cohort generalization limitations, using strict training-only genus "
+        "selection as the primary classifier-performance pipeline (Section 2.5.1). "
         "(**A**) Within-cohort (solid bars) versus LOCO cross-cohort (hatched bars) AUC-ROC for "
         "logistic regression (blue) and LightGBM (pink). Error bars on the LOCO bars = 95% CI from "
         "the diagnosis-stratified, participant-level bootstrap (10,000 replicates; Section 2.5.2), "
         "matching Table 3; within-cohort bars are shown without error bars in this panel. "
         "(**B**, **C**) Pairwise single-cohort-train / single-cohort-test AUC heatmaps for "
         "logistic regression and LightGBM respectively. Diagonal (within-cohort) values are "
-        "omitted; colour scale: red = lower AUC, green = higher AUC."
+        "omitted; colour scale: red = lower AUC, green = higher AUC. Matched values under the fixed "
+        "common-universe (396-genus) schema are given in Supplementary Table S1; one cell "
+        "(Kazakhstan→Ling 2020, LightGBM) differs materially between the two pipelines (0.58 vs. "
+        "0.44) and is discussed in Section 3.3."
     ),
     (
         "### 3.5 Label-Blind Transductive Batch Adjustment Does Not Improve Cross-Cohort Transferability",

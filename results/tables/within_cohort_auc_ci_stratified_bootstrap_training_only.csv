@@ -1,0 +1,9 @@
+cohort,model,auc_oof_training_only,auc_ci_lo,auc_ci_hi
+zhuang2018,logreg,0.6647,0.5462,0.7766
+zhuang2018,lgbm,0.6733,0.556,0.782
+ling2020,logreg,0.8896,0.8386,0.9347
+ling2020,lgbm,0.8415,0.7779,0.8976
+shanghai2022,logreg,0.9956,0.9833,1.0
+shanghai2022,lgbm,0.97,0.9289,0.9956
+kazakhstan2022,logreg,0.7368,0.6239,0.8383
+kazakhstan2022,lgbm,0.6109,0.4901,0.7294

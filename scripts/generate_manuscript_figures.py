@@ -24,6 +24,39 @@ DATA   = f"{BASE}/data/processed"
 WIDTH_IN = 180 / 25.4
 DPI = 300
 
+
+def save_manuscript_figure(fig, png_path, dpi=DPI):
+    """Saves a main manuscript figure (Figures 1-6) as BOTH the .png working
+    copy and the .jpg actually consumed by build_pdf.py / the Frontiers
+    upload package, from the same in-memory figure, in the same call.
+
+    This exists because build_pdf.py and the separate-figure-file Frontiers
+    upload convention both read manuscript_fig{N}.jpg, while matplotlib
+    savefig only ever wrote .png -- a regenerated figure could silently
+    leave a stale .jpg in place with no error, which happened once. Calling
+    this instead of fig.savefig(...) directly makes that class of bug
+    impossible: the .jpg is regenerated from the identical figure object,
+    in the same process, every time the .png is.
+    """
+    from PIL import Image
+    import io
+
+    fig.savefig(png_path, dpi=dpi, bbox_inches="tight", facecolor="white")
+
+    jpg_path = png_path.rsplit(".", 1)[0] + ".jpg"
+    buf = io.BytesIO()
+    fig.savefig(buf, format="png", dpi=dpi, bbox_inches="tight", facecolor="white")
+    buf.seek(0)
+    im = Image.open(buf)
+    if im.mode == "RGBA":
+        bg = Image.new("RGB", im.size, (255, 255, 255))
+        bg.paste(im, mask=im.split()[3])
+        im = bg
+    else:
+        im = im.convert("RGB")
+    im.save(jpg_path, "JPEG", quality=95, dpi=(dpi, dpi))
+    print(f"    -> also wrote {jpg_path}")
+
 COHORT_LABELS = {
     "zhuang2018":    "Zhuang 2018\n(China)",
     "ling2020":      "Ling 2020\n(China)",
@@ -77,8 +110,13 @@ def make_fig1():
     fig = plt.figure(figsize=(WIDTH_IN, WIDTH_IN * 1.42), dpi=DPI)
     fig.patch.set_facecolor("white")
 
-    gs = gridspec.GridSpec(1, 2, figure=fig, width_ratios=[1.65, 0.75],
-                           wspace=0.10, left=0.01, right=0.99,
+    # Panel A widened relative to B (1.65->1.9) and wspace tightened
+    # (0.10->0.07): the cohort table's rightmost column ("Analysis") was
+    # crowded against the table border, while Panel B's pipeline boxes had
+    # comfortable margin to spare. This gives Panel A ~13% more absolute
+    # width with no change to Panel B's box content or text.
+    gs = gridspec.GridSpec(1, 2, figure=fig, width_ratios=[1.9, 0.75],
+                           wspace=0.07, left=0.01, right=0.99,
                            top=0.92, bottom=0.04)
     ax_a = fig.add_subplot(gs[0])
     ax_b = fig.add_subplot(gs[1])
@@ -128,7 +166,10 @@ def make_fig1():
     row_countries = ["China", "China", "China", "Kazakhstan", "S. Korea"]
     row_colors    = ["#f7fbff", "#deebf7", "#c6dbef", "#9ecae1", "#d8e9f8"]
 
-    col_w = [0.21, 0.16, 0.17, 0.18, 0.15, 0.13]  # sum = 1.00
+    # Rebalanced from [0.21, 0.16, 0.17, 0.18, 0.15, 0.13]: Country and N
+    # had more room than their short contents needed, while Analysis
+    # ("Ph. 2-6" / "Ph. 4 only") was tight against the table's right edge.
+    col_w = [0.20, 0.14, 0.15, 0.18, 0.16, 0.17]  # sum = 1.00
 
     n_rows = len(rows)
     n_cols = len(col_headers)
@@ -198,8 +239,8 @@ def make_fig1():
 
     ax = ax_b
     steps = [
-        ("Phase 1", "DADA2 Processing\n(599 samples) → fecal\nfiltering & harmonization\n(509 samples, 396 genera)", "#1a6faf"),
-        ("Phase 2", "Within-Cohort Baseline\nNested 10×5 CV\n(LogReg + LGBM)", "#2ca02c"),
+        ("Phase 1", "DADA2 Processing\n(599 samples) → fecal\nfiltering & harmonization\n(509 samples, genus level)", "#1a6faf"),
+        ("Phase 2", "Within-Cohort Baseline\nNested 10×5 CV\n(train-only genera)", "#2ca02c"),
         ("Phase 3", "Cross-Cohort\nGeneralization\n(LOCO + Pairwise)", "#d62728"),
         ("Phase 4", "PERMANOVA Variance\nDecomposition\n(Aitchison + Bray-Curtis)", "#8c564b"),
         ("Phase 5", "Batch Correction\nLabel-blind primary\nComBat-seq + MMUPHin\n& LOCO Re-test", "#9467bd"),
@@ -244,19 +285,19 @@ def make_fig1():
             ha="center", va="bottom", fontsize=10, fontweight="bold")
 
     out = f"{FIGS}/manuscript_fig1.png"
-    fig.savefig(out, dpi=DPI, bbox_inches="tight", facecolor="white")
+    save_manuscript_figure(fig, out)
     plt.close(fig)
     print(f"  Saved: {out}")
 
 
 def make_fig2():
     print("  Generating Figure 2 (Within-Cohort Baseline AUC)…")
+    # Primary pipeline: strict training-only genus selection (Section 2.5.1).
     # CIs from the diagnosis-stratified, participant-level bootstrap
-    # (Section 2.5.2; 10,000 replicates) -- the same procedure Table 2's
-    # text values use, so the plotted error bars match the reported CIs.
-    # Point estimates (auc_oof) are unchanged from the original OOF
-    # predictions either way.
-    df = pd.read_csv(f"{TABLES}/within_cohort_auc_ci_stratified_bootstrap.csv")
+    # (Section 2.5.2; 10,000 replicates) applied to the training-only OOF
+    # predictions -- the same procedure and values Table 2's text uses.
+    df = pd.read_csv(f"{TABLES}/within_cohort_auc_ci_stratified_bootstrap_training_only.csv")
+    df = df.rename(columns={"auc_oof_training_only": "auc_oof"})
     df = df[df["cohort"].isin(LABELED_COHORTS)]
 
     fig, ax = plt.subplots(figsize=(WIDTH_IN * 0.7, WIDTH_IN * 0.5), dpi=DPI)
@@ -313,7 +354,7 @@ def make_fig2():
     plt.tight_layout()
 
     out = f"{FIGS}/manuscript_fig2.png"
-    fig.savefig(out, dpi=DPI, bbox_inches="tight", facecolor="white")
+    save_manuscript_figure(fig, out)
     plt.close(fig)
     print(f"  Saved: {out}")
 
@@ -321,13 +362,14 @@ def make_fig2():
 def make_fig3():
     print("  Generating Figure 3 (Cross-Cohort Generalization)…")
     drop_df  = pd.read_csv(f"{TABLES}/auc_drop_summary.csv")
+    # Primary pipeline: strict training-only genus selection (Section 2.5.1).
     # LOCO CIs from the diagnosis-stratified, participant-level bootstrap
-    # (Section 2.5.2; 10,000 replicates) -- matches the values in Table 3's
-    # text/CI column. Point estimates (auc) are unchanged from the original
-    # LOCO predictions; only the CI procedure differs from the historical
-    # loco_auc.csv table.
-    loco_df  = pd.read_csv(f"{TABLES}/loco_auc_ci_stratified_bootstrap.csv")
-    pair_df  = pd.read_csv(f"{TABLES}/pairwise_auc.csv")
+    # (Section 2.5.2; 10,000 replicates) applied to training-only predictions
+    # -- matches the values in Table 3's text/CI column.
+    loco_df  = pd.read_csv(f"{TABLES}/loco_auc_ci_stratified_bootstrap_training_only.csv")
+    loco_df  = loco_df.rename(columns={"auc_training_only": "auc"})
+    pair_df  = pd.read_csv(f"{TABLES}/pairwise_auc_training_only.csv")
+    pair_df  = pair_df.rename(columns={"auc_training_only": "auc"})
 
     # Wider canvas and larger wspace: panel B/C's "Train Cohort" y-axis
     # label was landing in the gap right next to panel A's rightmost
@@ -356,7 +398,8 @@ def make_fig3():
     offsets_within = [-0.225, -0.075]
     offsets_loco   = [ 0.075,  0.225]
 
-    within_df = pd.read_csv(f"{TABLES}/within_cohort_auc.csv")
+    within_df = pd.read_csv(f"{TABLES}/within_cohort_auc_training_only.csv")
+    within_df = within_df.rename(columns={"auc_oof_training_only": "auc_oof"})
 
     for m, ow, ol in zip(models, offsets_within, offsets_loco):
         w_aucs, l_aucs, l_lo, l_hi = [], [], [], []
@@ -435,7 +478,7 @@ def make_fig3():
 
     plt.tight_layout()
     out = f"{FIGS}/manuscript_fig3.png"
-    fig.savefig(out, dpi=DPI, bbox_inches="tight", facecolor="white")
+    save_manuscript_figure(fig, out)
     plt.close(fig)
     print(f"  Saved: {out}")
 
@@ -580,7 +623,7 @@ def make_fig4():
 
     plt.tight_layout()
     out = f"{FIGS}/manuscript_fig4.png"
-    fig.savefig(out, dpi=DPI, bbox_inches="tight", facecolor="white")
+    save_manuscript_figure(fig, out)
     plt.close(fig)
     print(f"  Saved: {out}")
 
@@ -648,7 +691,7 @@ def make_fig5():
 
     plt.tight_layout()
     out = f"{FIGS}/manuscript_fig5.png"
-    fig.savefig(out, dpi=DPI, bbox_inches="tight", facecolor="white")
+    save_manuscript_figure(fig, out)
     plt.close(fig)
     print(f"  Saved: {out}")
 
@@ -863,7 +906,7 @@ def make_fig6():
 
     plt.tight_layout()
     out = f"{FIGS}/manuscript_fig6.png"
-    fig.savefig(out, dpi=DPI, bbox_inches="tight", facecolor="white")
+    save_manuscript_figure(fig, out)
     plt.close(fig)
     print(f"  Saved: {out}")
 

@@ -6,9 +6,31 @@
 
 ### Table S1. Full Pairwise Cross-Cohort AUC Matrix
 
-Pairwise AUC-ROC for single-cohort train → single-cohort test transfer experiments. All 4×4 combinations excluding diagonal (within-cohort). Values are AUC-ROC with 95% bootstrap confidence intervals (1,000 resamples) on the test cohort predictions.
+Pairwise AUC-ROC for single-cohort train → single-cohort test transfer experiments, under strict training-only genus selection (**primary analysis**, Section 2.5.1; Figure 3B–C). All 4×4 combinations excluding diagonal (within-cohort). Values are AUC-ROC with 95% bootstrap CIs (1,000 resamples) on the test-cohort predictions.
 
-**Table S1A — Logistic Regression**
+**Table S1A — Logistic Regression (training-only, primary)**
+
+| Train \ Test | Zhuang 2018 | Ling 2020 | Zhu 2022 | Kazakhstan |
+|---|---|---|---|---|
+| Zhuang 2018 | — | 0.598 [0.51–0.69] | 0.697 [0.55–0.84] | 0.583 [0.45–0.71] |
+| Ling 2020 | 0.519 [0.41–0.64] | — | 0.858 [0.75–0.95] | 0.601 [0.47–0.73] |
+| Zhu 2022 | 0.594 [0.47–0.71] | 0.723 [0.65–0.80] | — | 0.566 [0.44–0.70] |
+| Kazakhstan | 0.545 [0.43–0.67] | 0.739 [0.66–0.81] | 0.650 [0.50–0.79] | — |
+
+**Table S1B — LightGBM (training-only, primary)**
+
+| Train \ Test | Zhuang 2018 | Ling 2020 | Zhu 2022 | Kazakhstan |
+|---|---|---|---|---|
+| Zhuang 2018 | — | 0.563 [0.47–0.65] | 0.642 [0.50–0.78] | 0.586 [0.46–0.71] |
+| Ling 2020 | 0.639 [0.53–0.75] | — | 0.817 [0.70–0.91] | 0.558 [0.42–0.68] |
+| Zhu 2022 | 0.533 [0.41–0.66] | 0.658 [0.57–0.73] | — | **0.432 [0.31–0.56]** |
+| Kazakhstan | 0.515 [0.39–0.64] | **0.436 [0.35–0.53]** | 0.567 [0.42–0.72] | — |
+
+Notable observations: The highest pairwise AUC remains Ling 2020 → Zhu 2022 (LogReg=0.86, LightGBM=0.82), reflecting transfer between two large Chinese fecal cohorts. Kazakhstan → Ling 2020 LogReg also transfers reasonably (0.74). Most pairwise AUCs cluster in the interquartile range 0.55–0.65 (median 0.59; n=24 directed pairs × 2 models), consistent with the overall pattern of limited cross-cohort transferability documented in Section 3.3. **One cell is flagged explicitly**: Kazakhstan → Ling 2020 (LightGBM), bolded above, is 0.436 under training-only selection versus 0.580 under the fixed common-universe schema (Table S1, reference version below) — a Δ=−0.144, the largest shift anywhere in the training-only vs. common-universe comparison (Table S4), moving this one cell from weak positive transfer to below chance. We report this without smoothing; it does not change the overall heterogeneous-transferability conclusion, since the best- and worst-transferring pairs otherwise agree between pipelines.
+
+**Common-universe (fixed 396-genus) reference values**, for comparison — identical pairwise-transfer procedure under the fixed common 396-genus schema used for this paper's secondary descriptive/harmonization analyses:
+
+**Table S1A-ref — Logistic Regression (common-universe reference)**
 
 | Train \ Test | Zhuang 2018 | Ling 2020 | Zhu 2022 | Kazakhstan |
 |---|---|---|---|---|
@@ -17,16 +39,16 @@ Pairwise AUC-ROC for single-cohort train → single-cohort test transfer experim
 | Zhu 2022 | 0.579 [0.46–0.70] | 0.760 [0.68–0.83] | — | 0.547 [0.43–0.67] |
 | Kazakhstan | 0.539 [0.42–0.67] | 0.739 [0.66–0.81] | 0.652 [0.50–0.78] | — |
 
-**Table S1B — LightGBM**
+**Table S1B-ref — LightGBM (common-universe reference)**
 
 | Train \ Test | Zhuang 2018 | Ling 2020 | Zhu 2022 | Kazakhstan |
 |---|---|---|---|---|
 | Zhuang 2018 | — | 0.598 [0.51–0.68] | 0.604 [0.46–0.74] | 0.493 [0.37–0.61] |
 | Ling 2020 | 0.617 [0.49–0.74] | — | 0.861 [0.77–0.94] | 0.602 [0.47–0.72] |
 | Zhu 2022 | 0.528 [0.41–0.65] | 0.591 [0.50–0.68] | — | 0.405 [0.28–0.53] |
-| Kazakhstan | 0.522 [0.40–0.64] | 0.580 [0.49–0.67] | 0.603 [0.45–0.75] | — |
+| Kazakhstan | 0.522 [0.40–0.64] | **0.580 [0.49–0.67]** | 0.603 [0.45–0.75] | — |
 
-Notable observations: The highest pairwise logistic regression AUC is Ling 2020 → Zhu 2022 (AUC=0.88), reflecting transfer between two large Chinese fecal cohorts. Kazakhstan → Ling 2020 also transfers reasonably (logistic regression AUC=0.74). Most pairwise AUCs cluster between 0.54 and 0.70, consistent with the overall pattern of limited cross-cohort transferability documented in Section 3.3.
+*Source data (primary):* `results/tables/pairwise_auc_training_only.csv`. *Source data (reference):* `results/tables/pairwise_auc.csv`.
 
 ---
 
@@ -97,37 +119,37 @@ Zhu 2022 analysis restricted to fecal samples only (n=60 binary: 30 AD + 30 CN).
 
 ---
 
-### Table S4. Training-Only Feature-Selection Sensitivity
+### Table S4. Training-Only (Primary) vs. Common-Universe (Reference) Feature Selection
 
-Genus retention (≥20% prevalence) re-derived independently within every split, using only that split's training-side samples (Section 2.5.1), compared against the main analysis's global (all-five-cohort) feature selection.
+Genus retention (≥20% prevalence) re-derived independently within every split, using only that split's training-side samples (Section 2.5.1) — the **primary** pipeline reported in Table 2 and Table 3 — compared against the fixed common 396-genus schema (Section 2.2) used for this paper's secondary descriptive/harmonization analyses (batch correction, SHAP, PERMANOVA).
 
 **LOCO**
 
-| Test Cohort | Model | Original (Global-Feature) LOCO AUC | Training-Only LOCO AUC | Δ | N Retained Genera (Training-Only) |
+| Test Cohort | Model | Training-Only LOCO AUC (primary) | Common-Universe LOCO AUC (reference) | Δ | N Retained Genera (Training-Only) |
 |---|---|---|---|---|---|
-| Zhuang 2018 | LogReg | 0.5041 | 0.5057 | +0.0016 | 370 |
-| Zhuang 2018 | LGBM | 0.5646 | 0.5960 | +0.0314 | 370 |
-| Ling 2020 | LogReg | 0.6775 | 0.6794 | +0.0019 | 370 |
-| Ling 2020 | LGBM | 0.6735 | 0.6534 | −0.0201 | 370 |
-| Zhu 2022 | LogReg | 0.8133 | 0.8122 | −0.0011 | 373 |
-| Zhu 2022 | LGBM | 0.7578 | 0.7878 | +0.0300 | 373 |
-| Kazakhstan | LogReg | 0.5644 | 0.6092 | +0.0448 | 150 |
-| Kazakhstan | LGBM | 0.5905 | 0.5247 | −0.0658 | 150 |
+| Zhuang 2018 | LogReg | 0.5057 | 0.5041 | −0.0016 | 370 |
+| Zhuang 2018 | LGBM | 0.5960 | 0.5646 | −0.0314 | 370 |
+| Ling 2020 | LogReg | 0.6794 | 0.6775 | −0.0019 | 370 |
+| Ling 2020 | LGBM | 0.6534 | 0.6735 | +0.0201 | 370 |
+| Zhu 2022 | LogReg | 0.8122 | 0.8133 | +0.0011 | 373 |
+| Zhu 2022 | LGBM | 0.7878 | 0.7578 | −0.0300 | 373 |
+| Kazakhstan | LogReg | 0.6092 | 0.5644 | −0.0448 | 150 |
+| Kazakhstan | LGBM | 0.5247 | 0.5905 | +0.0658 | 150 |
 
 **Within-cohort nested CV**
 
-| Cohort | Model | Original (Global-Feature) AUC | Training-Only AUC | Δ |
+| Cohort | Model | Training-Only AUC (primary) | Common-Universe AUC (reference) | Δ |
 |---|---|---|---|---|
-| Zhuang 2018 | LogReg | 0.6333 | 0.6647 | +0.0314 |
-| Zhuang 2018 | LGBM | 0.6349 | 0.6733 | +0.0384 |
-| Ling 2020 | LogReg | 0.8648 | 0.8896 | +0.0248 |
-| Ling 2020 | LGBM | 0.8618 | 0.8415 | −0.0203 |
-| Zhu 2022 | LogReg | 0.9978 | 0.9956 | −0.0022 |
-| Zhu 2022 | LGBM | 0.9789 | 0.9700 | −0.0089 |
-| Kazakhstan | LogReg | 0.7657 | 0.7368 | −0.0289 |
-| Kazakhstan | LGBM | 0.6943 | 0.6109 | −0.0834 |
+| Zhuang 2018 | LogReg | 0.6647 | 0.6333 | −0.0314 |
+| Zhuang 2018 | LGBM | 0.6733 | 0.6349 | −0.0384 |
+| Ling 2020 | LogReg | 0.8896 | 0.8648 | −0.0248 |
+| Ling 2020 | LGBM | 0.8415 | 0.8618 | +0.0203 |
+| Zhu 2022 | LogReg | 0.9956 | 0.9978 | +0.0022 |
+| Zhu 2022 | LGBM | 0.9700 | 0.9789 | +0.0089 |
+| Kazakhstan | LogReg | 0.7368 | 0.7657 | +0.0289 |
+| Kazakhstan | LGBM | 0.6109 | 0.6943 | +0.0834 |
 
-The retained genus count for LOCO training-only selection is lower when Kazakhstan is excluded from feature selection (150 genera) than when it is included in the training pool (370–373 genera), reflecting that Kazakhstan alone passes the 20%-prevalence threshold for many genera the Chinese/Korean-pipeline cohorts do not. No cohort–model combination changes qualitative classification (near-chance, intermediate, robust) between the global and training-only designs.
+The retained genus count for LOCO training-only selection is lower when Kazakhstan is excluded from feature selection (150 genera) than when it is included in the training pool (370–373 genera), reflecting that Kazakhstan alone passes the 20%-prevalence threshold for many genera the Chinese/Korean-pipeline cohorts do not. No cohort–model combination changes qualitative classification (near-chance, intermediate, robust) between the two pipelines; the largest single within-cohort/LOCO disagreement is 0.0834 (Kazakhstan LightGBM, within-cohort). The one pairwise-transfer cell that changes qualitatively (Kazakhstan → Ling 2020, LightGBM) is reported separately in Table S1, since pairwise transfer is a distinct experiment from within-cohort/LOCO.
 
 *Source data:* `results/tables/within_cohort_auc_training_only.csv`, `results/tables/loco_auc_training_only.csv`, `results/tables/pairwise_auc_training_only.csv`, `results/tables/training_only_feature_sensitivity_summary.csv`, `results/tables/training_only_feature_counts.csv`, `results/tables/training_only_feature_lists.csv` (full per-split retained-genus lists).
 
@@ -222,22 +244,39 @@ No permutation among the 1,000 drawn reached the observed AUC for either model; 
 
 ### Table S10. Formal Within-Cohort vs. LOCO AUC Difference (Paired, Diagnosis-Stratified Bootstrap)
 
-Paired, diagnosis-stratified, participant-level bootstrap (10,000 replicates; Section 2.5.2). Δ (= AUC-within minus AUC-LOCO) is computed on identical resampled participants for both AUC values in each replicate. "Proportion Δ≤0" is the fraction of bootstrap replicates with a non-positive delta.
+Paired, diagnosis-stratified, participant-level bootstrap (10,000 replicates; Section 2.5.2), applied to the strict training-only pipeline's out-of-fold predictions (primary analysis, Section 2.5.1; Table 2, Table 3). Δ (= AUC-within minus AUC-LOCO) is computed on identical resampled participants for both AUC values in each replicate. "Proportion Δ≤0" is the fraction of bootstrap replicates with a non-positive delta.
 
 | Cohort | Model | N | AUC Within | AUC LOCO | Observed Δ | Bootstrap Mean Δ | 95% CI | Proportion Δ≤0 |
 |---|---|---|---|---|---|---|---|---|
-| Zhuang 2018 | LogReg | 86 | 0.6333 | 0.5041 | 0.1293 | 0.1280 | [−0.047, 0.303] | 0.0787 |
-| Zhuang 2018 | LGBM | 86 | 0.6349 | 0.5646 | 0.0703 | 0.0705 | [−0.100, 0.239] | 0.2138 |
-| Ling 2020 | LogReg | 171 | 0.8648 | 0.6775 | 0.1873 | 0.1871 | [0.097, 0.277] | 0.0001 |
-| Ling 2020 | LGBM | 171 | 0.8618 | 0.6735 | 0.1883 | 0.1886 | [0.096, 0.284] | 0.0001 |
-| Zhu 2022 | LogReg | 60 | 0.9978 | 0.8133 | 0.1844 | 0.1848 | [0.072, 0.312] | 0.0000 |
-| Zhu 2022 | LGBM | 60 | 0.9789 | 0.7578 | 0.2211 | 0.2211 | [0.111, 0.346] | 0.0000 |
-| Kazakhstan | LogReg | 84 | 0.7657 | 0.5644 | 0.2014 | 0.2013 | [0.044, 0.357] | 0.0051 |
-| Kazakhstan | LGBM | 84 | 0.6943 | 0.5905 | 0.1038 | 0.1038 | [−0.049, 0.255] | 0.0917 |
+| Zhuang 2018 | LogReg | 86 | 0.6647 | 0.5057 | 0.1590 | — | [−0.015, 0.325] | 0.0381 |
+| Zhuang 2018 | LGBM | 86 | 0.6733 | 0.5960 | 0.0773 | — | [−0.096, 0.247] | 0.1908 |
+| Ling 2020 | LogReg | 171 | 0.8896 | 0.6794 | 0.2101 | — | [0.122, 0.300] | 0.0000 |
+| Ling 2020 | LGBM | 171 | 0.8415 | 0.6534 | 0.1882 | — | [0.095, 0.284] | 0.0000 |
+| Zhu 2022 | LogReg | 60 | 0.9956 | 0.8122 | 0.1833 | — | [0.071, 0.308] | 0.0001 |
+| Zhu 2022 | LGBM | 60 | 0.9700 | 0.7878 | 0.1822 | — | [0.069, 0.308] | 0.0003 |
+| Kazakhstan | LogReg | 84 | 0.7368 | 0.6092 | 0.1276 | — | [−0.029, 0.283] | 0.0559 |
+| Kazakhstan | LGBM | 84 | 0.6109 | 0.5247 | 0.0862 | — | [−0.093, 0.268] | 0.1786 |
 
-Five of eight pairs have a 95% CI excluding zero (Ling 2020 both models, Zhu 2022 both models, Kazakhstan LogReg). Three (Zhuang 2018 both models, Kazakhstan LGBM) show the same-signed delta with a CI that includes zero and are not formally significant at this sample size.
+Four of eight pairs have a 95% CI excluding zero (Ling 2020 both models, Zhu 2022 both models). Four (Zhuang 2018 both models, Kazakhstan both models) show the same-signed delta with a CI that includes zero and are not formally significant at this sample size.
 
-*Source data:* `results/tables/within_vs_loco_auc_difference_bootstrap.csv`, `results/tables/within_cohort_auc_ci_stratified_bootstrap.csv`, `results/tables/loco_auc_ci_stratified_bootstrap.csv`.
+*Source data (primary, training-only):* `results/tables/within_vs_loco_auc_difference_bootstrap_training_only.csv`, `results/tables/within_cohort_auc_ci_stratified_bootstrap_training_only.csv`, `results/tables/loco_auc_ci_stratified_bootstrap_training_only.csv`.
+
+**Common-universe (fixed 396-genus) reference values**, for comparison — identical bootstrap procedure applied to the fixed common-universe predictions used for this paper's secondary descriptive/harmonization analyses (Section 2.5.1):
+
+| Cohort | Model | AUC Within | AUC LOCO | Observed Δ | 95% CI | Significant? |
+|---|---|---|---|---|---|---|
+| Zhuang 2018 | LogReg | 0.6333 | 0.5041 | 0.1293 | [−0.047, 0.303] | no |
+| Zhuang 2018 | LGBM | 0.6349 | 0.5646 | 0.0703 | [−0.100, 0.239] | no |
+| Ling 2020 | LogReg | 0.8648 | 0.6775 | 0.1873 | [0.097, 0.277] | yes |
+| Ling 2020 | LGBM | 0.8618 | 0.6735 | 0.1883 | [0.096, 0.284] | yes |
+| Zhu 2022 | LogReg | 0.9978 | 0.8133 | 0.1844 | [0.072, 0.312] | yes |
+| Zhu 2022 | LGBM | 0.9789 | 0.7578 | 0.2211 | [0.111, 0.346] | yes |
+| Kazakhstan | LogReg | 0.7657 | 0.5644 | 0.2014 | [0.044, 0.357] | **yes (common-universe only)** |
+| Kazakhstan | LGBM | 0.6943 | 0.5905 | 0.1038 | [−0.049, 0.255] | no |
+
+The common-universe reference analysis yields five of eight intervals excluding zero, whereas the primary strict training-only analysis yields four of eight; Kazakhstan logistic regression is the one significance classification that differs between the two pipelines (Section 3.3).
+
+*Source data (common-universe reference):* `results/tables/within_vs_loco_auc_difference_bootstrap.csv`, `results/tables/within_cohort_auc_ci_stratified_bootstrap.csv`, `results/tables/loco_auc_ci_stratified_bootstrap.csv`.
 
 ---
 
@@ -308,11 +347,33 @@ Logistic regression remains significant at all three thresholds under this more 
 
 ---
 
+### Table S14. Zhu 2022 Technical Metadata Assessment (n=60 AD/CN Supervised Subset)
+
+Every non-identifier SRA RunInfo field for the Zhu 2022 fecal AD/CN subset (Section 4.3; Note S4), tabulated against diagnosis. To assess whether sequencing-batch/diagnosis confounding could contribute to this cohort's near-perfect within-cohort AUC, every usable technical field was checked directly against diagnosis.
+
+| Field | Observed Values (n=60) | Relationship to AD/CN | Usable as Independent Batch Variable? | Interpretation |
+|---|---|---|---|---|
+| `avgLength` | 600 bp (n=30), 602 bp (n=30) | **Exact**: all 600 bp runs are AD, all 602 bp runs are CN, zero exceptions | No — exactly collinear with diagnosis | Cannot be used as an adjustment covariate (Note S4); the strongest technical/diagnosis association found |
+| `LibraryLayout` | PAIRED (constant) | Constant across all 60 samples | No — no variation | Not a candidate confound |
+| `Platform` | ILLUMINA (constant) | Constant | No | Not a candidate confound |
+| `Model` (instrument) | Illumina MiSeq (constant) | Constant | No | Not a candidate confound |
+| `LibraryStrategy` | AMPLICON (constant) | Constant | No | Not a candidate confound |
+| `LibrarySelection` | PCR (constant) | Constant | No | Not a candidate confound |
+| `CenterName` | Ruijin Hospital Affiliated to Shanghai Jiao Tong University School of Medicine (constant) | Constant | No | Not a candidate confound |
+| `ReleaseDate` | 6 distinct timestamps, all within the same calendar day/hour | Strong but not exact (e.g., one timestamp bucket = 15 AD / 3 CN) | Partially — concordant with the `avgLength` grouping but not itself exactly collinear | Consistent with, not independent proof of, a submission-batch structure; not over-interpreted further |
+| Run accession (`Run`, SRR#) ordering | Ascending SRR7811020–SRR7811186 | Largely block-clustered by diagnosis, with exceptions (e.g., a few CN runs interspersed within an otherwise AD-dominated block) | No — imperfect, and accession order is not a validated technical variable | Consistent with samples having been submitted in largely, not perfectly, separate diagnosis-grouped batches |
+| `spots`, `bases`, `size_MB` | Continuous, sample-specific | Overlapping distributions; AD systematically lower mean than CN | No — overlapping, not a clean grouping variable | Corroborates the `avgLength`-linked grouping rather than constituting an independent confound |
+| Lane / plate / extraction-batch / sequencing-run identifier | **Not present in the deposited metadata** | N/A | N/A | No field of this kind is included in this cohort's public SRA export; a physical batch, lane, or extraction group cannot be identified from the data available to us |
+
+*Source data:* `data/raw/shanghai2022/metadata.tsv` (SRA RunInfo export); crosstabulation restricted to the 60 fecal AD/CN runs used in supervised analyses.
+
+---
+
 ## Supplementary Figures
 
 ### Figure S1. Zhu 2022: Fecal-Only Within-Cohort AUC
 
-**Caption:** Within-cohort AUC-ROC for Zhu 2022 fecal samples only (n=60 binary: 30 AD + 30 CN), estimated using standard StratifiedKFold 10-fold nested cross-validation. Blood microbiome (B_*) samples were excluded from all analyses; each participant appears exactly once in the fecal-only dataset, making standard StratifiedKFold appropriate. Logistic regression achieves AUC=0.998 [0.99–1.00] and LightGBM achieves AUC=0.979 [0.94–1.00]. The near-perfect within-cohort AUC should be interpreted cautiously given the small sample size (30 per class); see Section 3.2 and Section 4.3 for discussion. Error bars = 95% CI from the diagnosis-stratified, participant-level bootstrap (10,000 replicates; Section 2.5.2), matching Table 2.
+**Caption:** Within-cohort AUC-ROC for Zhu 2022 fecal samples only (n=60 binary: 30 AD + 30 CN), estimated using standard StratifiedKFold 10-fold nested cross-validation under the fixed common 396-genus universe (common-universe reference value; the primary training-only value in Table 2 is 0.996/0.970). Blood microbiome (B_*) samples were excluded from all analyses; each participant appears exactly once in the fecal-only dataset, making standard StratifiedKFold appropriate. Logistic regression achieves AUC=0.998 [0.99–1.00] and LightGBM achieves AUC=0.979 [0.94–1.00] under this common-universe schema. The near-perfect within-cohort AUC should be interpreted cautiously given the small sample size (30 per class) and the technical-metadata assessment in Section 4.3; see Section 3.2 for discussion. Error bars = 95% CI from the diagnosis-stratified, participant-level bootstrap (10,000 replicates; Section 2.5.2).
 
 *Source data:* results/model_outputs/within_cohort_cv/shanghai2022_*.csv
 ![Figure S1](/Users/arhan/Desktop/microbiome-ad-generalization/results/figures/final_supplementary/Figure_S1.jpg){width=70%}
@@ -415,6 +476,24 @@ The following metadata sources were queried for per-sample diagnosis labels:
 **No figure or table showing a signed AD/CN direction for LOCO SHAP values is included in this paper.** Mean signed SHAP is not used here as a global fitted-direction statistic, because it is background-relative and does not identify the sign of the fitted logistic coefficient (Section 2.8), and this is especially severe for LOCO SHAP specifically: the SHAP background (the three pooled training cohorts) and the evaluation set (the held-out cohort) are drawn from systematically different populations by construction, so the sign of a LOCO mean SHAP value is confounded with the raw cross-cohort compositional difference quantified by PERMANOVA (Section 3.4), independent of anything the model learned. No coefficient-based replacement direction is offered for LOCO SHAP either, because LOCO models are refit on pooled multi-cohort training data each time and a single stable-fold coefficient analysis analogous to Section 2.8's within-cohort procedure is not part of this design.
 
 LOCO SHAP **feature importance** (mean |SHAP|, magnitude only, no direction) remains available and is unaffected by this issue: see `results/tables/shap_loco_importance.csv`. For reference, the top-importance genus per held-out cohort is: Zhuang 2018 — *Akkermansia* (logistic regression |SHAP|=0.470); Ling 2020 — *Subdoligranulum* (|SHAP|=0.269); Zhu 2022 — *Akkermansia* (|SHAP|=0.372); Kazakhstan — *Christensenellaceae R-7 group* (|SHAP|=0.368); no genus ranked first across all four held-out conditions for either model (Section 3.6).
+
+---
+
+### Note S4. Zhu 2022 Technical-Metadata Confounding Assessment
+
+**Motivation.** Zhu 2022's within-cohort AUC (logistic regression 0.996, LightGBM 0.970 under the primary training-only pipeline; Table 2) is the highest of the four labeled cohorts, estimated from only n=60 (30 AD, 30 CN). Because this cohort showed near-perfect within-cohort discrimination, we assessed whether available technical metadata showed diagnosis-associated structure that could contribute to this result rather than biology. This note documents a direct check of every usable technical field in this cohort's deposited SRA metadata against diagnosis, restricted to the 60 fecal AD/CN runs (full field-by-field results in Supplementary Table S14).
+
+**What we found.** Of 47 raw SRA RunInfo fields, most are either sample-unique identifiers (accession numbers, hashes) or constant across all 60 samples (`LibraryLayout`, `Platform`, `Model`, `LibraryStrategy`, `LibrarySelection`, `CenterName`) and so cannot confound diagnosis. Among the remaining fields: `avgLength` (SRA-reported mean read length) is **exactly** associated with diagnosis — every one of the 30 AD runs is recorded at 600 bp and every one of the 30 CN runs at 602 bp, with no exceptions. `ReleaseDate` and run-accession (`Run`, SRR#) ordering show a concordant but non-exact grouping pattern (e.g., one release-timestamp bucket contains 15 AD and 3 CN runs; a handful of CN runs are interspersed within an otherwise AD-dominated accession block). `spots`, `bases`, and `size_MB` are continuous and overlapping between diagnosis groups, but AD runs show a systematically lower mean than CN runs, consistent with the `avgLength` split. **No lane, plate, extraction-batch, or sequencing-run identifier is present anywhere in this cohort's deposited public metadata**, so we cannot identify a physical batch directly; `avgLength` is simply the strongest candidate marker available in the public export.
+
+**Mechanistic interpretation.** We inspected the actual DADA2 invocation used for this cohort (`scripts/utils/dada2_pipeline.R`; Section 2.2): all paired-end reads in a cohort are truncated to one fixed length (approximately 240 bp forward / 200 bp reverse for Zhu 2022), applied uniformly regardless of a given sample's raw `avgLength`. This means the literal 2 bp raw-read-length difference between the two `avgLength` groups is discarded during truncation, before ASV inference — it cannot itself survive into the genus-level count table as a read-length artifact. We therefore distinguish two readings: (a) `avgLength` *directly causing* the classifier's discrimination — not mechanistically plausible given post-truncation processing; versus (b) `avgLength` *acting as a marker* for some other diagnosis-correlated technical grouping (e.g., a distinct sequencing run, reagent lot, or library-prep batch) whose other consequences (subtle error-profile or depth differences) could still survive into the processed data — this reading is not ruled out.
+
+**Why we cannot resolve this further with the available data.** Diagnosis and `avgLength` are exactly collinear in this 60-sample subset (every 600 bp run is AD; every 602 bp run is CN): there is zero within-`avgLength`-group diagnostic variance to test against. No regression adjustment, stratified analysis, or covariate-control procedure can separate a diagnosis effect from an exactly collinear covariate — this is a structural identifiability limit of the deposited data, not a modeling choice we made. We did not attempt an adjusted analysis for this reason, and no other deposited field provides an independent, non-collinear technical grouping variable to attempt one against.
+
+**What this does and does not license us to claim.** Supportable: a technical metadata field is exactly associated with diagnosis in this subset, other technical/submission metadata are concordantly (though not perfectly) grouped, and the public data cannot separate a technical from a biological explanation for this cohort's near-perfect classification. Not supportable: that `avgLength` causes the classification (no plausible mechanism survives truncation), that we have identified a specific physical batch (no such field is deposited), or that this proves the result is a technical artifact rather than genuine biology (we simply cannot tell). We report this as a disclosed, unresolved limitation (Section 4.3, Section 4.6), not a demonstrated confound.
+
+**Interpretation of existing robustness checks.** The repeated nested-CV (50 partitions) and 1,000-permutation label test (Section 2.4.1, Section 3.2) establish that this cohort's AUC is stable to fold reassignment and far exceeds a chance-label null. Neither check bears on the question addressed by this note: a reproducible, diagnosis-correlated technical confound would be exactly as stable across fold reassignment and exactly as distinguishable from a chance-label permutation null as genuine biological signal would be. These checks and this note answer different questions and should not be conflated.
+
+*Source data:* `data/raw/shanghai2022/metadata.tsv` (SRA RunInfo export); `scripts/utils/dada2_pipeline.R` (truncation parameters); full crosstabulation in Supplementary Table S14.
 
 ---
 
